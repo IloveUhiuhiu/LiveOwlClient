@@ -1,0 +1,5 @@
+.button:hover {
+    -fx-text-fill: #0099FF;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
