@@ -21,7 +21,7 @@ import java.io.IOException;
 public class LogInController {
 
     @FXML
-    private TextField username;
+    private TextField email;
 
     @FXML
     private PasswordField password;
@@ -34,10 +34,10 @@ public class LogInController {
 
     @FXML
     public void userLogIn() {
-        String user = username.getText();
+        String emailinput = email.getText();
         String pass = password.getText();
-        if (user.isEmpty() || pass.isEmpty()) {
-            wrongLogIn.setText("Please enter username and password");
+        if (emailinput.isEmpty() || pass.isEmpty()) {
+            wrongLogIn.setText("Please enter email and password");
             return;
         }
 
@@ -45,7 +45,7 @@ public class LogInController {
         Task<Boolean> loginTask = new Task<>() {
             @Override
             protected Boolean call() throws Exception {
-                return sendLoginRequest(user, pass);
+                return sendLoginRequest(emailinput, pass);
             }
         };
 
@@ -57,7 +57,7 @@ public class LogInController {
                     JavaFxApplication javaFxApplication = new JavaFxApplication();
                     JavaFxApplication.changeScene("/views/home.fxml");
                 } else {
-                    wrongLogIn.setText("username or password is incorrect!");
+                    wrongLogIn.setText("email or password is incorrect!");
                 }
             } catch (Exception e) {
                 wrongLogIn.setText("Error processing response!");
@@ -71,7 +71,7 @@ public class LogInController {
         new Thread(loginTask).start(); // Khởi động Task trong một luồng riêng
     }
 
-    private boolean sendLoginRequest(String username, String password) throws IOException {
+    private boolean sendLoginRequest(String email, String password) throws IOException {
         String url = "http://localhost:9090/login/singin"; // Địa chỉ API đăng nhập
 
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
@@ -79,12 +79,12 @@ public class LogInController {
 
             // Tạo JSON object để gửi trong body request
             JSONObject json = new JSONObject();
-            json.put("username", username);
+            json.put("email", email);
             json.put("password", password);
 
             // Thiết lập header cho request
             post.setHeader("Content-type", "application/x-www-form-urlencoded");
-            StringEntity entity = new StringEntity("username=" + username + "&password=" + password);
+            StringEntity entity = new StringEntity("email=" + email + "&password=" + password);
             post.setEntity(entity);
 
             // Gửi request và nhận phản hồi

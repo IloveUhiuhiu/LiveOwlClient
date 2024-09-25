@@ -2,12 +2,7 @@ package com.client.liveowl.controller;
 
 import com.client.liveowl.JavaFxApplication;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -18,13 +13,17 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SignUpController {
 
-    @FXML
-    private TextField username;
+   /* @FXML
+    private TextField username;*/
 
     @FXML
     private TextField email;
@@ -34,6 +33,27 @@ public class SignUpController {
 
     @FXML
     private PasswordField confirmpassword;
+
+    @FXML
+    private TextField fullname;
+
+    @FXML
+    private DatePicker dateofbirth;
+
+    @FXML
+    private RadioButton male;
+
+    @FXML
+    private RadioButton female;
+
+    @FXML
+    private Label wrongFN;
+
+    @FXML
+    private Label wrongDOB;
+
+    @FXML
+    private Label wrongGender;
 
     @FXML
     private Label wrongSignup;
@@ -61,10 +81,15 @@ public class SignUpController {
 
     @FXML
     public void userSignUp() throws IOException {
-        String usernameText = username.getText();
         String emailText = email.getText();
         String passwordText = password.getText();
         String confirmPasswordText = confirmpassword.getText();
+        String fullnameText = fullname.getText();
+        String dateofbirthText = dateofbirth.getValue().toString();
+        Boolean ismale = male.isSelected();
+        Boolean isfemale = female.isSelected();
+        Boolean gender = false;
+
 
         // Biểu thức chính quy để kiểm tra định dạng email
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
@@ -76,34 +101,34 @@ public class SignUpController {
         Pattern passwordPattern = Pattern.compile(passwordRegex);
         Matcher passwordMatcher = passwordPattern.matcher(passwordText);
 
-        if(usernameText.isEmpty() || emailText.isEmpty() || passwordText.isEmpty() || confirmPasswordText.isEmpty()) {
+        if(emailText.isEmpty() || passwordText.isEmpty() || confirmPasswordText.isEmpty() || fullnameText.isEmpty() || dateofbirthText.isEmpty() || (ismale == false && isfemale == false)) {
             wrongSignup.setText("Hãy nhập đầy đủ thông tin");
             return;
         }else {
             wrongSignup.setText("");
         }
-        // Kiểm tra độ dài của username
-        if (usernameText.length() < 5) {
-            wrongUS.setText("Username quá ngắn");
-            return;
-        }else {
-            wrongUS.setText("");
-        }
-
-        if (usernameText.length() > 20) {
-            wrongUS.setText("Username quá dài");
-            return;
-        }else {
-            wrongUS.setText("");
-        }
-
-        // Kiểm tra xem username có bắt đầu bằng chữ hay không
-        if (!Character.isLetter(usernameText.charAt(0))) {
-            wrongUS.setText("Username phải bắt đầu bằng chữ cái.");
-            return;
-        }else {
-            wrongUS.setText("");
-        }
+//        // Kiểm tra độ dài của username
+//        if (usernameText.length() < 5) {
+//            wrongUS.setText("Username quá ngắn");
+//            return;
+//        }else {
+//            wrongUS.setText("");
+//        }
+//
+//        if (usernameText.length() > 20) {
+//            wrongUS.setText("Username quá dài");
+//            return;
+//        }else {
+//            wrongUS.setText("");
+//        }
+//
+//        // Kiểm tra xem username có bắt đầu bằng chữ hay không
+//        if (!Character.isLetter(usernameText.charAt(0))) {
+//            wrongUS.setText("Username phải bắt đầu bằng chữ cái.");
+//            return;
+//        }else {
+//            wrongUS.setText("");
+//        }
 
         // Kiểm tra định dạng email
         if (!matcher.matches()) {
@@ -114,12 +139,12 @@ public class SignUpController {
         }
 
         // Kiểm tra username và password có trùng nhau không
-        if (usernameText.equals(passwordText)) {
-            wrongPW.setText("Password không được trùng với Username.");
-            return;
-        }else {
-            wrongPW.setText("");
-        }
+//        if (usernameText.equals(passwordText)) {
+//            wrongPW.setText("Password không được trùng với Username.");
+//            return;
+//        }else {
+//            wrongPW.setText("");
+//        }
 
         // Kiểm tra mật khẩu có đủ điều kiện không
         if (passwordText.length() < 8 || !passwordMatcher.matches()) {
@@ -145,64 +170,55 @@ public class SignUpController {
             wrongSignup.setText("");
         }
 
+        if(ismale)
+            gender = true;
+
         // Gọi API đăng ký nếu tất cả các điều kiện đều thỏa mãn
-        sendSignupRequest(usernameText, emailText, passwordText, confirmPasswordText);
+        sendSignupRequest(emailText, passwordText,fullnameText, dateofbirthText, gender );
     }
 
-    private void sendSignupRequest(String username, String email, String password, String confirmPassword) throws IOException {
-        String url = "http://localhost:9090/login/singup";
+    private void sendSignupRequest(String email, String password, String fullname, String dateofbirth, Boolean gender) throws IOException {
+        String url = "http://localhost:9090/login/singup";  // Địa chỉ API đăng ký tài khoản
 
         // Tạo client HTTP
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpPost post = new HttpPost(url);
 
-            // Tạo JSON object để gửi thông tin
+            // Tạo đối tượng JSON để chứa dữ liệu
             JSONObject json = new JSONObject();
-            json.put("username", username);
             json.put("email", email);
             json.put("password", password);
-            json.put("confirmpassword", confirmPassword);
-            json.put("role_id", 2);
+            json.put("role", 2);  // Giả định "2" là quyền mặc định cho tài khoản mới
+            json.put("fullname", fullname);
+            json.put("dateofbirth", dateofbirth);
+            json.put("gender", gender);
 
-            // Thiết lập header cho request
+            // Đặt header cho request
             post.setHeader("Content-type", "application/json");
             StringEntity entity = new StringEntity(json.toString());
             post.setEntity(entity);
 
-            // Gửi request và nhận phản hồi
+            // Gửi request và xử lý phản hồi
             try (CloseableHttpResponse response = httpClient.execute(post)) {
-                HttpEntity responseEntity =  response.getEntity();
+                HttpEntity responseEntity = response.getEntity();
                 String responseString = EntityUtils.toString(responseEntity);
                 JSONObject jsonResponse = new JSONObject(responseString);
 
-                if (jsonResponse.getBoolean("data") == true) {
-                    JavaFxApplication javaFxApplication = new JavaFxApplication();
+                if (jsonResponse.getBoolean("data")) {
+                    // Điều hướng về màn hình đăng nhập nếu đăng ký thành công
                     JavaFxApplication.changeScene("/views/Login.fxml");
                 } else {
-                    wrongSignup.setText("username hoặc email đã tồn tại");
+                    wrongSignup.setText("Email đã tồn tại.");
                 }
             }
+        } catch (IOException e) {
+            wrongSignup.setText("Có lỗi xảy ra khi gửi yêu cầu đăng ký.");
+            e.printStackTrace();
         }
     }
 
-    public boolean checkUserName(String username) {
-        if((username.length() >= 5) && (username.length() <= 20)) {
-            for(int i = 0; i< username.length(); i++) {
-                if(Character.isLetter(username.charAt(0))) {
-                    wrongSignup.setText("username cannot begin with numbers or special characters");
-                    return  false;
-                }
-            }
-            return true;
-        } else if (username.length() <5) {
-            wrongSignup.setText("username is too short");
-            return  false;
-        }
-        else {
-            wrongSignup.setText("username is too long");
-            return  false;
-        }
-    }
+
+
 
     @FXML
     public void SignupToLogin() throws IOException {

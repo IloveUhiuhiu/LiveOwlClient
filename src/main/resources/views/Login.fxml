@@ -52,12 +52,12 @@
                   <Font name="System Bold" size="30.0" />
                </font>
             </Label>
-            <Label layoutX="41.0" layoutY="138.0" text="Username">
+            <Label layoutX="41.0" layoutY="138.0" text="Email">
                <font>
                   <Font size="11.0" />
                </font>
             </Label>
-            <TextField fx:id="username" layoutX="41.0" layoutY="161.0" prefHeight="26.0" prefWidth="201.0" promptText="username" />
+            <TextField fx:id="email" layoutX="41.0" layoutY="161.0" prefHeight="26.0" prefWidth="201.0" promptText="email" />
             <Label layoutX="41.0" layoutY="207.0" text="Password" />
             <PasswordField fx:id="password" layoutX="41.0" layoutY="225.0" prefHeight="26.0" prefWidth="201.0" promptText="password" />
             <CheckBox fx:id="checkbox" layoutX="41.0" layoutY="307.0" mnemonicParsing="false" prefHeight="18.0" prefWidth="134.0" text="Remember me" />
