@@ -19,6 +19,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 
 public class LogInController {
+    private String jwtToken;
 
     @FXML
     private TextField email;
@@ -41,7 +42,6 @@ public class LogInController {
             return;
         }
 
-        // Sử dụng Task để gửi yêu cầu đăng nhập
         Task<Boolean> loginTask = new Task<>() {
             @Override
             protected Boolean call() throws Exception {
@@ -54,7 +54,7 @@ public class LogInController {
                 boolean result = loginTask.get();
                 if (result) {
                     wrongLogIn.setText("Login successful!");
-                    JavaFxApplication javaFxApplication = new JavaFxApplication();
+                    // Chuyển sang trang home
                     JavaFxApplication.changeScene("/views/home.fxml");
                 } else {
                     wrongLogIn.setText("email or password is incorrect!");
@@ -68,40 +68,45 @@ public class LogInController {
             wrongLogIn.setText("Error connecting to server!");
         });
 
-        new Thread(loginTask).start(); // Khởi động Task trong một luồng riêng
+        new Thread(loginTask).start();
     }
 
     private boolean sendLoginRequest(String email, String password) throws IOException {
-        String url = "http://localhost:9090/login/singin"; // Địa chỉ API đăng nhập
+        String url = "http://localhost:9090/login/singin";
 
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpPost post = new HttpPost(url);
 
-            // Tạo JSON object để gửi trong body request
             JSONObject json = new JSONObject();
             json.put("email", email);
             json.put("password", password);
 
-            // Thiết lập header cho request
             post.setHeader("Content-type", "application/x-www-form-urlencoded");
             StringEntity entity = new StringEntity("email=" + email + "&password=" + password);
             post.setEntity(entity);
 
-            // Gửi request và nhận phản hồi
             try (CloseableHttpResponse response = httpClient.execute(post)) {
                 HttpEntity responseEntity = response.getEntity();
                 String responseString = EntityUtils.toString(responseEntity);
                 JSONObject jsonResponse = new JSONObject(responseString);
 
-                // Kiểm tra kết quả đăng nhập
-                return jsonResponse.getBoolean("data");
+                if (jsonResponse.getBoolean("issucess")) {
+                    // Lưu JWT token
+                    jwtToken = jsonResponse.getString("data");
+                    return true;
+                }
+                return false;
             }
         }
     }
 
     @FXML
     public void LoginToSignup() throws IOException {
-        JavaFxApplication javaFxApplication = new JavaFxApplication();
         JavaFxApplication.changeScene("/views/Signup.fxml");
     }
+
+    public String getJwtToken() {
+        return jwtToken;
+    }
 }
+
