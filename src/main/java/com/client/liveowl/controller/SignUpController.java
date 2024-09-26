@@ -47,6 +47,12 @@ public class SignUpController {
     private RadioButton female;
 
     @FXML
+    private RadioButton student;
+
+    @FXML
+    private RadioButton teacher;
+
+    @FXML
     private Label wrongFN;
 
     @FXML
@@ -88,7 +94,10 @@ public class SignUpController {
         String dateofbirthText = dateofbirth.getValue().toString();
         Boolean ismale = male.isSelected();
         Boolean isfemale = female.isSelected();
+        Boolean isstudent = student.isSelected();
+        Boolean isteacher = teacher.isSelected();
         Boolean gender = false;
+        int role = 1;
 
 
         // Biểu thức chính quy để kiểm tra định dạng email
@@ -101,7 +110,7 @@ public class SignUpController {
         Pattern passwordPattern = Pattern.compile(passwordRegex);
         Matcher passwordMatcher = passwordPattern.matcher(passwordText);
 
-        if(emailText.isEmpty() || passwordText.isEmpty() || confirmPasswordText.isEmpty() || fullnameText.isEmpty() || dateofbirthText.isEmpty() || (ismale == false && isfemale == false)) {
+        if(emailText.isEmpty() || passwordText.isEmpty() || confirmPasswordText.isEmpty() || fullnameText.isEmpty() || dateofbirthText.isEmpty() || (ismale == false && isfemale == false) || (isstudent == false && isteacher == false)) {
             wrongSignup.setText("Hãy nhập đầy đủ thông tin");
             return;
         }else {
@@ -172,12 +181,15 @@ public class SignUpController {
 
         if(ismale)
             gender = true;
+        if(isteacher)
+            role = 2;
+
 
         // Gọi API đăng ký nếu tất cả các điều kiện đều thỏa mãn
-        sendSignupRequest(emailText, passwordText,fullnameText, dateofbirthText, gender );
+        sendSignupRequest(emailText, passwordText,fullnameText, dateofbirthText, gender, role);
     }
 
-    private void sendSignupRequest(String email, String password, String fullname, String dateofbirth, Boolean gender) throws IOException {
+    private void sendSignupRequest(String email, String password, String fullname, String dateofbirth, Boolean gender, int role) throws IOException {
         String url = "http://localhost:9090/login/singup";  // Địa chỉ API đăng ký tài khoản
 
         // Tạo client HTTP
@@ -188,7 +200,7 @@ public class SignUpController {
             JSONObject json = new JSONObject();
             json.put("email", email);
             json.put("password", password);
-            json.put("role", 2);  // Giả định "2" là quyền mặc định cho tài khoản mới
+            json.put("role", role);
             json.put("fullname", fullname);
             json.put("dateofbirth", dateofbirth);
             json.put("gender", gender);
