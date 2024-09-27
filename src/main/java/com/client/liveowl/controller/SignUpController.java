@@ -91,17 +91,20 @@ public class SignUpController {
         String passwordText = password.getText();
         String confirmPasswordText = confirmpassword.getText();
         String fullnameText = fullname.getText();
-        String dateofbirthText = dateofbirth.getValue().toString();
         Boolean ismale = male.isSelected();
         Boolean isfemale = female.isSelected();
         Boolean isstudent = student.isSelected();
         Boolean isteacher = teacher.isSelected();
         Boolean gender = false;
         int role = 1;
+        String dateofbirthText = "";
+        try {
+            dateofbirthText  = dateofbirth.getValue().toString();
+        }catch (Exception e){
 
-
+        }
         // Biểu thức chính quy để kiểm tra định dạng email
-        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,}$";
         Pattern pattern = Pattern.compile(emailRegex);
         Matcher matcher = pattern.matcher(emailText);
 
@@ -142,8 +145,9 @@ public class SignUpController {
         // Kiểm tra định dạng email
         if (!matcher.matches()) {
             wrongEM.setText("Email không hợp lệ.");
+            System.out.println("email không hợp lệ");
             return;
-        }else {
+        } else {
             wrongEM.setText("");
         }
 
@@ -183,8 +187,6 @@ public class SignUpController {
             gender = true;
         if(isteacher)
             role = 2;
-
-
         // Gọi API đăng ký nếu tất cả các điều kiện đều thỏa mãn
         sendSignupRequest(emailText, passwordText,fullnameText, dateofbirthText, gender, role);
     }
@@ -214,10 +216,10 @@ public class SignUpController {
             try (CloseableHttpResponse response = httpClient.execute(post)) {
                 HttpEntity responseEntity = response.getEntity();
                 String responseString = EntityUtils.toString(responseEntity);
+                System.out.println("kq " + responseString);
                 JSONObject jsonResponse = new JSONObject(responseString);
 
-                if (jsonResponse.getBoolean("data")) {
-                    // Điều hướng về màn hình đăng nhập nếu đăng ký thành công
+                if (jsonResponse.getBoolean("issucess")) {
                     JavaFxApplication.changeScene("/views/Login.fxml");
                 } else {
                     wrongSignup.setText("Email đã tồn tại.");
@@ -228,9 +230,6 @@ public class SignUpController {
             e.printStackTrace();
         }
     }
-
-
-
 
     @FXML
     public void SignupToLogin() throws IOException {
