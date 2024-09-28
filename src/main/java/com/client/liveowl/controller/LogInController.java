@@ -15,6 +15,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
+import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
 
@@ -61,6 +62,7 @@ public class LogInController {
                 }
             } catch (Exception e) {
                 wrongLogIn.setText("Error processing response!");
+                System.out.println(e);
             }
         });
 
@@ -72,7 +74,7 @@ public class LogInController {
     }
 
     private boolean sendLoginRequest(String email, String password) throws IOException {
-        String url = "http://localhost:9090/login/singin";
+        String url = "http://localhost:9090/users/signin";
 
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpPost post = new HttpPost(url);
@@ -91,7 +93,7 @@ public class LogInController {
                 System.out.println("kq " + responseString);
                 JSONObject jsonResponse = new JSONObject(responseString);
 
-                if (jsonResponse.getBoolean("issucess")) {
+                if ((response.getStatusLine().getStatusCode() == HttpStatus.OK.value())) {
                     // Lưu JWT token
                     jwtToken = jsonResponse.getString("data");
                     return true;
@@ -100,6 +102,7 @@ public class LogInController {
             }
         }
     }
+
 
     @FXML
     public void LoginToSignup() throws IOException {

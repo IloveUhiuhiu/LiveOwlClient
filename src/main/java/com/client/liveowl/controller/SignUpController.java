@@ -11,6 +11,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
+import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -192,7 +193,7 @@ public class SignUpController {
     }
 
     private void sendSignupRequest(String email, String password, String fullname, String dateofbirth, Boolean gender, int role) throws IOException {
-        String url = "http://localhost:9090/login/singup";  // Địa chỉ API đăng ký tài khoản
+        String url = "http://localhost:9090/users/signup";  // Địa chỉ API đăng ký tài khoản
 
         // Tạo client HTTP
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
@@ -219,9 +220,9 @@ public class SignUpController {
                 System.out.println("kq " + responseString);
                 JSONObject jsonResponse = new JSONObject(responseString);
 
-                if (jsonResponse.getBoolean("issucess")) {
+                if ((response.getStatusLine().getStatusCode() == HttpStatus.OK.value())) {
                     JavaFxApplication.changeScene("/views/Login.fxml");
-                } else {
+                }else {
                     wrongSignup.setText("Email đã tồn tại.");
                 }
             }

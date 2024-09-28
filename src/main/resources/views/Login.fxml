@@ -58,9 +58,9 @@
                </font>
             </Label>
             <TextField fx:id="email" layoutX="41.0" layoutY="161.0" prefHeight="26.0" prefWidth="201.0" promptText="email" />
-            <Label layoutX="41.0" layoutY="207.0" text="Password" />
-            <PasswordField fx:id="password" layoutX="41.0" layoutY="225.0" prefHeight="26.0" prefWidth="201.0" promptText="password" />
-            <CheckBox fx:id="checkbox" layoutX="41.0" layoutY="307.0" mnemonicParsing="false" prefHeight="18.0" prefWidth="134.0" text="Remember me" />
+            <Label layoutX="41.0" layoutY="207.0" prefHeight="18.0" prefWidth="78.0" text="Mật khẩu" />
+            <PasswordField fx:id="password" layoutX="41.0" layoutY="225.0" prefHeight="26.0" prefWidth="201.0" promptText="mật khẩu" />
+            <CheckBox fx:id="checkbox" layoutX="41.0" layoutY="307.0" mnemonicParsing="false" prefHeight="18.0" prefWidth="134.0" text="Lưu tài khoản" />
             <Button fx:id="btnLogin" layoutX="164.0" layoutY="303.0" mnemonicParsing="false" onAction="#userLogIn" prefHeight="26.0" prefWidth="78.0" style="-fx-background-color: #53095b;" text="LOG IN" textFill="#c6d44a">
                <font>
                   <Font name="System Bold" size="12.0" />
@@ -71,7 +71,7 @@
                   <Font name="System Italic" size="12.0" />
                </font>
             </Label>
-            <Hyperlink fx:id="hyperlink" layoutX="61.0" layoutY="346.0" onAction="#LoginToSignup" prefHeight="24.0" prefWidth="154.0" text="No Account yet? SIGN UP" textAlignment="JUSTIFY" />
+            <Hyperlink fx:id="hyperlink" layoutX="57.0" layoutY="346.0" onAction="#LoginToSignup" prefHeight="24.0" prefWidth="163.0" text="Chưa có tài khoản? Đăng kí" textAlignment="JUSTIFY" />
          </children>
       </AnchorPane>
    </right>
