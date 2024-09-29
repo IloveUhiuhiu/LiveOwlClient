@@ -1,14 +1,112 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="$CONTROLLER_NAME$"
-            prefHeight="400.0" prefWidth="600.0" >
-
-</AnchorPane>
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" style="-fx-background-image: url('/images/bg.png');" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.client.liveowl.controller.student.HomeController">
+    <children>
+        <HBox prefHeight="100.0" prefWidth="200.0">
+            <children>
+                <ImageView fitHeight="130.0" fitWidth="75.0" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                        <Image url="@../images/logo.png" />
+                    </image>
+                </ImageView>
+                <Label text="LiveOwl" textFill="WHITE">
+                    <font>
+                        <Font name="System Bold" size="18.0" />
+                    </font>
+                    <padding>
+                        <Insets top="10.0" />
+                    </padding>
+                </Label>
+                <Label text="1:00 PM | Sun, Jun 6" textFill="WHITE">
+                    <font>
+                        <Font name="System Bold" size="14.0" />
+                    </font>
+                    <HBox.margin>
+                        <Insets left="480.0" top="15.0" />
+                    </HBox.margin></Label>
+                <Circle fill="WHITE" radius="30.0" stroke="BLACK" strokeType="INSIDE">
+                    <HBox.margin>
+                        <Insets left="20.0" />
+                    </HBox.margin></Circle>
+            </children>
+            <padding>
+                <Insets left="11.0" top="10.0" />
+            </padding>
+        </HBox>
+        <HBox prefHeight="475.0" prefWidth="900.0">
+            <children>
+                <Pane opacity="0.6" prefHeight="402.0" prefWidth="351.0" style="-fx-background-color: white; -fx-background-radius: 10px;">
+                    <HBox.margin>
+                        <Insets left="40.0" />
+                    </HBox.margin>
+                </Pane>
+                <Pane opacity="0.6" prefHeight="270.0" prefWidth="420.0" style="-fx-background-color: white; -fx-background-radius: 10px;">
+                    <HBox.margin>
+                        <Insets left="50.0" />
+                    </HBox.margin>
+                </Pane>
+            </children>
+            <padding>
+                <Insets bottom="50.0" top="50.0" />
+            </padding></HBox>
+        <HBox prefHeight="252.0" prefWidth="900.0">
+            <children>
+                <VBox opacity="0.6" prefHeight="133.0" prefWidth="430.0" style="-fx-background-color: white; -fx-background-radius: 10px;">
+                    <children>
+                        <Label text="Tham gia thi" textFill="#050505">
+                            <font>
+                                <Font name="System Bold" size="13.0" />
+                            </font>
+                            <VBox.margin>
+                                <Insets left="30.0" top="30.0" />
+                            </VBox.margin>
+                        </Label>
+                        <HBox prefHeight="100.0" prefWidth="402.0">
+                            <children>
+                                <TextField fx:id="codeTextField" prefHeight="32.0" prefWidth="246.0" promptText="Nhâp mã" />
+                                <Button fx:id="joinButton" mnemonicParsing="false" prefHeight="32.0" prefWidth="124.0" style="-fx-background-color: #1b98e0;" text="Tham gia" textFill="WHITE">
+                                    <HBox.margin>
+                                        <Insets left="10.0" />
+                                    </HBox.margin>
+                                </Button>
+                            </children>
+                            <padding>
+                                <Insets left="30.0" />
+                            </padding>
+                            <VBox.margin>
+                                <Insets top="30.0" />
+                            </VBox.margin>
+                        </HBox>
+                    </children>
+                </VBox>
+                <VBox opacity="0.6" prefHeight="133.0" prefWidth="338.0" style="-fx-background-color: white; -fx-background-radius: 10px;">
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <HBox.margin>
+                  <Insets left="48.0" />
+               </HBox.margin>
+               <children>
+                  <Button fx:id="createButton" mnemonicParsing="false" text="CreateButton" />
+               </children></VBox>
+            </children>
+            <padding>
+                <Insets bottom="10.0" left="40.0" top="10.0" />
+            </padding>
+            <opaqueInsets>
+                <Insets />
+            </opaqueInsets></HBox>
+    </children>
+</VBox>
