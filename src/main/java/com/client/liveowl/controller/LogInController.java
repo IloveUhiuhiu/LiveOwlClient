@@ -11,8 +11,6 @@ import com.client.liveowl.util.Authentication;
 import java.io.IOException;
 
 public class LogInController {
-    private String jwtToken;
-
     @FXML
     private TextField email;
 
@@ -46,8 +44,11 @@ public class LogInController {
                 boolean result = loginTask.get();
                 if (result) {
                     wrongLogIn.setText("Đăng nhập thành công!");
-
-                    JavaFxApplication.changeScene("/views/Home.fxml");
+                    if (Authentication.getRole() == 1) {
+                        JavaFxApplication.changeScene("/views/Home.fxml");
+                    } else {
+                        JavaFxApplication.changeScene("/views/Student.fxml");
+                    }
                 } else {
                     wrongLogIn.setText("Email hoặc mật khẩu không hợp lệ!");
                 }
@@ -63,15 +64,10 @@ public class LogInController {
         new Thread(loginTask).start();
     }
 
-
-
     @FXML
     public void LoginToSignup() throws IOException {
         JavaFxApplication.changeScene("/views/Signup.fxml");
     }
 
-    public String getJwtToken() {
-        return jwtToken;
-    }
 }
 

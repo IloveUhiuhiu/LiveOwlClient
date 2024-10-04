@@ -6,9 +6,10 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import org.opencv.core.Core;
+
 import java.io.IOException;
 
 public class JavaFxApplication extends Application {
@@ -31,6 +32,11 @@ public class JavaFxApplication extends Application {
         Parent pane = FXMLLoader.load(JavaFxApplication.class.getResource(fxml));
         stage.setScene(new Scene(pane)); // Tạo một scene mới
         stage.show();
+    }
+
+
+    public static void setMaximized() {
+        stage.setMaximized(true);
     }
 
     public static void main(String[] args) {

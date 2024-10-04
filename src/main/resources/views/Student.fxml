@@ -12,7 +12,7 @@
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" style="-fx-background-image: url('/images/bg.png');" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.client.liveowl.controller.student.HomeController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" style="-fx-background-image: url('/images/bg.png');" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.client.liveowl.controller.StudentController">
     <children>
         <HBox prefHeight="100.0" prefWidth="200.0">
             <children>
@@ -80,6 +80,9 @@
                                     <HBox.margin>
                                         <Insets left="10.0" />
                                     </HBox.margin>
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
                                 </Button>
                             </children>
                             <padding>
@@ -97,10 +100,7 @@
                </opaqueInsets>
                <HBox.margin>
                   <Insets left="48.0" />
-               </HBox.margin>
-               <children>
-                  <Button fx:id="createButton" mnemonicParsing="false" text="CreateButton" />
-               </children></VBox>
+               </HBox.margin></VBox>
             </children>
             <padding>
                 <Insets bottom="10.0" left="40.0" top="10.0" />

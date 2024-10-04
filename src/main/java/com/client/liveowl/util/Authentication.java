@@ -18,7 +18,7 @@ public class Authentication {
     private static final String BASE_URI = "http://localhost:9090";
     private static boolean isAuthenticated;
     private static String token;
-
+    private static int role;
     public Authentication() {
 
     }
@@ -31,7 +31,7 @@ public class Authentication {
         isAuthenticated = authenticated;
     }
 
-    public String getToken() {
+    public static String getToken() {
         return token;
     }
 
@@ -39,7 +39,12 @@ public class Authentication {
         this.token = token;
     }
 
-
+    public static int getRole() {
+        return role;
+    }
+    public void setRole(int role) {
+        this.role = role;
+    }
     public static boolean login(String email, String password) throws Exception {
         String url = BASE_URI + "/users/signin?email=" + email + "&password=" + password;
         CloseableHttpClient httpClient = HttpClients.createDefault();
@@ -52,7 +57,10 @@ public class Authentication {
             HttpEntity responseEntity = response.getEntity();
             String responseString = EntityUtils.toString(responseEntity);
             JSONObject jsonResponse = new JSONObject(responseString);
-            token = jsonResponse.getString("data");
+            JSONObject data = jsonResponse.getJSONObject("data");
+
+            token = data.getString("token");
+            role = data.getInt("role");
             return true;
         } else  {
             return false;

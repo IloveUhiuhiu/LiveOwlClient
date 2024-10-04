@@ -1,5 +1,6 @@
 package com.client.liveowl;
 
+import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.videoio.VideoCapture;
@@ -8,117 +9,134 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.Socket;
+import java.net.*;
 
-public class StudentSocket implements AutoCloseable{
-    private Socket socket;
-    private DataInputStream dis;
-    private DataOutputStream dos;
-    private static final int PORT = 9876;
-    private static final String HOSTNAME = "localhost";
-    private static boolean captureFromCamera = false;
-
-    public StudentSocket(String host, int port) throws IOException {
-        System.out.println("Connecting to " + host + ":" + port);
-        socket = new Socket(host, port);
-        dis = new DataInputStream(socket.getInputStream());
-        dos = new DataOutputStream(socket.getOutputStream());
-
-    }
-    public void sendRequest(String message) {
-        try {
-            dos.writeUTF(message);
-        } catch (IOException e) {
-            throw new RuntimeException("Lỗi khi gửi " + message);
-        }
-    }
-    public String receiveResponse() {
-        try {
-            return dis.readUTF();
-        } catch (IOException e) {
-            throw new RuntimeException("Lỗi khi nhập phản hổi!!!");
-        }
-
-    }    @Override
-    public void close() throws IOException {
-        if (dis != null) dis.close();
-        if (dos != null) dos.close();
-        if (socket != null) socket.close();
+public class StudentSocket{
+    public static int SERVER_PORT;
+    public static String SERVER_HOSTNAME = null;
+    public static int CLIENT_PORT_SEND = 8000;
+    public static int CLIENT_PORT_RECIEVE = 7000;
+    DatagramSocket socket;
+    static  {
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
     }
 
-    public void liveStream() {
-        VideoCapture camera = new VideoCapture(0);
-        if (!camera.isOpened()) {
-            throw new RuntimeException("Không thể mở Camera!");
-        }
+    public StudentSocket(String SERVER_HOSTNAME, int SERVER_PORT) {
+        this.SERVER_PORT = SERVER_PORT;
+        this.SERVER_HOSTNAME = SERVER_HOSTNAME;
         try {
-            new Thread(() -> listenForRequests(socket)).start();
-            dos = new DataOutputStream(socket.getOutputStream());
-            captureImages(dos, camera);
-        } catch (IOException e) {
+            socket = new DatagramSocket(CLIENT_PORT_SEND);
+        } catch (SocketException e) {
             throw new RuntimeException(e);
+        }
+    }
+    public void sendRequest(String message) throws IOException {
+        InetAddress address = InetAddress.getByName(SERVER_HOSTNAME);
+        int port = SERVER_PORT;
+        byte[] messageBytes = message.getBytes();
+        DatagramPacket packet = new DatagramPacket(messageBytes, messageBytes.length, address, port);
+        socket.send(packet);
+    }
+    public int receivePort() throws IOException {
+        byte[] receive = new byte[1];
+        DatagramPacket receivePacket = new DatagramPacket(receive, receive.length);
+        socket.receive(receivePacket);
+        SERVER_PORT += (receive[0] & 0xff);
+        return SERVER_PORT;
+    }
+    public void LiveStream() {
+        new Thread(new ClientTaskUdp(socket)).start();
+    }
+
+
+}
+class ClientTaskUdp extends Thread {
+    DatagramSocket socket;
+    private static volatile boolean captureFromCamera = false;
+
+    public static VideoCapture camera = new VideoCapture(0);
+
+    public ClientTaskUdp(DatagramSocket socket) {
+        this.socket = socket;
+
+    }
+    public void sendRequest(String message, InetAddress address, int port) throws IOException {
+        byte[] messageBytes = message.getBytes();
+        DatagramPacket packet = new DatagramPacket(messageBytes, messageBytes.length, address, port);
+        socket.send(packet);
+    }
+
+    @Override
+    public void run() {
+
+        try {
+            InetAddress address = InetAddress.getByName(StudentSocket.SERVER_HOSTNAME);
+            int port = StudentSocket.SERVER_PORT;
+            if (!camera.isOpened()) {
+                System.err.println("Error: Không mở được camera!");
+                return;
+            }
+
+//            DatagramSocket socketRecieve = new DatagramSocket(CLIENT_PORT_RECIEVE);
+//            new Thread(() -> listenForRequests(socketRecieve)).start();
+//            System.out.println("Lắng nghe bật camera!");
+            captureImages(socket, camera);
+        } catch (IOException | AWTException | InterruptedException e) {
+            System.err.println("Error: " + e.getMessage());
+            System.out.println("Server đang đóng...");
         } finally {
             camera.release();
         }
 
-
-
     }
-    private static void listenForRequests(Socket socket) {
-        try (DataInputStream dis = new DataInputStream(socket.getInputStream())) {
+
+    private static void listenForRequests(DatagramSocket socketRecieve) {
+        try {
             while (true) {
-                String request = dis.readUTF();
+                byte[] receive = new byte[1024];
+                DatagramPacket receivePacket = new DatagramPacket(receive, receive.length);
+                socketRecieve.receive(receivePacket);
+                byte [] data = receivePacket.getData();
+                String request = new String(data, 0, receivePacket.getLength());
                 captureFromCamera = request.equals("startCamera");
             }
-        } catch (IOException e) {
-            throw new RuntimeException("Lỗi trong khi lắng nghe bật camera!!!");
+        } catch (Exception e) {
+            System.err.println("Error listening required: " + e.getMessage());
         }
     }
 
-    private static void captureImages(DataOutputStream dos, VideoCapture camera) {
-        Robot robot = null;
-        try {
-            robot = new Robot();
-        } catch (AWTException e) {
-            throw new RuntimeException("Lỗi trong khi khởi tạo robot!!!");
-        }
+
+    private static void captureImages(DatagramSocket socket,VideoCapture camera) throws AWTException, IOException, InterruptedException {
+        Robot robot = new Robot();
         while (true) {
             if (captureFromCamera) {
                 Mat frame = new Mat();
                 if (camera.read(frame) && !frame.empty()) {
-                    sendImage(dos, frame);
+                    sendImage(socket, frame);
                 }
             } else {
-                BufferedImage screenCapture = robot.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
-                sendImage(dos, screenCapture);
-            }
 
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                throw new RuntimeException("Lỗi lệnh Sleep!!!");
+                BufferedImage screenCapture = robot.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
+                sendImage(socket, screenCapture);
             }
+            Thread.sleep(100);
         }
     }
 
-    private static void sendImage(DataOutputStream dos, Mat frame) {
-        Imgproc.cvtColor(frame, frame, Imgproc.COLOR_BGR2RGB);
-        sendImage(dos, matToBufferedImage(frame));
+    private static void sendImage(DatagramSocket socket, Mat frame) throws IOException {
+        Imgproc.cvtColor(frame, frame, Imgproc.COLOR_BGR2RGB); // Đảm bảo đúng định dạng màu
+        sendImage(socket, matToBufferedImage(frame));
     }
 
-    private static void sendImage(DataOutputStream dos, BufferedImage image) {
+    private static void sendImage(DatagramSocket socket, BufferedImage image) throws IOException {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            ImageIO.write(image, "jpg", baos);
+            ImageIO.write(image, "jpg", baos); // Sử dụng định dạng JPEG
             byte[] imageBytes = baos.toByteArray();
-            dos.writeInt(imageBytes.length);
-            dos.write(imageBytes);
-            dos.flush();
             System.out.println("Đã gửi ảnh kích thước: " + imageBytes.length + " bytes");
-        } catch (Exception e) {
-            throw new RuntimeException("Lỗi trong quá trình gửi ảnh!!!");
+            sendPacketImage(socket, imageBytes);
+
+
         }
     }
 
@@ -128,5 +146,83 @@ public class StudentSocket implements AutoCloseable{
         mat.get(0, 0, data);
         image.getRaster().setDataElements(0, 0, mat.width(), mat.height(), data);
         return image;
+    }
+
+    private static void sendPacketImage(DatagramSocket socket, byte[] imageByteArray) throws IOException {
+
+
+
+//        int numberToSend = imageByteArray.length;
+//        System.out.println("Sending length of image" + numberToSend);
+//        byte[] requestPacket = new byte[4]; // Một số nguyên 4 byte
+//        requestPacket[0] = (byte) (numberToSend >> 24);
+//        requestPacket[1] = (byte) (numberToSend >> 16);
+//        requestPacket[2] = (byte) (numberToSend >> 8);
+//        requestPacket[3] = (byte) (numberToSend);
+//        DatagramPacket requestDatagramPacket = new DatagramPacket(requestPacket, requestPacket.length, InetAddress.getByName(HOSTNAME), PORT);
+//        socket.send(requestDatagramPacket);
+
+
+        System.out.println("Bắt đầu gửi ảnh");
+        int sequenceNumber = 0; // For order
+        boolean flag; // To see if we got to the end of the file
+        int ackSequence = 0; // To see if the datagram was received correctly
+
+        for (int i = 0; i < imageByteArray.length; i = i + 1021) {
+            sequenceNumber += 1;
+
+            // Create message
+            byte[] message = new byte[1024]; // First two bytes of the data are for control (datagram integrity and order)
+            message[0] = (byte) (sequenceNumber >> 8);
+            message[1] = (byte) (sequenceNumber);
+
+            if ((i + 1021) >= imageByteArray.length) { // Have we reached the end of file?
+                flag = true;
+                message[2] = (byte) (1); // We reached the end of the file (last datagram to be send)
+            } else {
+                flag = false;
+                message[2] = (byte) (0); // We haven't reached the end of the file, still sending datagrams
+            }
+
+            if (!flag) {
+                System.arraycopy(imageByteArray, i, message, 3, 1021);
+            } else { // If it is the last datagram
+                System.arraycopy(imageByteArray, i, message, 3, imageByteArray.length - i);
+            }
+            InetAddress address = InetAddress.getByName(StudentSocket.SERVER_HOSTNAME);
+            int port = StudentSocket.SERVER_PORT;
+            DatagramPacket sendPacket = new DatagramPacket(message, message.length, address, port); // The data to be sent
+            socket.send(sendPacket); // Sending the data
+            System.out.println("Gửi thành công packet thứ :" + sequenceNumber);
+
+            boolean ackRec; // Was the datagram received?
+
+            while (true) {
+                System.out.println("Gửi ack!");
+                byte[] ack = new byte[2]; // Create another packet for datagram ackknowledgement
+                DatagramPacket ackpack = new DatagramPacket(ack, ack.length);
+
+                try {
+                    socket.setSoTimeout(500); // Waiting for the server to send the ack
+                    socket.receive(ackpack);
+                    ackSequence = ((ack[0] & 0xff) << 8) + (ack[1] & 0xff); // Figuring the sequence number
+                    System.out.println(ackSequence);
+                    ackRec = true; // We received the ack
+                } catch (SocketTimeoutException e) {
+                    System.out.println("Socket timed out waiting for ack");
+                    ackRec = false; // We did not receive an ack
+                }
+
+                // If the package was received correctly next packet can be sent
+                if ((ackSequence == sequenceNumber) && (ackRec)) {
+                    System.out.println("Ack received: Sequence Number = " + ackSequence);
+                    break;
+                } // Package was not received, so we resend it
+                else {
+                    socket.send(sendPacket);
+                    System.out.println("Resending: Sequence Number = " + sequenceNumber);
+                }
+            }
+        }
     }
 }
