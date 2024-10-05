@@ -36,7 +36,7 @@ public class JavaFxApplication extends Application implements NativeKeyListener 
     public void start(Stage primaryStage) throws Exception{
         stg = primaryStage;
         primaryStage.setResizable(false);
-        Parent root = FXMLLoader.load(getClass().getResource("/views/Login.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/views/home.fxml"));
         primaryStage.setTitle("LOGIN");
         primaryStage.setScene(new Scene(root, 600, 400));
         primaryStage.show();

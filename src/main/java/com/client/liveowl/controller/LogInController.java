@@ -74,7 +74,7 @@ public class LogInController {
     }
 
     private boolean sendLoginRequest(String email, String password) throws IOException {
-        String url = "http://localhost:9090/users/signin";
+        String url = "http:/  /localhost:9090/users/signin";
 
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpPost post = new HttpPost(url);
