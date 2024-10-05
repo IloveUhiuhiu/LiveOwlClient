@@ -13,20 +13,20 @@ import java.io.IOException;
 import java.net.*;
 
 public class StudentSocket{
-    public static int SERVER_PORT;
-    public static String SERVER_HOSTNAME = null;
+    public static int SERVER_PORT = 9000;
+    public static String SERVER_HOSTNAME = "127.0.0.1";
     public static int CLIENT_PORT_SEND = 8000;
     public static int CLIENT_PORT_RECIEVE = 7000;
     DatagramSocket socket;
+    DatagramSocket socket2;
     static  {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
     }
 
-    public StudentSocket(String SERVER_HOSTNAME, int SERVER_PORT) {
-        this.SERVER_PORT = SERVER_PORT;
-        this.SERVER_HOSTNAME = SERVER_HOSTNAME;
+    public StudentSocket() {
         try {
             socket = new DatagramSocket(CLIENT_PORT_SEND);
+            socket2 = new DatagramSocket(CLIENT_PORT_RECIEVE);
         } catch (SocketException e) {
             throw new RuntimeException(e);
         }
@@ -45,21 +45,31 @@ public class StudentSocket{
         SERVER_PORT += (receive[0] & 0xff);
         return SERVER_PORT;
     }
-    public void LiveStream() {
-        new Thread(new ClientTaskUdp(socket)).start();
+    public void LiveStream(String code) throws IOException {
+        sendRequest("connect");
+        System.out.println("Gửi thành công chuỗi connect đến server!");
+        sendRequest("student");
+        System.out.println("Gửi role student!");
+        sendRequest(code);
+        System.out.println("Gửi mã " + code + " cuộc thi thành công!");
+        int newPort = receivePort();
+        System.out.println("Port mới là :" + newPort);
+        System.out.println("Livestream thôi!");
+        new Thread(new StudentTaskUdp(socket,socket2)).start();
     }
 
 
 }
-class ClientTaskUdp extends Thread {
+class StudentTaskUdp extends Thread {
     DatagramSocket socket;
+    DatagramSocket socket2;
     private static volatile boolean captureFromCamera = false;
 
     public static VideoCapture camera = new VideoCapture(0);
 
-    public ClientTaskUdp(DatagramSocket socket) {
+    public StudentTaskUdp(DatagramSocket socket, DatagramSocket socket2) {
         this.socket = socket;
-
+        this.socket2 = socket2;
     }
     public void sendRequest(String message, InetAddress address, int port) throws IOException {
         byte[] messageBytes = message.getBytes();
@@ -77,12 +87,37 @@ class ClientTaskUdp extends Thread {
                 System.err.println("Error: Không mở được camera!");
                 return;
             }
+            Thread thread1 = new Thread(()->{
+                try {
+                    captureImages(socket, camera);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-//            DatagramSocket socketRecieve = new DatagramSocket(CLIENT_PORT_RECIEVE);
-//            new Thread(() -> listenForRequests(socketRecieve)).start();
-//            System.out.println("Lắng nghe bật camera!");
-            captureImages(socket, camera);
-        } catch (IOException | AWTException | InterruptedException e) {
+            });
+            Thread thread2 = new Thread(()->{
+                System.out.println("Lắng nghe bật camera!");
+                try {
+                    while (true) {
+                        byte[] receive = new byte[1024];
+                        DatagramPacket receivePacket = new DatagramPacket(receive, receive.length);
+                        socket2.receive(receivePacket);
+                        byte [] data = receivePacket.getData();
+                        String request = new String(data, 0, receivePacket.getLength());
+
+                        captureFromCamera = request.equals("Yes");
+                        System.out.println("yêu cầu: " + request + " và " + captureFromCamera);
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error listening required: " + e.getMessage());
+                }
+
+            });
+            thread1.start();
+            thread2.start();
+
+
+        } catch (IOException e) {
             System.err.println("Error: " + e.getMessage());
             System.out.println("Server đang đóng...");
         } finally {
@@ -91,29 +126,16 @@ class ClientTaskUdp extends Thread {
 
     }
 
-    private static void listenForRequests(DatagramSocket socketRecieve) {
-        try {
-            while (true) {
-                byte[] receive = new byte[1024];
-                DatagramPacket receivePacket = new DatagramPacket(receive, receive.length);
-                socketRecieve.receive(receivePacket);
-                byte [] data = receivePacket.getData();
-                String request = new String(data, 0, receivePacket.getLength());
-                captureFromCamera = request.equals("startCamera");
-            }
-        } catch (Exception e) {
-            System.err.println("Error listening required: " + e.getMessage());
-        }
-    }
-
-
     private static void captureImages(DatagramSocket socket,VideoCapture camera) throws AWTException, IOException, InterruptedException {
         Robot robot = new Robot();
         while (true) {
             if (captureFromCamera) {
+                System.out.println("Vào camerra rồi nè!");
                 Mat frame = new Mat();
                 if (camera.read(frame) && !frame.empty()) {
                     sendImage(socket, frame);
+                } else {
+                    System.out.println("Có vấn de roi!!!");
                 }
             } else {
 

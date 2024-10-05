@@ -5,12 +5,13 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.text.Font?>
 
 <BorderPane prefHeight="800.0" prefWidth="1500.0" style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.client.liveowl.controller.LiveController">
    <center>
-      <ScrollPane prefHeight="800.0" prefWidth="1500.0" style="-fx-background-color: yellow;" BorderPane.alignment="CENTER">
+      <ScrollPane prefHeight="800.0" prefWidth="1500.0" BorderPane.alignment="CENTER">
          <content>
-            <GridPane fx:id="gridImage" alignment="CENTER" prefHeight="800.0" prefWidth="1500.0" style="-fx-background-color: red;" />
+            <GridPane fx:id="gridImage" alignment="CENTER" prefHeight="800.0" prefWidth="1500.0" />
          </content>
          <BorderPane.margin>
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
@@ -18,6 +19,9 @@
       </ScrollPane>
    </center>
    <bottom>
-      <Button fx:id="addImage" mnemonicParsing="false" text="Thêm ảnh" BorderPane.alignment="CENTER" />
+      <Button fx:id="exitButton" mnemonicParsing="false" onAction="#clickExitButton" style="-fx-background-color: red;" text="Kết thúc cuộc họp" textFill="#fcf5f5" BorderPane.alignment="CENTER">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font></Button>
    </bottom>
 </BorderPane>

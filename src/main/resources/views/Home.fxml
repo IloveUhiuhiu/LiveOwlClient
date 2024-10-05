@@ -104,7 +104,7 @@
                                           <Image url="@../images/search-interface-symbol.png" />
                                        </image>
                                     </ImageView>
-                                    <TextField layoutX="38.0" layoutY="4.0" prefHeight="25.0" prefWidth="320.0" style="-fx-background-radius: 15px;" />
+                                    <TextField layoutX="38.0" layoutY="4.0" prefHeight="25.0" prefWidth="320.0" style="-fx-background-color: none;" />
                                  </children>
                               </Pane>
                               <Pane layoutX="576.0" layoutY="6.0" prefHeight="71.0" prefWidth="73.0" style="-fx-background-radius: 45; -fx-background-color: white;" />

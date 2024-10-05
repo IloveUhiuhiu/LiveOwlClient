@@ -14,8 +14,6 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 
 public class StudentController {
-    private static final String HOSTNAME = "localhost";
-    private static final int PORT = 9000;
     @FXML
     private TextField codeTextField;
     @FXML
@@ -32,54 +30,8 @@ public class StudentController {
         }
         System.out.println("Mã đã nhập: " + code);
         try {
-            StudentSocket theSocket = new StudentSocket(HOSTNAME, PORT);
-            theSocket.sendRequest("connect");
-            System.out.println("Gửi thành công chuỗi connect đến server!");
-            theSocket.sendRequest("student");
-            System.out.println("Gửi role student!");
-            theSocket.sendRequest(code);
-            System.out.println("Gửi mã cuộc thi thành công!");
-            int newPort = theSocket.receivePort();
-            System.out.println("Port mới là :" + newPort);
-            System.out.println("Livestream thôi!");
-            theSocket.LiveStream();
-
-//            Task<Void> task = new Task<>() {
-//                @Override
-//                protected Void call() throws IOException {
-//                    do {
-//                        try {
-//                            theSocket.sendRequest("student");
-//                            theSocket.sendRequest(code);
-//                        } catch (Exception e) {
-//
-//                        }
-//                        String response = theSocket.receiveResponse();
-//                        if (!response.equals("success")) {
-//                            AlertDialog alertDialog = new AlertDialog("Cảnh báo","Lỗi kết nối","Kết nối không thành công!",Alert.AlertType.ERROR);
-//                            alertDialog.showInformationDialog();
-//                        } else {
-//                            break;
-//                        }
-//                    } while (true);
-//
-//                    theSocket.liveStream();
-//                    return null;
-//                }
-//
-//                @Override
-//                protected void succeeded() {
-//                    System.out.println("Kết nối thành công.");
-//                }
-//
-//                @Override
-//                protected void failed() {
-//
-//                    System.out.println("Kết nối thất bại.");
-//                }
-//            };
-//
-//            new Thread(task).start();
+            StudentSocket theSocket = new StudentSocket();
+            theSocket.LiveStream(code);
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }

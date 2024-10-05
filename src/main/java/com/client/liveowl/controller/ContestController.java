@@ -83,26 +83,50 @@ public class ContestController {
         detailButton.setPrefWidth(80);
         detailButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
 
+        detailButton.setOnAction(event -> {
+                try {
+                    loadContent("/views/DetailExam/fxml");
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+        });
+
         updateButton.setLayoutX(260);
         updateButton.setLayoutY(70);
         updateButton.setPrefWidth(80);
         updateButton.setStyle("-fx-background-color: #006D6E; -fx-text-fill: white;");
+        updateButton.setOnAction(event -> {
+            try {
+                loadContent("/views/UpdateExam.fxml");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
         deleteButton.setLayoutX(360);
         deleteButton.setLayoutY(70);
         deleteButton.setPrefWidth(80);
         deleteButton.setStyle("-fx-background-color: #FF0000; -fx-text-fill: white;");
 
+
         liveButton.setLayoutX(460);
         liveButton.setLayoutY(70);
         liveButton.setPrefWidth(80);
         liveButton.setStyle("-fx-background-color: #333333; -fx-text-fill: white;");
+        liveButton.setOnAction(event -> {
+            try {
+                LiveController.code = exam.getCodeOfExam();
+                JavaFxApplication.changeScene("/views/Live.fxml");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
         pane.getChildren().addAll(imageView, labelTitle,detailLabel,detailButton,updateButton,deleteButton,liveButton);
         return pane;
     }
-    public void loadContent() throws IOException {
+    public void loadContent(String url) throws IOException {
         System.out.println("loadContent");
-        Pane content = FXMLLoader.load(getClass().getResource("/views/DetailContest.fxml"));
+        Pane content = FXMLLoader.load(getClass().getResource(url));
         contentContainer.getChildren().clear();
         contentContainer.getChildren().add(content);
         System.out.println("finished");
@@ -111,7 +135,7 @@ public class ContestController {
     @FXML
     private void clickAddButton() throws IOException {
         System.out.println("clickAddButton");
-        loadContent();
+        loadContent("/views/AddExam.fxml");
     }
     @FXML
     private void clickPreButton() {
