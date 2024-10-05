@@ -56,7 +56,7 @@ public class LogInController {
                 if (result) {
                     wrongLogIn.setText("Login successful!");
                     // Chuyển sang trang home
-                    JavaFxApplication.changeScene("/views/home.fxml");
+                    JavaFxApplication.changeScene("/views/Home.fxml");
                 } else {
                     wrongLogIn.setText("email or password is incorrect!");
                 }
