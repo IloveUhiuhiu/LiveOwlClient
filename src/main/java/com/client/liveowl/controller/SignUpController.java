@@ -10,6 +10,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 
@@ -225,8 +226,10 @@ public class SignUpController {
                 }else {
                     wrongSignup.setText("Email đã tồn tại.");
                 }
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
             }
-        } catch (IOException e) {
+        } catch (IOException | JSONException e) {
             wrongSignup.setText("Có lỗi xảy ra khi gửi yêu cầu đăng ký.");
             e.printStackTrace();
         }

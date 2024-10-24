@@ -1,6 +1,6 @@
 .btnthemmoi {
     -fx-text-fill: #e9eef1;
-    -fx-transition: all 0.5s ease; 
+    -fx-transition: all 0.5s ease;
 }
 
 .btnthemmoi:hover {

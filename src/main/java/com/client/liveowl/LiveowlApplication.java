@@ -11,7 +11,8 @@ public class LiveowlApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(LiveowlApplication.class, args);
 		Application.launch(JavaFxApplication.class, args);
-	//	Application.launch(KeyLoggerClient.class, args);
+
 	}
 
 }
+
