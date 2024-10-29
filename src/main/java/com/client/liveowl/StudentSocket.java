@@ -11,48 +11,60 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.*;
+import java.util.Random;
+import java.util.logging.Logger;
 
 public class StudentSocket{
+
     public static int SERVER_PORT = 9000;
-    public static String SERVER_HOSTNAME = "127.0.0.1";
+    public static final String SERVER_HOSTNAME = "127.0.0.1";
     public static int CLIENT_PORT_SEND = 8000;
-    public static int CLIENT_PORT_RECIEVE = 7000;
-    public static int LENGTH = 32768;
-    public static int ID = 0;
-    DatagramSocket socketSend;
-    DatagramSocket socketRecieve;
-    static  {
+    public static int CLIENT_PORT_RECEIVE = 7000;
+    public static final int LENGTH = 32768;
+    public static int ID_IMAGE = 0;
+    public static int COUNT = 0;
+
+    static {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
     }
-    public static VideoCapture camera = new VideoCapture(0);
+
+    public static final VideoCapture camera = new VideoCapture(0);
+    private DatagramSocket socketSend;
+    private DatagramSocket socketReceive;
+
     public StudentSocket() {
         try {
+            Random rand = new Random();
+            CLIENT_PORT_SEND = rand.nextInt(100)+8000;
+            CLIENT_PORT_RECEIVE = CLIENT_PORT_SEND - 1000;
+            System.out.println("Client port send: " + CLIENT_PORT_SEND);
             socketSend = new DatagramSocket(CLIENT_PORT_SEND);
-            socketRecieve = new DatagramSocket(CLIENT_PORT_RECIEVE);
+            socketReceive = new DatagramSocket(CLIENT_PORT_RECEIVE);
         } catch (SocketException e) {
-            System.err.println("Lỗi trong khi khởi tạo Socket :" + e.getMessage());
+            System.out.println("Lỗi khi khởi tạo Socket: " + e.getMessage());
         }
     }
 
     public void sendMsg(String message) throws IOException {
         InetAddress address = InetAddress.getByName(SERVER_HOSTNAME);
-        int port = SERVER_PORT;
         byte[] messageBytes = message.getBytes();
-        DatagramPacket packet = new DatagramPacket(messageBytes, messageBytes.length, address, port);
+        DatagramPacket packet = new DatagramPacket(messageBytes, messageBytes.length, address, SERVER_PORT);
         socketSend.send(packet);
     }
-    public int receivePort() throws IOException {
-        byte[] receive = new byte[1];
-        DatagramPacket receivePacket = new DatagramPacket(receive, receive.length);
-        socketSend.receive(receivePacket);
-        SERVER_PORT += (receive[0] & 0xff);
-        return SERVER_PORT;
+
+
+    public void receivePort() throws IOException {
+        byte[] messageBytes = new byte[1];
+        DatagramPacket packet = new DatagramPacket(messageBytes, messageBytes.length);
+        socketSend.receive(packet);
+        SERVER_PORT += (messageBytes[0] & 0xff);
     }
+
     public String receiveMsg() throws IOException {
-        byte[] receive = new byte[1024];
-        DatagramPacket receivePacket = new DatagramPacket(receive, receive.length);
-        socketSend.receive(receivePacket);
-        return new String(receivePacket.getData(), 0, receivePacket.getLength());
+        byte[] messageBytes = new byte[1024];
+        DatagramPacket packet = new DatagramPacket(messageBytes, messageBytes.length);
+        socketSend.receive(packet);
+        return new String(packet.getData(), 0, packet.getLength());
     }
 
     public void LiveStream(String code) throws IOException {
@@ -66,15 +78,15 @@ public class StudentSocket{
             String message = receiveMsg();
             System.out.println(message);
             if (message.equals("fail")) {
+
                 System.out.println("Try again.");
                 continue;
             }
             break;
         }
-        int newPort = receivePort();
-        System.out.println("Port mới là :" + newPort);
-        System.out.println("Livestream thôi!");
-        new Thread(new StudentTaskUdp(socketSend, socketRecieve)).start();
+        receivePort();
+        System.out.println("Port mới là: " + StudentSocket.SERVER_PORT);
+        new Thread(new StudentTaskUdp(socketSend, socketReceive)).start();
     }
 
 
@@ -83,55 +95,47 @@ class StudentTaskUdp extends Thread {
     DatagramSocket socketSend;
     DatagramSocket socketRecieve;
     private static int captureFromCamera = 0;
-
-    public StudentTaskUdp(DatagramSocket socketSend, DatagramSocket socketRecieve) {
+    private static Robot robot = null;
+    public StudentTaskUdp(DatagramSocket socketSend, DatagramSocket socketRecieve)  {
         this.socketSend = socketSend;
         this.socketRecieve = socketRecieve;
     }
 
     public String receiveMsg() throws IOException {
-        byte[] receive = new byte[1024];
-        DatagramPacket receivePacket = new DatagramPacket(receive, receive.length);
-        socketRecieve.receive(receivePacket);
-        return new String(receivePacket.getData(),0,receivePacket.getLength());
+        byte[] messageBytes = new byte[1024];
+        DatagramPacket packet = new DatagramPacket(messageBytes, messageBytes.length);
+        socketRecieve.receive(packet);
+        return new String(packet.getData(),0,packet.getLength());
     }
 
     @Override
     public void run() {
-
         try {
-            InetAddress address = InetAddress.getByName(StudentSocket.SERVER_HOSTNAME);
-            int port = StudentSocket.SERVER_PORT;
-
-            Thread thread = new Thread(()->{
-                System.out.println("Lắng nghe bật camera!");
+            Thread thread = new Thread(() -> {
                 try {
                     while (true) {
                         String request = receiveMsg();
                         if (request.equals("camera")) captureFromCamera ^= 1;
-                        System.out.println("yêu cầu: " + request + " và " + captureFromCamera);
                     }
-                } catch (Exception e) {
-                    System.err.println("Lỗi trong khi lắng nghe bật camera: " + e.getMessage());
+                } catch (IOException e) {
+                    System.out.println("Lỗi khi lắng nghe bật camera: " + e.getMessage());
                 }
-
             });
             thread.start();
+            robot = new Robot();
             captureImages(socketSend, StudentSocket.camera);
         } catch (Exception e) {
-            System.err.println("Error: " + e.getMessage());
-            System.out.println("Server đang đóng...");
+            System.out.println("Error: " + e.getMessage());
         } finally {
-            System.out.println("Camera release");
             StudentSocket.camera.release();
         }
-
     }
 
-    private static void captureImages(DatagramSocket socket,VideoCapture camera) throws AWTException, IOException, InterruptedException {
-        Robot robot = new Robot();
+    private static void captureImages(DatagramSocket socket,VideoCapture camera) throws Exception {
 
         while (true) {
+            ++StudentSocket.COUNT;
+            System.out.println("Gửi ảnh thứ " + StudentSocket.COUNT);
             if (captureFromCamera == 1) {
                 if (!camera.isOpened()) {
                     System.err.println("Error: Không mở được camera!");
@@ -185,34 +189,37 @@ class StudentTaskUdp extends Thread {
 
         System.out.println("Bắt đầu gửi ảnh");
         int sequenceNumber = 0; // For order
-        boolean flag; // To see if we got to the end of the file
+        boolean flag;
         InetAddress address = InetAddress.getByName(StudentSocket.SERVER_HOSTNAME);
         int port = StudentSocket.SERVER_PORT;
-        byte[] lengthBytes = new byte[4];
+        byte[] lengthBytes = new byte[6];
         int length = imageByteArray.length;
-        // Lưu độ dài vào mảng byte
-        lengthBytes[0] = (byte) (StudentSocket.ID);
-        lengthBytes[1] = (byte) (length >> 16);
-        lengthBytes[2] = (byte) (length >> 8);
-        lengthBytes[3] = (byte) (length);
+
+        lengthBytes[0] = (byte) (0);
+        lengthBytes[1] = (byte) (StudentSocket.ID_IMAGE);
+        lengthBytes[2] = (byte) (length >> 16);
+        lengthBytes[3] = (byte) (length >> 8);
+        lengthBytes[4] = (byte) (length);
+        lengthBytes[5] = (byte) ((length + StudentSocket.LENGTH - 5)/(StudentSocket.LENGTH - 4));
         DatagramPacket packet = new DatagramPacket(lengthBytes, lengthBytes.length, address, port);
         socket.send(packet);
 
         for (int i = 0; i < imageByteArray.length; i = i + StudentSocket.LENGTH - 4) {
             sequenceNumber += 1;
-            // Tạo packet nhỏ có độ dài 2^16 với 2 byte đầu lưu thứ tự và byte thứ 3 lưu kết thúc hay chưa
+
             byte[] message = new byte[StudentSocket.LENGTH];
-            message[0] = (byte) (sequenceNumber >> 8);
-            message[1] = (byte) (sequenceNumber);
+            message[0] = (byte) (1);
+            message[1] = (byte) (StudentSocket.ID_IMAGE);
+            message[2] = (byte) (sequenceNumber);
 
             if ((i + StudentSocket.LENGTH - 4) >= imageByteArray.length) {
                 flag = true;
-                message[2] = (byte) (1);
+                message[3] = (byte) (1);
             } else {
                 flag = false;
-                message[2] = (byte) (0);
+                message[3] = (byte) (0);
             }
-            message[3] = (byte) (StudentSocket.ID);
+
 
             if (!flag) {
                 System.arraycopy(imageByteArray, i, message, 4, StudentSocket.LENGTH - 4);
@@ -222,10 +229,10 @@ class StudentTaskUdp extends Thread {
 
             DatagramPacket sendPacket = new DatagramPacket(message, message.length, address, port);
             socket.send(sendPacket); // Sending the data
-            Thread.sleep(100);
-            System.out.println("Gửi thành công packet thứ :" + sequenceNumber);
+            Thread.sleep(1);
+            //System.out.println("Gửi thành công packet thứ :" + sequenceNumber);
         }
-        StudentSocket.ID += 1;
-        StudentSocket.ID %= 10;
+
+        StudentSocket.ID_IMAGE = (StudentSocket.ID_IMAGE + 1) %  200;
     }
 }
