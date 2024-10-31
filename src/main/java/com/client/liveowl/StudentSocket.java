@@ -13,17 +13,16 @@ import java.io.IOException;
 import java.net.*;
 import java.util.Random;
 import java.util.logging.Logger;
-
 public class StudentSocket{
-
-    public static int SERVER_PORT = 9000;
-    public static final String SERVER_HOSTNAME = "127.0.0.1";
-    public static int CLIENT_PORT_SEND = 8000;
-    public static int CLIENT_PORT_RECEIVE = 7000;
-    public static final int LENGTH = 32768;
-    public static int ID_IMAGE = 0;
-    public static int COUNT = 0;
-
+    public static int serverPort = 9000;
+    public static final String serverHostName = "127.0.0.1";
+    public static int clientPortSend = 8000;
+    public static int clientPortReceive = 7000;
+    public static final int maxDatagramPacketLength = 32768;
+    public static int imageId = 0;
+    public static int studentId = 0;
+    public static int imageCount = 0;
+    public static Random rand = new Random();
     static {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
     }
@@ -34,21 +33,20 @@ public class StudentSocket{
 
     public StudentSocket() {
         try {
-            Random rand = new Random();
-            CLIENT_PORT_SEND = rand.nextInt(100)+8000;
-            CLIENT_PORT_RECEIVE = CLIENT_PORT_SEND - 1000;
-            System.out.println("Client port send: " + CLIENT_PORT_SEND);
-            socketSend = new DatagramSocket(CLIENT_PORT_SEND);
-            socketReceive = new DatagramSocket(CLIENT_PORT_RECEIVE);
+            clientPortSend = rand.nextInt(100)+8000;
+            clientPortReceive = clientPortSend - 1000;
+            System.out.println("Client port send: " + clientPortSend);
+            socketSend = new DatagramSocket(clientPortSend);
+            socketReceive = new DatagramSocket(clientPortReceive);
         } catch (SocketException e) {
             System.out.println("Lỗi khi khởi tạo Socket: " + e.getMessage());
         }
     }
 
     public void sendMsg(String message) throws IOException {
-        InetAddress address = InetAddress.getByName(SERVER_HOSTNAME);
+        InetAddress address = InetAddress.getByName(serverHostName);
         byte[] messageBytes = message.getBytes();
-        DatagramPacket packet = new DatagramPacket(messageBytes, messageBytes.length, address, SERVER_PORT);
+        DatagramPacket packet = new DatagramPacket(messageBytes, messageBytes.length, address, serverPort);
         socketSend.send(packet);
     }
 
@@ -57,7 +55,13 @@ public class StudentSocket{
         byte[] messageBytes = new byte[1];
         DatagramPacket packet = new DatagramPacket(messageBytes, messageBytes.length);
         socketSend.receive(packet);
-        SERVER_PORT += (messageBytes[0] & 0xff);
+        serverPort += (messageBytes[0] & 0xff);
+    }
+    public void receiveID() throws IOException {
+        byte[] messageBytes = new byte[1];
+        DatagramPacket packet = new DatagramPacket(messageBytes, messageBytes.length);
+        socketSend.receive(packet);
+        studentId = (messageBytes[0] & 0xff);
     }
 
     public String receiveMsg() throws IOException {
@@ -66,7 +70,27 @@ public class StudentSocket{
         socketSend.receive(packet);
         return new String(packet.getData(), 0, packet.getLength());
     }
+    public void sendExitForTeacher() throws Exception {
+        System.out.println("Send exit for teacher");
+        InetAddress address = InetAddress.getByName(StudentSocket.serverHostName);
+        int port = StudentSocket.serverPort;
+        byte[] msgBytes = new byte[2];
 
+
+        msgBytes[0] = (byte) 4;
+        msgBytes[1] = (byte) StudentSocket.studentId;
+        DatagramPacket packet = new DatagramPacket(msgBytes, msgBytes.length, address, port);
+        DatagramSocket tmpSocket = new DatagramSocket(1234);
+        try {
+            tmpSocket.send(packet);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        camera.release();
+        socketReceive.close();
+        socketSend.close();
+        tmpSocket.close();
+    }
     public void LiveStream(String code) throws IOException {
         while (true) {
             sendMsg("connect");
@@ -84,8 +108,9 @@ public class StudentSocket{
             }
             break;
         }
+        receiveID();
         receivePort();
-        System.out.println("Port mới là: " + StudentSocket.SERVER_PORT);
+        System.out.println("Port mới là: " + StudentSocket.serverPort);
         new Thread(new StudentTaskUdp(socketSend, socketReceive)).start();
     }
 
@@ -114,8 +139,16 @@ class StudentTaskUdp extends Thread {
             Thread thread = new Thread(() -> {
                 try {
                     while (true) {
+
                         String request = receiveMsg();
+                        System.out.println("msg: " + request);
                         if (request.equals("camera")) captureFromCamera ^= 1;
+                        else if (request.equals("exit")) {
+
+                            socketSend.close();
+                            socketRecieve.close();
+                            StudentSocket.camera.release();
+                        }
                     }
                 } catch (IOException e) {
                     System.out.println("Lỗi khi lắng nghe bật camera: " + e.getMessage());
@@ -134,8 +167,8 @@ class StudentTaskUdp extends Thread {
     private static void captureImages(DatagramSocket socket,VideoCapture camera) throws Exception {
 
         while (true) {
-            ++StudentSocket.COUNT;
-            System.out.println("Gửi ảnh thứ " + StudentSocket.COUNT);
+            ++StudentSocket.imageCount;
+            System.out.println("Gửi ảnh thứ " + StudentSocket.imageCount);
             if (captureFromCamera == 1) {
                 if (!camera.isOpened()) {
                     System.err.println("Error: Không mở được camera!");
@@ -187,52 +220,56 @@ class StudentTaskUdp extends Thread {
 
     private static void sendPacketImage(DatagramSocket socket, byte[] imageByteArray) throws Exception {
 
-        System.out.println("Bắt đầu gửi ảnh");
+        //System.out.println("Bắt đầu gửi ảnh");
         int sequenceNumber = 0; // For order
         boolean flag;
-        InetAddress address = InetAddress.getByName(StudentSocket.SERVER_HOSTNAME);
-        int port = StudentSocket.SERVER_PORT;
-        byte[] lengthBytes = new byte[6];
+        InetAddress address = InetAddress.getByName(StudentSocket.serverHostName);
+        int port = StudentSocket.serverPort;
+        byte[] lengthBytes = new byte[7];
         int length = imageByteArray.length;
 
-        lengthBytes[0] = (byte) (0);
-        lengthBytes[1] = (byte) (StudentSocket.ID_IMAGE);
-        lengthBytes[2] = (byte) (length >> 16);
-        lengthBytes[3] = (byte) (length >> 8);
-        lengthBytes[4] = (byte) (length);
-        lengthBytes[5] = (byte) ((length + StudentSocket.LENGTH - 5)/(StudentSocket.LENGTH - 4));
+        lengthBytes[0] = (byte) 0;
+        lengthBytes[1] = (byte) (StudentSocket.studentId);
+        lengthBytes[2] = (byte) (StudentSocket.imageId);
+        lengthBytes[3] = (byte) (length >> 16);
+        lengthBytes[4] = (byte) (length >> 8);
+        lengthBytes[5] = (byte) (length);
+        lengthBytes[6] = (byte) ((length + StudentSocket.maxDatagramPacketLength - 6)/(StudentSocket.maxDatagramPacketLength - 5));
         DatagramPacket packet = new DatagramPacket(lengthBytes, lengthBytes.length, address, port);
         socket.send(packet);
 
-        for (int i = 0; i < imageByteArray.length; i = i + StudentSocket.LENGTH - 4) {
+        for (int i = 0; i < imageByteArray.length; i = i + StudentSocket.maxDatagramPacketLength - 5) {
             sequenceNumber += 1;
+            // Create message
+            byte[] message = new byte[StudentSocket.maxDatagramPacketLength];
 
-            byte[] message = new byte[StudentSocket.LENGTH];
-            message[0] = (byte) (1);
-            message[1] = (byte) (StudentSocket.ID_IMAGE);
-            message[2] = (byte) (sequenceNumber);
+            message[0] = (byte)(1);
+            message[1] = (byte)(StudentSocket.studentId);
+            message[2] = (byte)(StudentSocket.imageId);
+            message[3] = (byte) (sequenceNumber);
 
-            if ((i + StudentSocket.LENGTH - 4) >= imageByteArray.length) {
+
+            if ((i + StudentSocket.maxDatagramPacketLength-5) >= imageByteArray.length) {
                 flag = true;
-                message[3] = (byte) (1);
+                message[4] = (byte) (1);
             } else {
                 flag = false;
-                message[3] = (byte) (0);
+                message[4] = (byte) (0);
             }
-
-
             if (!flag) {
-                System.arraycopy(imageByteArray, i, message, 4, StudentSocket.LENGTH - 4);
-            } else {
-                System.arraycopy(imageByteArray, i, message, 4, imageByteArray.length - i);
+                System.arraycopy(imageByteArray, i, message, 5, StudentSocket.maxDatagramPacketLength - 5);
+            } else { // If it is the last datagram
+                System.arraycopy(imageByteArray, i, message, 5, imageByteArray.length - i);
             }
 
+            //System.out.println(address.toString() + ":" + port);
             DatagramPacket sendPacket = new DatagramPacket(message, message.length, address, port);
             socket.send(sendPacket); // Sending the data
             Thread.sleep(1);
             //System.out.println("Gửi thành công packet thứ :" + sequenceNumber);
-        }
 
-        StudentSocket.ID_IMAGE = (StudentSocket.ID_IMAGE + 1) %  200;
+        }
+        StudentSocket.imageId = (StudentSocket.imageId + 1) %  10;
     }
+
 }
