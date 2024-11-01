@@ -27,7 +27,6 @@ public class LiveController {
     public static boolean isLive = false;
     @FXML
     private Button exitButton;
-    public static Boolean isCamera = false;
     @FXML
     private GridPane gridImage;
     public static Map<Integer,ImageView> imageViews = new HashMap<>();
@@ -71,7 +70,7 @@ public class LiveController {
             buttonView.setOnAction(event -> {
                 System.out.println("Button " + index + " đã được nhấn");
                 try {
-                    TeacherSocket.clickButton(index);
+                    TeacherSocket.clickBtnCamera(index);
                 } catch (Exception e) {
                     System.out.println("Lỗi khi nhấn button: " + e.getMessage());
                 }
@@ -122,7 +121,7 @@ public class LiveController {
         alert.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
                 try {
-                    teacherSocket.exitLive();
+                    teacherSocket.clickBtnExit();
                     isLive = false;
                     teacherSocket = null;
                     JavaFxApplication.changeScene("/views/Home.fxml");

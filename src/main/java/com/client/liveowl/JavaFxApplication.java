@@ -39,7 +39,7 @@ public class JavaFxApplication extends Application {
             alert.showAndWait().ifPresent(response -> {
                 if (response == ButtonType.OK) {
                     if (LiveController.isLive == true) {
-                        LiveController.teacherSocket.exitLive();
+                        LiveController.teacherSocket.clickBtnExit();
                     }
                     if (Authentication.getRole() == 2) {
                         try {
