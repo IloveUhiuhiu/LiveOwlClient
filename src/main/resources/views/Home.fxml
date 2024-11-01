@@ -40,25 +40,25 @@
                         </Label>
                         <ImageView fitHeight="19.0" fitWidth="21.0" layoutX="29.0" layoutY="175.0" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@../images/icons8-home-24.png" />
+                              <Image url="@../images/icons_home.png" />
                            </image>
                         </ImageView>
                         <Button fx:id="homeButton" layoutX="51.0" layoutY="172.0" mnemonicParsing="false" onAction="#clickHomeButton" style="-fx-background-color: transparent;" styleClass="btnmenu" stylesheets="@css/style.css" text="Trang chủ" />
                         <ImageView fitHeight="19.0" fitWidth="25.0" layoutX="29.0" layoutY="216.0" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@../images/icons8-exam-50.png" />
+                              <Image url="@../images/icons_exam.png" />
                            </image>
                         </ImageView>
                         <Button fx:id="contestButton" layoutX="53.0" layoutY="214.0" mnemonicParsing="false" onAction="#clickContestButton" style="-fx-background-color: transparent;" styleClass="btnmenu" stylesheets="@css/style.css" text="Cuộc thi" />
                         <ImageView fitHeight="29.0" fitWidth="21.0" layoutX="28.0" layoutY="257.0" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@../images/icons8-report-card-24.png" />
+                              <Image url="@../images/icons_report.png" />
                            </image>
                         </ImageView>
                         <Button fx:id="result" layoutX="53.0" layoutY="258.0" mnemonicParsing="false" onAction="#clickResultButton" style="-fx-background-color: transparent;" styleClass="btnmenu" stylesheets="@css/style.css" text="Kết quả" />
                         <ImageView fitHeight="22.0" fitWidth="21.0" layoutX="27.0" layoutY="301.0" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@../images/icons8-message-50.png" />
+                              <Image url="@../images/icons_message.png" />
                            </image>
                         </ImageView>
                         <Button fx:id="messageButton" layoutX="51.0" layoutY="298.0" mnemonicParsing="false" onAction="#clickMessageButton" style="-fx-background-color: transparent;" styleClass="btnmenu" stylesheets="@css/style.css" text="Tin nhắn" />
@@ -69,19 +69,19 @@
                         </Label>
                         <ImageView fitHeight="21.0" fitWidth="21.0" layoutX="26.0" layoutY="402.0" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@../images/icons8-man-50.png" />
+                              <Image url="@../images/icons_man.png" />
                            </image>
                         </ImageView>
                         <Button fx:id="profileButton" layoutX="47.0" layoutY="401.0" mnemonicParsing="false" onAction="#clickProfileButton" style="-fx-background-color: transparent;" styleClass="btnmenu" stylesheets="@css/style.css" text="Thông tin liên hệ" />
                         <ImageView fitHeight="18.0" fitWidth="21.0" layoutX="27.0" layoutY="443.0" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@../images/icons8-phone-50.png" />
+                              <Image url="@../images/icons_phone.png" />
                            </image>
                         </ImageView>
                         <Button fx:id="lienlac" layoutX="50.0" layoutY="439.0" mnemonicParsing="false" style="-fx-background-color: transparent;" styleClass="btnmenu" stylesheets="@css/style.css" text="Liên lạc" />
                         <ImageView fitHeight="21.0" fitWidth="21.0" layoutX="26.0" layoutY="485.0" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@../images/icons8-logout-50.png" />
+                              <Image url="@../images/icons_logout.png" />
                            </image>
                         </ImageView>
                         <Button fx:id="logoutButton" layoutX="49.0" layoutY="483.0" mnemonicParsing="false" onAction="#clickLogoutButton" style="-fx-background-color: transparent;" styleClass="btnmenu" stylesheets="@css/style.css" text="Đăng xuất" />

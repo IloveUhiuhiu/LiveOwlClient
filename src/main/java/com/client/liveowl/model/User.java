@@ -15,6 +15,7 @@ import java.util.Date;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class User implements Serializable {
     private static final String BASE_URI = "http://localhost:9090";
+    private String accountId;
     private String email;
     private String password;
     private String role;
@@ -31,6 +32,14 @@ public class User implements Serializable {
         this.email = email;
         this.password = password;
         this.role = role;
+    }
+
+    public String getAccountId() {
+        return accountId;
+    }
+
+    public void setAccountId(String accountId) {
+        this.accountId = accountId;
     }
 
     public String getEmail() {
