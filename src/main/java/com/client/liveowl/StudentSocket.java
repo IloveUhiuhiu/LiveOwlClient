@@ -1,6 +1,8 @@
 package com.client.liveowl;
-
+import com.client.liveowl.controller.JoinExamController;
 import com.client.liveowl.util.UdpHandler;
+import javafx.application.Platform;
+import javafx.scene.image.Image;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
@@ -9,25 +11,30 @@ import org.opencv.videoio.VideoCapture;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.*;
 import java.util.Random;
 public class StudentSocket{
+    public static int maxDatagramPacketLength = 1500;
     public static int serverPort = 9000;
+    //public static final String serverHostName = "192.168.110.194";
     public static final String serverHostName = "127.0.0.1";
     public static int clientPortSend = 8000;
-    public static int clientPortReceive = 7000;
-    public static final int maxDatagramPacketLength = 32768;
+    public static int clientPortReceive = 7000;;
     public static int imageId = 0;
     public static int studentId = 0;
     public static int imageCount = 0;
+    public static int period = 0;
     public static Random rand = new Random();
+    public static boolean isLive = false;
+    public static int captureFromCamera = 1;
     static {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
     }
 
-    public static final VideoCapture camera = new VideoCapture(0);
+    public static final VideoCapture camera = null;
     public static DatagramSocket socketSend;
     public static DatagramSocket socketReceive;
 
@@ -49,36 +56,37 @@ public class StudentSocket{
         socketReceive.close();
         socketSend.close();
     }
-    public void LiveStream(String code) throws IOException {
-        while (true) {
-            UdpHandler.sendMsg(socketSend,"connect",InetAddress.getByName(serverHostName),serverPort);
-            System.out.println("Gửi thành công chuỗi connect đến server!");
-            UdpHandler.sendMsg(socketSend,"student",InetAddress.getByName(serverHostName),serverPort);
-            System.out.println("Gửi role student!");
-            UdpHandler.sendMsg(socketSend,code,InetAddress.getByName(serverHostName),serverPort);
-            System.out.println("Gửi mã " + code + " cuộc thi thành công!");
-            String message = UdpHandler.receiveMsg(socketSend,InetAddress.getByName(serverHostName),serverPort);
-            System.out.println(message);
-            if (message.equals("fail")) {
-                System.out.println("Try again.");
-                continue;
-            }
-            break;
+    public boolean CheckConnect(String code) throws IOException {
+        UdpHandler.sendMsg(socketSend,"connect",InetAddress.getByName(serverHostName),serverPort);
+        System.out.println("Gửi thành công chuỗi connect đến server!");
+        UdpHandler.sendMsg(socketSend,"student",InetAddress.getByName(serverHostName),serverPort);
+        System.out.println("Gửi role student!");
+        UdpHandler.sendMsg(socketSend,code,InetAddress.getByName(serverHostName),serverPort);
+        System.out.println("Gửi mã " + code + " cuộc thi thành công!");
+        String message = UdpHandler.receiveMsg(socketSend,InetAddress.getByName(serverHostName),serverPort);
+        System.out.println(message);
+        if (message.equals("fail")) {
+            return false;
         }
         studentId += UdpHandler.receivePort(socketSend);
         serverPort += UdpHandler.receivePort(socketSend);
         System.out.println("Port mới là: " + StudentSocket.serverPort);
-        new Thread(new StudentTaskUdp(socketSend, socketReceive)).start();
+        return true;
+    }
+    public void LiveStream(JoinExamController controller) throws IOException {
+        new Thread(new StudentTaskUdp(socketSend, socketReceive,controller)).start();
     }
 }
 class StudentTaskUdp extends Thread {
     private DatagramSocket socketSend;
     private DatagramSocket socketRecieve;
-    private static int captureFromCamera = 0;
+
     private static Robot robot = null;
-    public StudentTaskUdp(DatagramSocket socketSend, DatagramSocket socketRecieve)  {
+    private static JoinExamController controller;
+    public StudentTaskUdp(DatagramSocket socketSend, DatagramSocket socketRecieve, JoinExamController controller)  {
         this.socketSend = socketSend;
         this.socketRecieve = socketRecieve;
+        this.controller = controller;
     }
     @Override
     public void run() {
@@ -89,7 +97,7 @@ class StudentTaskUdp extends Thread {
 
                         String request = UdpHandler.receiveMsg(socketRecieve,InetAddress.getByName(StudentSocket.serverHostName),StudentSocket.serverPort);
                         System.out.println("msg: " + request);
-                        if (request.equals("camera")) captureFromCamera ^= 1;
+                        if (request.equals("camera")) StudentSocket.captureFromCamera ^= 1;
                         else if (request.equals("exit")) {
                             socketSend.close();
                             socketRecieve.close();
@@ -102,6 +110,7 @@ class StudentTaskUdp extends Thread {
             });
             thread.start();
             robot = new Robot();
+
             captureImages(socketSend, StudentSocket.camera);
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
@@ -111,30 +120,48 @@ class StudentTaskUdp extends Thread {
     }
 
     private static void captureImages(DatagramSocket socket,VideoCapture camera) throws Exception {
+        try {
+            while (true) {
+                ++StudentSocket.imageCount;
+                System.out.println("Gửi ảnh thứ " + StudentSocket.imageCount);
+                if (StudentSocket.captureFromCamera == 1) {
+                    if (camera == null) {
+                        camera = new VideoCapture(0);
+                    }
+                    if (!camera.isOpened()) {
+                        System.err.println("Error: Không mở được camera!");
+                        return;
+                    }
+                    Mat frame = new Mat();
+                    if (camera.read(frame)) {
+                        if (!frame.empty()) {
+                            if (StudentSocket.isLive) sendImage(socket, frame);
+                            else {
+                                updateImage(frame);
+                            }
 
-        while (true) {
-            ++StudentSocket.imageCount;
-            System.out.println("Gửi ảnh thứ " + StudentSocket.imageCount);
-            if (captureFromCamera == 1) {
-                if (!camera.isOpened()) {
-                    System.err.println("Error: Không mở được camera!");
-                    return;
-                }
-                Mat frame = new Mat();
-                if (camera.read(frame)) {
-                    if (!frame.empty()) {
-                        sendImage(socket, frame);
+                        } else {
+                            System.out.println("Frame rỗng!");
+                        }
                     } else {
-                        System.out.println("Frame rỗng!");
+                        System.out.println("Không thể đọc từ camera!");
+                        Thread.sleep(10);
                     }
                 } else {
-                    System.out.println("Không thể đọc từ camera!");
-                    Thread.sleep(10);
+                    if (camera != null) {
+                        camera.release();
+                        camera = null;
+                    }
+                    BufferedImage screenCapture = robot.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
+                    if (StudentSocket.isLive) sendImage(socket, screenCapture);
                 }
-            } else {
-                BufferedImage screenCapture = robot.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
-                sendImage(socket, screenCapture);
+
+
             }
+        } catch (Exception e) {
+
+        } finally {
+            if (camera!= null) camera.release();
         }
     }
 
@@ -163,7 +190,32 @@ class StudentTaskUdp extends Thread {
         image.getRaster().setDataElements(0, 0, mat.width(), mat.height(), data);
         return image;
     }
+    private static void updateImage(Mat frame) {
+        Imgproc.cvtColor(frame, frame, Imgproc.COLOR_BGR2RGB); // Đảm bảo đúng định dạng màu
+        BufferedImage bufferedImage = matToBufferedImage(frame);
+        // Chuyển đổi BufferedImage thành mảng byte
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            ImageIO.write(bufferedImage, "png", baos); // Lưu hình ảnh vào mảng byte
+            baos.flush();
+            byte[] imageBytes = baos.toByteArray();
+            Image newImage = new Image(new ByteArrayInputStream(imageBytes));
+            System.out.println(imageBytes.length);
+            Platform.runLater(() -> controller.updateImage(newImage));
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                baos.close(); // Đảm bảo đóng ByteArrayOutputStream
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
+
+
+
+    }
     private static void sendPacketImage(DatagramSocket socket, byte[] imageByteArray) throws Exception {
 
         //System.out.println("Bắt đầu gửi ảnh");
@@ -203,7 +255,12 @@ class StudentTaskUdp extends Thread {
                 System.arraycopy(imageByteArray, i, message, 5, imageByteArray.length - i);
             }
             UdpHandler.sendBytesArray(socket,message,InetAddress.getByName(StudentSocket.serverHostName),StudentSocket.serverPort);
-            Thread.sleep(1);
+            ++StudentSocket.period;
+            if (StudentSocket.period == 20) {
+                Thread.sleep(1);
+                StudentSocket.period = 0;
+            }
+
         }
         StudentSocket.imageId = (StudentSocket.imageId + 1) %  10;
     }

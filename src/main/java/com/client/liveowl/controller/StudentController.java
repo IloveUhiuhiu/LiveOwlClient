@@ -1,7 +1,9 @@
 package com.client.liveowl.controller;
 
+import com.client.liveowl.JavaFxApplication;
 import com.client.liveowl.StudentSocket;
 import com.client.liveowl.util.AlertDialog;
+import com.client.liveowl.util.Authentication;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -33,7 +35,10 @@ public class StudentController {
         System.out.println("Mã đã nhập: " + code);
         try {
             theSocket = new StudentSocket();
-            theSocket.LiveStream(code);
+            if (theSocket.CheckConnect(code)) {
+                Authentication.setCode(code);
+                JavaFxApplication.changeScene("/views/JoinExam.fxml");
+            }
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }

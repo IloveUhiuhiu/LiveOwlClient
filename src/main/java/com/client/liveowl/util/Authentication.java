@@ -15,10 +15,11 @@ import java.io.IOException;
 
 
 public class Authentication {
-    private static final String BASE_URI = "http://localhost:9090";
+    private static final String BASE_URI = "http://127.0.0.1:9090";
     private static boolean isAuthenticated;
     private static String token;
     private static int role;
+    private static String code;
     public Authentication() {
 
     }
@@ -29,6 +30,12 @@ public class Authentication {
 
     private void setAuthenticated(boolean authenticated) {
         isAuthenticated = authenticated;
+    }
+    public static String getCode() {
+        return code;
+    }
+    public static void setCode(String code) {
+        Authentication.code = code;
     }
 
     public static String getToken() {

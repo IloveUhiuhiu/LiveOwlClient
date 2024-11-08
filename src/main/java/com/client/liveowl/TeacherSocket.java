@@ -7,18 +7,28 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.*;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 public class TeacherSocket{
+    public static int maxDatagramPacketLength = 1500;
     public static int serverPort = 9000;
     public static String serverHostName = "127.0.0.1";
     public static int clientPortSend = 6000;
     public static int clientPortReceive = 5000;
     public static Map<String, byte[]> buffer = new HashMap<>();
+    public static Map<String, Integer> numberBuffer = new HashMap<>();
     public static int imageCount = 0;
+    public static int imageAtual = 0;
     public static DatagramSocket socketSend;
     public static DatagramSocket socketRecieve;
+    public static ConcurrentLinkedQueue<String> sendList = new ConcurrentLinkedQueue<>();
     public TeacherSocket() {
         try {
             serverPort = 9000;
@@ -40,6 +50,7 @@ public class TeacherSocket{
             System.out.println("Port mới là :" + serverPort);
             System.out.println("Chờ mọi người tham gia!");
             new Thread(new TeacherTaskUdp(socketSend,socketRecieve,liveController)).start();
+            new Thread(new DisplayImage(liveController)).start();
 
     }
     public static void clickBtnCamera(int number) {
@@ -81,8 +92,8 @@ class TeacherTaskUdp extends Thread {
         try {
 
             while (true) {
-                System.out.println("Bắt đầu nhận ảnh");
-                byte[] message = new byte[UdpHandler.maxDatagramPacketLength];
+                //System.out.println("Bắt đầu nhận ảnh");
+                byte[] message = new byte[TeacherSocket.maxDatagramPacketLength];
                 UdpHandler.receiveBytesArr(socketSend,message);
                 int packetType = (message[0] & 0xff);
                 if (packetType == 0) {
@@ -92,42 +103,40 @@ class TeacherTaskUdp extends Thread {
                     int numberOfImage = message[6] & 0xff;
                     byte[] imageBytes = new byte[lengthOfImage];
                     String Key = imageId + ":" + clientId;
-                    if (TeacherSocket.buffer.containsKey(Key)) {
-                        TeacherSocket.buffer.remove(Key);
-                    }
                     TeacherSocket.buffer.put(Key, imageBytes);
+                    TeacherSocket.numberBuffer.put(Key, numberOfImage);
+                    System.out.println("nhận độ dai " + lengthOfImage);
 
                 } else if (packetType == 1){
                     int clientId = (message[1] & 0xff);
                     int packetId = (message[2] & 0xff);
                     int sequenceNumber = (message[3] & 0xff);
                     boolean isLastPacket = ((message[4] & 0xff) == 1);
-                    int destinationIndex = (sequenceNumber - 1) * (UdpHandler.maxDatagramPacketLength-5);
+                    int destinationIndex = (sequenceNumber - 1) * (TeacherSocket.maxDatagramPacketLength-5);
                     String Key = packetId + ":" + clientId;
+                    //System.out.println(sequenceNumber +", " + packetId + ":" + clientId + ", " + destinationIndex);
                     if (TeacherSocket.buffer.containsKey(Key)) {
-                        int lengthOfImage = TeacherSocket.buffer.get(Key).length;
+                        byte[] imageBytes = TeacherSocket.buffer.get(Key);
+
+                        TeacherSocket.numberBuffer.put(Key, TeacherSocket.numberBuffer.get(Key) - 1) ;
+                        int lengthOfImage = imageBytes.length;
                         if (destinationIndex >= 0 && destinationIndex < lengthOfImage) {
-                            if (!isLastPacket) {
-                                System.arraycopy(message, 5, TeacherSocket.buffer.get(Key), destinationIndex, UdpHandler.maxDatagramPacketLength-5);
+                            if (destinationIndex + TeacherSocket.maxDatagramPacketLength - 5 < lengthOfImage) {
+                                System.arraycopy(message, 5, imageBytes, destinationIndex, TeacherSocket.maxDatagramPacketLength-5);
                             } else {
-                                System.arraycopy(message, 5, TeacherSocket.buffer.get(Key), destinationIndex, lengthOfImage % (UdpHandler.maxDatagramPacketLength-5));
-                                byte[] imageBytes = TeacherSocket.buffer.get(Key);
-                                if (imageBytes != null && imageBytes.length > 0) {
-                                    try (ByteArrayInputStream inputStream = new ByteArrayInputStream(imageBytes)) {
-                                        Image newImage = new Image(inputStream);
-                                        Platform.runLater(() -> liveController.updateImage(clientId,newImage));
-                                    } catch (Exception e) {
-                                        System.err.println("Lỗi khi tạo hình ảnh: " + e.getMessage());
-                                    }
-                                } else {
-                                    System.out.println("Ảnh null");
-                                }
-                                TeacherSocket.imageCount++;
-                                System.out.println("Nhận ảnh thứ " + TeacherSocket.imageCount + ", " + lengthOfImage);
+                                System.arraycopy(message, 5, imageBytes, destinationIndex, lengthOfImage % (TeacherSocket.maxDatagramPacketLength-5));
+
                             }
                         } else {
-                            System.out.println("Chỉ số đích không hợp lệ: " + destinationIndex);
+                            System.out.println("Chỉ số đích không hợp lệ: " + destinationIndex + ", lengthOFImage" + lengthOfImage);
+                       }
+
+                        if (TeacherSocket.numberBuffer.get(Key) == 0) {
+                            ++TeacherSocket.imageAtual;
+                            System.out.println("Số ảnh nhận thực sự: " + TeacherSocket.imageAtual);
+                            TeacherSocket.sendList.add(Key);
                         }
+
                     } else {
                         System.out.println("Lỗi ID_Paket bị xóa khỏi buffer!");
                     }
@@ -143,7 +152,7 @@ class TeacherTaskUdp extends Thread {
                 }
             }
 
-        } catch (IOException | RuntimeException e) {
+        } catch (Exception e) {
             System.err.println(e.getMessage());
         } finally {
             try {
@@ -157,4 +166,42 @@ class TeacherTaskUdp extends Thread {
     }
 
 
+}
+class DisplayImage implements  Runnable{
+    private final ExecutorService executorService = Executors.newCachedThreadPool();
+    LiveController liveController;
+    DisplayImage(LiveController liveController) {
+        this.liveController = liveController;
+    }
+    @Override
+    public void run() {
+        while (true) {
+            String packetId = TeacherSocket.sendList.poll();
+            if (packetId != null) {
+                byte[] imageBytes = TeacherSocket.buffer.get(packetId);
+                int pos = packetId.lastIndexOf(":");
+                int imageId = Integer.parseInt(packetId.substring(0, pos));
+                int clientId = Integer.parseInt(packetId.substring(pos + 1));
+
+                if (imageBytes != null && imageBytes.length > 0) {
+                    TeacherSocket.imageCount++;
+                    System.out.println("Hiển thị ảnh thứ " + TeacherSocket.imageCount + ", " + imageBytes.length);
+
+                    // Sử dụng CompletableFuture để xử lý bất đồng bộ
+                    CompletableFuture.runAsync(() -> {
+                        try {
+                            // Chỉ tạo ByteArrayInputStream khi cần thiết
+                            Image newImage = new Image(new ByteArrayInputStream(imageBytes));
+                            // Cập nhật hình ảnh trên UI
+                            Platform.runLater(() -> liveController.updateImage(clientId, newImage));
+                        } catch (Exception e) {
+                            System.err.println("Lỗi khi tạo hình ảnh: " + e.getMessage());
+                        }
+                    });
+                } else {
+                    System.out.println("Ảnh null");
+                }
+            }
+        }
+    }
 }

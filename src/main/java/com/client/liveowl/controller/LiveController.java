@@ -85,7 +85,7 @@ public class LiveController {
         gridImage.getChildren().clear(); // Xóa các node hiện tại
         int columns = Math.min(numImages, 3);
         int rows = (int) Math.ceil((double) numImages / columns);
-
+        exitButton.setText(numImages + ", " + rows + ", " + columns);
         for (int i: imageViews.keySet()) {
             ImageView imageView = imageViews.get(i);
             Button buttonView = buttonViews.get(i);
