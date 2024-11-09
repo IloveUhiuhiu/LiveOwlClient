@@ -19,6 +19,8 @@ public class StudentController {
     private TextField codeTextField;
     @FXML
     private Button joinButton;
+    public static StudentSocket theSocket = null;
+
     @FXML
     public void initialize() {
         joinButton.setOnAction(event -> handleJoinButtonClick());
@@ -31,7 +33,7 @@ public class StudentController {
         }
         System.out.println("Mã đã nhập: " + code);
         try {
-            StudentSocket theSocket = new StudentSocket();
+            theSocket = new StudentSocket();
             theSocket.LiveStream(code);
         } catch (IOException e) {
             System.err.println(e.getMessage());
@@ -39,6 +41,8 @@ public class StudentController {
 
 
     }
+
+
 
 
 }

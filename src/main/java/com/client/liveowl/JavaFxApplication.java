@@ -1,11 +1,16 @@
 package com.client.liveowl;
 
 
+import com.client.liveowl.controller.LiveController;
+import com.client.liveowl.controller.StudentController;
+import com.client.liveowl.util.AlertDialog;
 import com.client.liveowl.util.Authentication;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import org.opencv.core.Core;
@@ -18,6 +23,7 @@ public class JavaFxApplication extends Application {
     public static Authentication authentication;
 
 
+
     @Override
     public void start(Stage primaryStage) throws Exception{
         stage = primaryStage;
@@ -25,6 +31,30 @@ public class JavaFxApplication extends Application {
         Parent root = FXMLLoader.load(getClass().getResource("/views/Login.fxml"));
         stage.setTitle("Login");
         stage.setScene(new Scene(root));
+        stage.setOnCloseRequest(event -> {
+            event.consume();
+            AlertDialog alertDialog = new AlertDialog("Xác nhận thoát "  + authentication + ", " + Authentication.getRole(),null,"Bạn có chắc chắn muốn thoát không?",Alert.AlertType.CONFIRMATION);
+            Alert alert = alertDialog.getConfirmationDialog();
+
+            alert.showAndWait().ifPresent(response -> {
+                if (response == ButtonType.OK) {
+                    if (LiveController.isLive == true) {
+                        LiveController.teacherSocket.clickBtnExit();
+                    }
+                    if (Authentication.getRole() == 2) {
+                        try {
+
+                            StudentController.theSocket.sendExitForTeacher();
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                    stage.close();
+                }
+            });
+
+
+        });
         stage.show();
     }
 
@@ -38,6 +68,10 @@ public class JavaFxApplication extends Application {
     public static void setMaximized() {
         stage.setMaximized(true);
     }
+    public static void setResizable(boolean resizable) {
+        stage.setResizable(resizable);
+    }
+
 
     public static void main(String[] args) {
         Application.launch(args);

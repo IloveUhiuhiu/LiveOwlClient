@@ -123,9 +123,12 @@ package com.client.liveowl.controller;
 
 import com.client.liveowl.JavaFxApplication;
 import com.client.liveowl.TeacherSocket;
+import com.client.liveowl.util.AlertDialog;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
@@ -134,49 +137,38 @@ import javafx.scene.layout.VBox;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class LiveController {
 
+    public static TeacherSocket teacherSocket;
     public static String code;
+    public static boolean isLive = false;
     @FXML
     private Button exitButton;
-    public static Boolean isCamera = false;
     @FXML
     private GridPane gridImage;
-    private static int MAX = 10;
-    private static int numImages = 0;
-    public static List<ImageView> imageViews = new ArrayList<>(); // Không static
-    public static List<Button> buttonViews = new ArrayList<>();
+    public static Map<Integer,ImageView> imageViews = new HashMap<>();
+    public static Map<Integer,Button> buttonViews = new HashMap<>();
     private double heightMax = 600; // Không static
     private double widthMax = 2 * heightMax; // Không static
+    private int numImages = 0;
 
 
     @FXML
     public void initialize() {
-        for (int i = 0; i < MAX; i++) {
-            ImageView imageView = new ImageView();
-            imageViews.add(imageView);
 
-            Button buttonView = new Button("TurnOn/TurnOff");
-            final int index = i;
-            buttonView.setOnAction(event -> {
-                System.out.println("Button " + index + " đã được nhấn");
-                try {
-                    TeacherSocket.clickButton(index);
-                } catch (Exception e) {
-                    System.out.println("Lỗi khi nhấn button: " + e.getMessage());
-                }
-            });
-            buttonViews.add(buttonView);
-        }
-        TeacherSocket theSocket = new TeacherSocket();
+        isLive = true;
+        teacherSocket = new TeacherSocket();
         try {
-            theSocket.LiveStream(code,this);
+            teacherSocket.LiveStream(code,this);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         JavaFxApplication.setMaximized();
+        JavaFxApplication.setResizable(false);
 
         gridImage.setHgap(10);
         gridImage.setVgap(10);
@@ -188,13 +180,24 @@ public class LiveController {
 
     public void updateImage(int number,Image newImage) {
 
-        if (number < numImages) {
+        if (imageViews.containsKey(number)) {
             if (imageViews.get(number).getImage() != newImage) {
                 imageViews.get(number).setImage(newImage);
             }
         } else {
-            imageViews.get(number).setImage(newImage);
-            numImages++;
+            imageViews.put(number, new ImageView(newImage));
+            Button buttonView = new Button("TurnOn/TurnOff");
+            final int index = number;
+            buttonView.setOnAction(event -> {
+                System.out.println("Button " + index + " đã được nhấn");
+                try {
+                    TeacherSocket.clickBtnCamera(index);
+                } catch (Exception e) {
+                    System.out.println("Lỗi khi nhấn button: " + e.getMessage());
+                }
+            });
+            buttonViews.put(number,buttonView);
+            ++numImages;
             updateGridLayout();
         }
 
@@ -204,10 +207,9 @@ public class LiveController {
         int columns = Math.min(numImages, 3);
         int rows = (int) Math.ceil((double) numImages / columns);
 
-        for (int i = 0; i < numImages; i++) {
+        for (int i: imageViews.keySet()) {
             ImageView imageView = imageViews.get(i);
             Button buttonView = buttonViews.get(i);
-
             // Điều chỉnh kích thước ảnh
             adjustImageSize(imageView, rows, columns);
 
@@ -233,7 +235,30 @@ public class LiveController {
         }
     }
     @FXML
-    private void clickExitButton() throws IOException {
-        JavaFxApplication.changeScene("/views/Home.fxml");
+    private void clickExitButton() {
+
+        AlertDialog alertDialog = new AlertDialog("Xác nhận thoát",null,"Bạn có chắc chắn muốn thoát không?", Alert.AlertType.CONFIRMATION);
+        Alert alert = alertDialog.getConfirmationDialog();
+        alert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                try {
+                    teacherSocket.clickBtnExit();
+                    isLive = false;
+                    teacherSocket = null;
+                    JavaFxApplication.changeScene("/views/Home.fxml");
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
+    }
+    public void requestExitFromStudent(int number) {
+        if (imageViews.containsKey(number)) {
+            numImages--;
+            imageViews.remove(number);
+            buttonViews.remove(number);
+            updateGridLayout();
+        }
     }
 }

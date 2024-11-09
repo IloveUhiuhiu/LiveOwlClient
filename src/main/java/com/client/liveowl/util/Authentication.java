@@ -15,6 +15,7 @@ import java.io.IOException;
 
 
 public class Authentication {
+ //private static final String BASE_URI = "http://10.10.26.252:9090";
     private static final String BASE_URI = "http://localhost:9090";
     private static boolean isAuthenticated;
     private static String token;
@@ -84,3 +85,4 @@ public class Authentication {
         return true;
     }
 }
+
