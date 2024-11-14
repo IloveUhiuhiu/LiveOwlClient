@@ -7,11 +7,14 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserHandler {
     private static final String BASE_URI = "http://localhost:9090";
@@ -54,9 +57,49 @@ public class UserHandler {
             throw new RuntimeException(e);
         }
     }
+
+    public static List<String> getAllAccountID() {
+        String url = BASE_URI + "/users/allaccoutid";
+        System.out.println(Authentication.getToken());
+        System.out.println(url);
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        HttpPost post = new HttpPost(url);
+        String token = "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoxLCJzdWIiOiJjQGdtYWlsLmNvbSJ9.qO1hErx1vP51kB0TtksN53lj2miR-xDzGEt8y8Lq-Dg";
+        // Thêm header chứa token
+        post.setHeader("Authorization", "Bearer " + token);
+
+        try (CloseableHttpResponse response = httpClient.execute(post)) {
+            int statusCode = response.getStatusLine().getStatusCode();
+            System.out.println("statusCode: " + statusCode);
+
+            if (statusCode == HttpStatus.OK.value()) {
+                HttpEntity responseEntity = response.getEntity();
+                String responseString = EntityUtils.toString(responseEntity);
+                JSONObject jsonResponse = new JSONObject(responseString);
+                JSONArray dataArray = jsonResponse.getJSONArray("data");
+
+                List<String> allaccountid = new ArrayList<>();
+
+                for (int i = 0; i < dataArray.length(); i++) {
+                    allaccountid.add(dataArray.getString(i));
+                }
+                return allaccountid;
+            } else {
+                System.err.println("Failed to fetch allaccountid: " + statusCode);
+                return null;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+}
 //    public  static  void main(String[] args) {
-//        String userId = getUserId();
-//        System.out.println(userId);
+//        List<String> allid = getAllAccountID();
+//        for (String id : allid) {
+//            System.out.println(id);
+//        }
 //    }
 }
 
