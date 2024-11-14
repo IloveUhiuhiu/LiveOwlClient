@@ -1,19 +1,14 @@
 package com.client.liveowl;
 import com.client.liveowl.controller.LiveController;
+import com.client.liveowl.model.ImageData;
 import com.client.liveowl.util.UdpHandler;
-import javafx.application.Platform;
 import javafx.scene.image.Image;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.*;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 
 public class TeacherSocket{
@@ -28,7 +23,8 @@ public class TeacherSocket{
     public static int imageAtual = 0;
     public static DatagramSocket socketSend;
     public static DatagramSocket socketRecieve;
-    public static ConcurrentLinkedQueue<String> sendList = new ConcurrentLinkedQueue<>();
+    public static ConcurrentLinkedQueue<ImageData> sendList = new ConcurrentLinkedQueue<>();
+    public static int isExit = -1;
     public TeacherSocket() {
         try {
             serverPort = 9000;
@@ -39,7 +35,6 @@ public class TeacherSocket{
         }
     }
     public void LiveStream(String code, LiveController liveController) throws IOException {
-
             UdpHandler.sendMsg(socketSend,"connect",InetAddress.getByName(serverHostName),serverPort);
             System.out.println("Gửi thành công chuỗi connect đến server!");
             UdpHandler.sendMsg(socketSend,"teacher",InetAddress.getByName(serverHostName),serverPort);
@@ -49,19 +44,16 @@ public class TeacherSocket{
             serverPort +=  UdpHandler.receivePort(socketSend);
             System.out.println("Port mới là :" + serverPort);
             System.out.println("Chờ mọi người tham gia!");
-            new Thread(new TeacherTaskUdp(socketSend,socketRecieve,liveController)).start();
-            new Thread(new DisplayImage(liveController)).start();
-
+            new Thread(new TeacherTaskUdp(socketSend,socketRecieve)).start();
+            //new Thread(new getImage()).start();
     }
     public static void clickBtnCamera(int number) {
         try {
             UdpHandler.sendRequestCamera(socketRecieve,number,InetAddress.getByName(serverHostName),serverPort);
-            //System.out.println("Gửi thành công Id học sinh cho " + address.toString() + "," + port);
             System.out.println("Gửi thành công yêu cầu button camera");
         } catch (IOException e) {
             System.out.println("Lỗi khi nhấn button camera" + e.getMessage());
         }
-
     }
     public void clickBtnExit() {
         try {
@@ -74,17 +66,20 @@ public class TeacherSocket{
             System.out.println("Lỗi khi gửi thông điệp exit " + e.getMessage());
         }
     }
-
+    public static synchronized int getExit() {
+        return isExit;
+    }
+    public static synchronized void setExit(int exit) {
+        isExit = exit;
+    }
 }
 
 class TeacherTaskUdp extends Thread {
     DatagramSocket socketSend;
     static DatagramSocket socketRecieve;
-    LiveController liveController;
-    public TeacherTaskUdp(DatagramSocket socketSend, DatagramSocket socketRecieve ,LiveController liveController) {
+    public TeacherTaskUdp(DatagramSocket socketSend, DatagramSocket socketRecieve) {
         this.socketSend = socketSend;
         this.socketRecieve = socketRecieve;
-        this.liveController = liveController;
     }
 
     @Override
@@ -134,19 +129,27 @@ class TeacherTaskUdp extends Thread {
                         if (TeacherSocket.numberBuffer.get(Key) == 0) {
                             ++TeacherSocket.imageAtual;
                             System.out.println("Số ảnh nhận thực sự: " + TeacherSocket.imageAtual);
-                            TeacherSocket.sendList.add(Key);
+                                if (imageBytes != null && imageBytes.length > 0) {
+                                    TeacherSocket.imageCount++;
+                                    System.out.println("Hiển thị ảnh thứ " + TeacherSocket.imageCount + ", " + imageBytes.length + ", " + TeacherSocket.sendList.size());
+                                    try {
+                                        Image newImage = new Image(new ByteArrayInputStream(imageBytes));
+                                        TeacherSocket.sendList.add(new ImageData(clientId, newImage));
+                                    } catch (Exception e) {
+                                        System.err.println("Lỗi khi tạo hình ảnh: " + e.getMessage());
+                                    }
+                                } else {
+                                    System.out.println("Ảnh null");
+                                }
+                                TeacherSocket.buffer.remove(Key);
                         }
-
                     } else {
                         System.out.println("Lỗi ID_Paket bị xóa khỏi buffer!");
                     }
                 } else if (packetType == 4) {
                     int clientId = (message[1] & 0xff);
                     System.out.println("Nhận exit từ" + clientId);
-                    Platform.runLater(() -> {
-                        liveController.requestExitFromStudent(clientId);
-                    });
-
+                    TeacherSocket.setExit(clientId);
                 } else {
 
                 }
@@ -165,43 +168,4 @@ class TeacherTaskUdp extends Thread {
         }
     }
 
-
-}
-class DisplayImage implements  Runnable{
-    private final ExecutorService executorService = Executors.newCachedThreadPool();
-    LiveController liveController;
-    DisplayImage(LiveController liveController) {
-        this.liveController = liveController;
-    }
-    @Override
-    public void run() {
-        while (true) {
-            String packetId = TeacherSocket.sendList.poll();
-            if (packetId != null) {
-                byte[] imageBytes = TeacherSocket.buffer.get(packetId);
-                int pos = packetId.lastIndexOf(":");
-                int imageId = Integer.parseInt(packetId.substring(0, pos));
-                int clientId = Integer.parseInt(packetId.substring(pos + 1));
-
-                if (imageBytes != null && imageBytes.length > 0) {
-                    TeacherSocket.imageCount++;
-                    System.out.println("Hiển thị ảnh thứ " + TeacherSocket.imageCount + ", " + imageBytes.length);
-
-                    // Sử dụng CompletableFuture để xử lý bất đồng bộ
-                    CompletableFuture.runAsync(() -> {
-                        try {
-                            // Chỉ tạo ByteArrayInputStream khi cần thiết
-                            Image newImage = new Image(new ByteArrayInputStream(imageBytes));
-                            // Cập nhật hình ảnh trên UI
-                            Platform.runLater(() -> liveController.updateImage(clientId, newImage));
-                        } catch (Exception e) {
-                            System.err.println("Lỗi khi tạo hình ảnh: " + e.getMessage());
-                        }
-                    });
-                } else {
-                    System.out.println("Ảnh null");
-                }
-            }
-        }
-    }
 }

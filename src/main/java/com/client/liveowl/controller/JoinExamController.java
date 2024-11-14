@@ -1,10 +1,7 @@
 package com.client.liveowl.controller;
-
 import com.client.liveowl.StudentSocket;
-import com.client.liveowl.util.AlertDialog;
-import com.client.liveowl.util.Authentication;
+import javafx.animation.AnimationTimer;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -21,12 +18,12 @@ public class JoinExamController {
     private Button buttonRequest;
     @FXML
     private TextField isActive;
+    private AnimationTimer animationTimer;
 
     @FXML
     public void initialize() {
         try {
-
-            StudentController.theSocket.LiveStream(this);
+            StudentController.theSocket.LiveStream();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -39,19 +36,24 @@ public class JoinExamController {
                     "-fx-border-color: #FFFFFF;" + // Màu viền trắng
                     "-fx-border-width: 2px;" + // Độ dày viền
                     "-fx-alignment: CENTER;"); // Căn giữa văn bả
-            StudentSocket.isLive = true;
-
-
-
+            StudentSocket.updateLive();
         });
-
         buttonCamera.setOnAction(e -> {
-            StudentSocket.captureFromCamera ^= 1;
+            StudentSocket.updateCamera();
         });
+        animationTimer = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                Image image = StudentSocket.cache.poll();
+                if (image != null) {
+                    updateImage(image);
+                }
+            }
+        };
+        animationTimer.start();
     }
-
     public void updateImage(Image img) {
-        if (StudentSocket.captureFromCamera == 0) {
+        if (StudentSocket.getCamera() == 0) {
             image.setImage(null);
         } else {
             if (image == null) {
@@ -62,7 +64,4 @@ public class JoinExamController {
         }
 
     }
-
-
-
 }
