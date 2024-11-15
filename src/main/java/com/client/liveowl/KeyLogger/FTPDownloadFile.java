@@ -56,6 +56,10 @@ public String xuly(String input) {
                         code.append("{");
                         i += 2;
                         continue;
+                    case "Equals":
+                        code.append("+");
+                        i++;
+                        continue;
                     case "Close":
                         code.append("}");
                         i += 2;
@@ -65,7 +69,6 @@ public String xuly(String input) {
             continue;
         }
 
-        // Xử lý các từ khóa khác và chuyển đổi chúng
         switch (element) {
             case "Space":
                 code.append(" ");
@@ -79,9 +82,12 @@ public String xuly(String input) {
             case "Semicolon":
                 code.append(";");
                 break;
+            case "Comma":
+                code.append(",");
+                break;
             case "Backspace":
                 if (code.length() > 0) {
-                    code.deleteCharAt(code.length() - 1); // Xóa ký tự cuối cùng
+                    code.deleteCharAt(code.length() - 1);
                 }
                 break;
             default:
@@ -89,7 +95,7 @@ public String xuly(String input) {
                 break;
         }
     }
-    return code.toString();  // Trả về chuỗi đã xử lý
+    return code.toString();
 }
 //public static void main(String[] args) {
 //    FTPDownloadFile downloadFile = new FTPDownloadFile();
