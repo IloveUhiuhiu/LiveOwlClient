@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
 
-<Pane xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      prefHeight="200.0" prefWidth="300.0">
-    <Label text="This is the Result Content!" />
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="661.0" style="-fx-background-color: white; -fx-background-radius: 15px;" stylesheets="@css/style.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.client.liveowl.controller.ResultController">
+   <children>
+      <GridPane fx:id="gridPane" layoutX="88.0" layoutY="50.0" hgap="20.0" vgap="20.0">
+         <!-- The GridPane will be populated dynamically by the controller -->
+      </GridPane>
+      <Button fx:id="prevButton" layoutX="228.0" layoutY="420.0" mnemonicParsing="false" style="-fx-background-radius: 15px;" text="Trang trước" onAction="#onPrevPage" />
+      <Button fx:id="nextButton" layoutX="361.0" layoutY="420.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="78.0" style="-fx-background-radius: 15px;" text="Trang sau" onAction="#onNextPage" />
+   </children>
 </Pane>

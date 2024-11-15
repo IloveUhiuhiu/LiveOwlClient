@@ -194,7 +194,7 @@ public class SignUpController {
     }
 
     private void sendSignupRequest(String email, String password, String fullname, String dateofbirth, Boolean gender, int role) throws IOException {
-        String url = "http://localhost:9090/users/signup";  // Địa chỉ API đăng ký tài khoản
+        String url = "http://192.168.110.194:9090/users/signup";  // Địa chỉ API đăng ký tài khoản
 
         // Tạo client HTTP
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {

@@ -9,31 +9,31 @@
 <?import javafx.scene.text.Font?>
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.client.liveowl.controller.JoinExamController">
-   <center>
-      <AnchorPane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: white;" BorderPane.alignment="CENTER">
-         <children>
-            <Pane layoutX="64.0" layoutY="135.0" prefHeight="350.0" prefWidth="500.0" style="-fx-background-color: #202124; -fx-background-radius: 10px;">
-               <children>
-                  <ImageView fx:id="image" fitHeight="350.0" fitWidth="500.0" pickOnBounds="true" preserveRatio="true" />
-                  <Button fx:id="buttonCamera" layoutX="225.0" layoutY="286.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0" style="-fx-background-radius: 50px; -fx-background-color: red;" textFill="WHITE" />
-               </children>
-            </Pane>
-            <Button fx:id="buttonRequest" layoutX="637.0" layoutY="298.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="150.0" style="-fx-background-color: #0b57d0; -fx-background-radius: 20px;" text="Yêu cầu tham gia" textFill="WHITE">
-               <font>
-                  <Font name="Arial Bold" size="13.0" />
-               </font>
-            </Button>
-            <TextField layoutX="601.0" layoutY="232.0" style="-fx-alignment: center; -fx-border-color: white; -fx-background-color: white;" text="Sẵn sàng tham gia?">
-               <font>
-                  <Font name="Arial Bold" size="18.0" />
-               </font>
-            </TextField>
-            <TextField fx:id="isActive" layoutX="621.0" layoutY="40.0" prefHeight="27.0" prefWidth="241.0" style="-fx-alignment: center; -fx-background-color: white; -fx-border-color: white;">
-               <font>
-                  <Font name="Arial Bold" size="14.0" />
-               </font>
-            </TextField>
-         </children>
-      </AnchorPane>
-   </center>
+    <center>
+        <AnchorPane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: white;" BorderPane.alignment="CENTER">
+            <children>
+                <Pane layoutX="64.0" layoutY="135.0" prefHeight="350.0" prefWidth="500.0" style="-fx-background-color: #202124; -fx-background-radius: 10px;">
+                    <children>
+                        <ImageView fx:id="image" fitHeight="350.0" fitWidth="500.0" pickOnBounds="true" preserveRatio="true" />
+                        <Button fx:id="buttonCamera" layoutX="225.0" layoutY="286.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0" style="-fx-background-radius: 50px; -fx-background-color: red;" textFill="WHITE" />
+                    </children>
+                </Pane>
+                <Button fx:id="buttonRequest" layoutX="637.0" layoutY="298.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="150.0" style="-fx-background-color: #0b57d0; -fx-background-radius: 20px;" text="Yêu cầu tham gia" textFill="WHITE">
+                    <font>
+                        <Font name="Arial Bold" size="13.0" />
+                    </font>
+                </Button>
+                <TextField layoutX="601.0" layoutY="232.0" style="-fx-alignment: center; -fx-border-color: white; -fx-background-color: white;" text="Sẵn sàng tham gia?">
+                    <font>
+                        <Font name="Arial Bold" size="18.0" />
+                    </font>
+                </TextField>
+                <TextField fx:id="isActive" layoutX="621.0" layoutY="40.0" prefHeight="27.0" prefWidth="241.0" style="-fx-alignment: center; -fx-background-color: white; -fx-border-color: white;">
+                    <font>
+                        <Font name="Arial Bold" size="14.0" />
+                    </font>
+                </TextField>
+            </children>
+        </AnchorPane>
+    </center>
 </BorderPane>
