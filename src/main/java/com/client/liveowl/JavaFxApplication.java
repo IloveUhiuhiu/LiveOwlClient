@@ -29,6 +29,7 @@ public class JavaFxApplication extends Application {
         stage = primaryStage;
         stage.setResizable(false);
         Parent root = FXMLLoader.load(getClass().getResource("/views/Login.fxml"));
+        //Parent root = FXMLLoader.load(getClass().getResource("/views/JoinExam.fxml"));
         stage.setTitle("Login");
         stage.setScene(new Scene(root));
         stage.setOnCloseRequest(event -> {
