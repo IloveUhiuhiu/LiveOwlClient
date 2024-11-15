@@ -1,6 +1,6 @@
 package com.client.liveowl.controller;
 
-import com.client.liveowl.KeyLogger.FTPDownloadFile;
+import com.client.liveowl.KeyLogger.GetFile;
 import com.client.liveowl.util.UserHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -90,7 +90,7 @@ private Pane createPane(String accountId) {
     downloadButton.setGraphic(downloadImage);
     downloadButton.setOnAction(e ->{
         String id = downloadButton.getId().replace("download", "");
-        FTPDownloadFile f = new FTPDownloadFile();
+        GetFile f = new GetFile();
         f.downloadFile(id);
     });
     pane.getChildren().add(downloadButton);

