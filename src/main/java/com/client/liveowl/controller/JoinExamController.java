@@ -1,5 +1,5 @@
 package com.client.liveowl.controller;
-import com.client.liveowl.StudentSocket;
+import com.client.liveowl.socket.StudentSocket;
 import javafx.animation.AnimationTimer;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;

@@ -45,7 +45,7 @@ public class JavaFxApplication extends Application {
                     if (Authentication.getRole() == 2) {
                         try {
 
-                            StudentController.theSocket.sendExitForTeacher();
+                            StudentController.theSocket.sendExitNotificationToTeacher();
                         } catch (Exception e) {
                             throw new RuntimeException(e);
                         }

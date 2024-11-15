@@ -19,7 +19,7 @@
       </ScrollPane>
    </center>
    <bottom>
-      <Button fx:id="exitButton" mnemonicParsing="false" onAction="#clickExitButton" style="-fx-background-color: red;" text="Kết thúc cuộc họp" textFill="#fcf5f5" BorderPane.alignment="CENTER">
+      <Button fx:id="exitButton" mnemonicParsing="false" onAction="#handleExitButtonClick" style="-fx-background-color: red;" text="Kết thúc cuộc họp" textFill="#fcf5f5" BorderPane.alignment="CENTER">
          <font>
             <Font name="System Bold" size="14.0" />
          </font></Button>

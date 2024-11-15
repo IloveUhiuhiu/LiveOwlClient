@@ -1,19 +1,16 @@
 package com.client.liveowl.controller;
 
 import com.client.liveowl.JavaFxApplication;
-import com.client.liveowl.StudentSocket;
+import com.client.liveowl.socket.StudentSocket;
 import com.client.liveowl.util.AlertDialog;
 import com.client.liveowl.util.Authentication;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.concurrent.Task;
 
 
 import java.io.IOException;
-import java.net.DatagramPacket;
 
 public class StudentController {
     @FXML

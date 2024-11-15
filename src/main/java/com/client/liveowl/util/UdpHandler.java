@@ -1,5 +1,4 @@
 package com.client.liveowl.util;
-import com.client.liveowl.TeacherSocket;
 
 import java.io.IOException;
 import java.net.DatagramPacket;

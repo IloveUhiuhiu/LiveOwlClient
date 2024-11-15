@@ -1,4 +1,4 @@
-package com.client.liveowl.model;
+package com.client.liveowl.util;
 import javafx.scene.image.Image;
 import org.opencv.core.Mat;
 

@@ -1,11 +1,10 @@
 package com.client.liveowl.controller;
 
 import com.client.liveowl.JavaFxApplication;
-import com.client.liveowl.TeacherSocket;
-import com.client.liveowl.model.ImageData;
+import com.client.liveowl.socket.TeacherSocket;
+import com.client.liveowl.util.ImageData;
 import com.client.liveowl.util.AlertDialog;
 import javafx.animation.AnimationTimer;
-import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -15,17 +14,10 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-import javafx.util.Duration;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class LiveController {
 
@@ -38,14 +30,12 @@ public class LiveController {
     private GridPane gridImage;
     public static Map<Integer,ImageView> imageViews = new HashMap<>();
     public static Map<Integer,Button> buttonViews = new HashMap<>();
-    private double heightMax = 450; // Không static
-    private double widthMax = 800; // Không static
+    private double heightMax = 450;
+    private double widthMax = 800;
     private int numImages = 0;
     private AnimationTimer animationTimer;
     private long lastUpdate = 0;
     private static final long UPDATE_INTERVAL = 16_666_667;
-//    private static final long UPDATE_INTERVAL = 33_333_333;
-//    private static final long UPDATE_INTERVAL = 20_000_000;
 
 
     @FXML
@@ -54,7 +44,7 @@ public class LiveController {
         isLive = true;
         teacherSocket = new TeacherSocket();
         try {
-            teacherSocket.LiveStream(code,this);
+            teacherSocket.LiveStream(code);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -68,22 +58,14 @@ public class LiveController {
         animationTimer = new AnimationTimer() {
             @Override
             public void handle(long now) {
-//                if (now - lastUpdate >= UPDATE_INTERVAL) {
-//                    ImageData imageData = TeacherSocket.sendList.poll();
-//
-//                    if (imageData != null) {
-//                            updateImage(imageData.getClientId(), imageData.getImage());
-//                    }
-//                    lastUpdate = now;
-//                }
-
                 ImageData imageData = TeacherSocket.sendList.poll();
                 if (imageData != null) {
                     updateImage(imageData.getClientId(), imageData.getImage());
                 }
                 int clientIdExit = TeacherSocket.getExit();
                 if( clientIdExit >= 0) {
-                    requestExitFromStudent(clientIdExit);
+                    handleStudentExitRequest(clientIdExit);
+                    TeacherSocket.setExit(-1);
                 }
             }
 
@@ -150,7 +132,7 @@ public class LiveController {
         }
     }
     @FXML
-    private void clickExitButton() {
+    private void handleExitButtonClick() {
 
         AlertDialog alertDialog = new AlertDialog("Xác nhận thoát",null,"Bạn có chắc chắn muốn thoát không?", Alert.AlertType.CONFIRMATION);
         Alert alert = alertDialog.getConfirmationDialog();
@@ -161,7 +143,7 @@ public class LiveController {
                     isLive = false;
                     teacherSocket = null;
                     if (animationTimer != null) {
-                        animationTimer.stop(); // Dừng AnimationTimer
+                        animationTimer.stop();
                     }
                     JavaFxApplication.changeScene("/views/Home.fxml");
                 } catch (IOException e) {
@@ -171,7 +153,7 @@ public class LiveController {
         });
 
     }
-    public void requestExitFromStudent(int number) {
+    public void handleStudentExitRequest(int number) {
         if (imageViews.containsKey(number)) {
             numImages--;
             imageViews.remove(number);
