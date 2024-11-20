@@ -16,6 +16,7 @@ import java.util.List;
 
 public class UserHandler {
     private static final String BASE_URI = "http://localhost:9090";
+   // private static final String BASE_URI = "http://10.10.26.160:9090";
 
     public static String getUserId() {
         String url = BASE_URI + "/users/detail";

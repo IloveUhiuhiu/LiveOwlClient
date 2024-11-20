@@ -76,24 +76,29 @@ private Pane createPane(String accountId) {
     seenImage.setFitHeight(20);
     seenImage.setFitWidth(20);
     seenButton.setGraphic(seenImage);
-    pane.getChildren().add(seenButton);
-
-    Button downloadButton = new Button();
-    downloadButton.setLayoutX(84.0);
-    downloadButton.setLayoutY(28.0);
-    downloadButton.setPrefSize(30.0, 28.0);
-    downloadButton.setStyle("-fx-background-color: white;");
-    downloadButton.setId("download" + accountId);
-    ImageView downloadImage = new ImageView(new Image(getClass().getResource("/images/download.png").toExternalForm()));
-    downloadImage.setFitHeight(20);
-    downloadImage.setFitWidth(20);
-    downloadButton.setGraphic(downloadImage);
-    downloadButton.setOnAction(e ->{
-        String id = downloadButton.getId().replace("download", "");
+    seenButton.setOnAction(e ->{
+        String id = seenButton.getId().replace("seen", "");
         GetFile f = new GetFile();
         f.downloadFile(id);
     });
-    pane.getChildren().add(downloadButton);
+    pane.getChildren().add(seenButton);
+
+//    Button downloadButton = new Button();
+//    downloadButton.setLayoutX(84.0);
+//    downloadButton.setLayoutY(28.0);
+//    downloadButton.setPrefSize(30.0, 28.0);
+//    downloadButton.setStyle("-fx-background-color: white;");
+//    downloadButton.setId("download" + accountId);
+//    ImageView downloadImage = new ImageView(new Image(getClass().getResource("/images/download.png").toExternalForm()));
+//    downloadImage.setFitHeight(20);
+//    downloadImage.setFitWidth(20);
+//    downloadButton.setGraphic(downloadImage);
+//    downloadButton.setOnAction(e ->{
+//        String id = downloadButton.getId().replace("download", "");
+//        GetFile f = new GetFile();
+//        f.downloadFile(id);
+//    });
+//    pane.getChildren().add(downloadButton);
 
     return pane;
 }
