@@ -21,8 +21,8 @@ import java.util.logging.Logger;
 public class StudentSocket{
     public static int maxDatagramPacketLength = 1500;
     public static int serverPort = 9000;
-    public static final String serverHostName = "192.168.1.21";
-   // public static final String serverHostName = "localhost";
+    //public static final String serverHostName = "192.168.1.21";
+    public static final String serverHostName = "localhost";
     public static int clientPortSend = 8000;
     public static int clientPortReceive = 7000;
     public static int imageId = 0;

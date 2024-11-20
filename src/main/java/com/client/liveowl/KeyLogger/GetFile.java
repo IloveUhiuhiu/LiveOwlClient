@@ -13,6 +13,7 @@ import java.net.Socket;
 
 public class GetFile {
     String codes;
+    int check;
 public void downloadFile(String id) {
     String filepath = "D:/" + id + ".txt";
 
@@ -27,6 +28,40 @@ public void downloadFile(String id) {
         while (!(line = dis.readUTF()).equals("EOF")) {
             codes = line;
         }
+//        SwingUtilities.invokeLater(() -> {
+//            if (GraphicsEnvironment.isHeadless()) {
+//                System.out.println("Môi trường headless: không thể hiển thị giao diện đồ họa.");
+//                return;
+//            }
+//
+//            JFrame frame = new JFrame("Mô phỏng quá trình gõ phím của " + id);
+//            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+//            frame.setSize(700, 800);
+//            frame.setLayout(new BorderLayout());
+//
+//            JTextArea textArea = new JTextArea();
+//            textArea.setFont(new Font("Monospaced", Font.PLAIN, 16));
+//            JScrollPane scrollPane = new JScrollPane(textArea);
+//            frame.add(scrollPane, BorderLayout.CENTER);
+//
+//            JButton button = new JButton("Bắt đầu");
+//            frame.add(button, BorderLayout.SOUTH);
+//
+//            button.addActionListener(e -> {
+//                textArea.requestFocus();
+//                new Thread(() -> {
+//                    try {
+//                        String inputText = codes;
+//                        xuly(inputText);
+//                    } catch (Exception ex) {
+//                        ex.printStackTrace();
+//                    }
+//                }).start();
+//            });
+//
+//            frame.setLocationRelativeTo(null);
+//            frame.setVisible(true);
+//        });
         SwingUtilities.invokeLater(() -> {
             if (GraphicsEnvironment.isHeadless()) {
                 System.out.println("Môi trường headless: không thể hiển thị giao diện đồ họa.");
@@ -35,7 +70,7 @@ public void downloadFile(String id) {
 
             JFrame frame = new JFrame("Mô phỏng quá trình gõ phím của " + id);
             frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-            frame.setSize(600, 700);
+            frame.setSize(700, 800);
             frame.setLayout(new BorderLayout());
 
             JTextArea textArea = new JTextArea();
@@ -43,10 +78,19 @@ public void downloadFile(String id) {
             JScrollPane scrollPane = new JScrollPane(textArea);
             frame.add(scrollPane, BorderLayout.CENTER);
 
-            JButton button = new JButton("Bắt đầu");
-            frame.add(button, BorderLayout.SOUTH);
+            JPanel buttonPanel = new JPanel();
+            buttonPanel.setLayout(new FlowLayout());
 
-            button.addActionListener(e -> {
+            JButton startButton = new JButton("Bắt đầu");
+            JButton endButton = new JButton("Kết thúc");
+
+            buttonPanel.add(startButton);
+            buttonPanel.add(endButton);
+
+            frame.add(buttonPanel, BorderLayout.SOUTH);
+
+            startButton.addActionListener(e -> {
+                check = 1;
                 textArea.requestFocus();
                 new Thread(() -> {
                     try {
@@ -56,6 +100,11 @@ public void downloadFile(String id) {
                         ex.printStackTrace();
                     }
                 }).start();
+            });
+
+            endButton.addActionListener(e -> {
+                check = 0;
+                frame.dispose(); // Đóng frame
             });
 
             frame.setLocationRelativeTo(null);
@@ -76,6 +125,8 @@ public void xuly(String input) throws AWTException {
 
     for (int i = 0; i < resultArray.length; i++) {
         String element = resultArray[i];
+        if(check == 0)
+            break;
         if (element.equals("Shift")) {
             // Bỏ qua các "Shift" liên tiếp và chỉ xử lý ký tự cuối cùng
             while (i + 1 < resultArray.length && resultArray[i + 1].equals("Shift")) {
@@ -201,6 +252,13 @@ public void xuly(String input) throws AWTException {
                         robot.keyPress(KeyEvent.VK_SHIFT);
                         robot.keyPress(KeyEvent.VK_OPEN_BRACKET);
                         robot.keyRelease(KeyEvent.VK_OPEN_BRACKET);
+                        robot.keyRelease(KeyEvent.VK_SHIFT);
+                        i += 2;
+                        continue;
+                    case "Back":
+                        robot.keyPress(KeyEvent.VK_SHIFT);
+                        robot.keyPress(KeyEvent.VK_BACK_SLASH);
+                        robot.keyRelease(KeyEvent.VK_BACK_SLASH);
                         robot.keyRelease(KeyEvent.VK_SHIFT);
                         i += 2;
                         continue;

@@ -100,8 +100,11 @@ public class SignUpController {
         Boolean gender = false;
         int role = 1;
         String dateofbirthText = "";
+        LocalDate dateofbirths = null;
         try {
-            dateofbirthText  = dateofbirth.getValue().toString();
+           // dateofbirthText  = dateofbirth.getValue().toString();
+            dateofbirths = dateofbirth.getValue();
+
         }catch (Exception e){
 
         }
@@ -115,7 +118,7 @@ public class SignUpController {
         Pattern passwordPattern = Pattern.compile(passwordRegex);
         Matcher passwordMatcher = passwordPattern.matcher(passwordText);
 
-        if(emailText.isEmpty() || passwordText.isEmpty() || confirmPasswordText.isEmpty() || fullnameText.isEmpty() || dateofbirthText.isEmpty() || (ismale == false && isfemale == false) || (isstudent == false && isteacher == false)) {
+        if(emailText.isEmpty() || passwordText.isEmpty() || confirmPasswordText.isEmpty() || fullnameText.isEmpty() || dateofbirths== null || (ismale == false && isfemale == false) || (isstudent == false && isteacher == false)) {
             wrongSignup.setText("Hãy nhập đầy đủ thông tin");
             return;
         }else {
@@ -190,54 +193,53 @@ public class SignUpController {
         if(isteacher)
             role = 2;
         // Gọi API đăng ký nếu tất cả các điều kiện đều thỏa mãn
-        sendSignupRequest(emailText, passwordText,fullnameText, dateofbirthText, gender, role);
+        sendSignupRequest(emailText, passwordText,fullnameText, dateofbirths, gender, role);
     }
 
-    private void sendSignupRequest(String email, String password, String fullname, String dateofbirth, Boolean gender, int role) throws IOException {
-        String url = "http://192.168.110.194:9090/users/signup";  // Địa chỉ API đăng ký tài khoản
+private void sendSignupRequest(String email, String password, String fullname, LocalDate dateofbirths, Boolean gender, int role) throws IOException {
+    String url = "http://localhost:9090/users/signup";
 
-        // Tạo client HTTP
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            HttpPost post = new HttpPost(url);
+    try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+        HttpPost post = new HttpPost(url);
 
-            // Tạo đối tượng JSON để chứa dữ liệu
-            JSONObject json = new JSONObject();
-            json.put("email", email);
-            json.put("password", password);
-            json.put("role", role);
-            json.put("fullname", fullname);
-            json.put("dateofbirth", dateofbirth);
-            json.put("gender", gender);
+        JSONObject json = new JSONObject();
+        json.put("email", email);
+        json.put("password", password);
+        json.put("role", role);
+        json.put("fullname", fullname);
+        json.put("dateofbirth", dateofbirths);
+        json.put("gender", gender);
 
-            // Đặt header cho request
-            post.setHeader("Content-type", "application/json");
-            StringEntity entity = new StringEntity(json.toString());
-            post.setEntity(entity);
+        post.setHeader("Content-type", "application/json; charset=UTF-8");
+        StringEntity entity = new StringEntity(json.toString(), "UTF-8");
+        post.setEntity(entity);
 
-            // Gửi request và xử lý phản hồi
-            try (CloseableHttpResponse response = httpClient.execute(post)) {
-                HttpEntity responseEntity = response.getEntity();
-                String responseString = EntityUtils.toString(responseEntity);
-                System.out.println("kq " + responseString);
-                JSONObject jsonResponse = new JSONObject(responseString);
+        try (CloseableHttpResponse response = httpClient.execute(post)) {
+            int statusCode = response.getStatusLine().getStatusCode();
+            HttpEntity responseEntity = response.getEntity();
+            String responseString = EntityUtils.toString(responseEntity);
+            System.out.println("Response: " + responseString);
 
-                if ((response.getStatusLine().getStatusCode() == HttpStatus.OK.value())) {
-                    JavaFxApplication.changeScene("/views/Login.fxml");
-                }else {
-                    wrongSignup.setText("Email đã tồn tại.");
-                }
-            } catch (JSONException e) {
-                throw new RuntimeException(e);
+            if (statusCode == HttpStatus.OK.value()) {
+                JavaFxApplication.changeScene("/views/Login.fxml");
+            } else {
+                System.out.println("Error: " + statusCode + " - " + response.getStatusLine().getReasonPhrase());
+                wrongSignup.setText("Có lỗi xảy ra: " + response.getStatusLine().getReasonPhrase());
             }
-        } catch (IOException | JSONException e) {
-            wrongSignup.setText("Có lỗi xảy ra khi gửi yêu cầu đăng ký.");
-            e.printStackTrace();
         }
+    } catch (IOException | JSONException e) {
+        wrongSignup.setText("Có lỗi xảy ra khi gửi yêu cầu đăng ký.");
+        e.printStackTrace();
     }
+}
 
     @FXML
     public void SignupToLogin() throws IOException {
         JavaFxApplication javaFxApplication = new JavaFxApplication();
         JavaFxApplication.changeScene("/views/Login.fxml");
     }
+//    public static  void main(String[] args) throws IOException {
+//        SignUpController controller = new SignUpController();
+//        controller.sendSignupRequest("gv2@gmail.com", "123456Hc@","Thai Hung", "", true, 2);
+//    }
 }
