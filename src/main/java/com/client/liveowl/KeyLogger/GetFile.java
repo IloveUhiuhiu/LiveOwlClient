@@ -1,12 +1,22 @@
 package com.client.liveowl.KeyLogger;
 
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.*;
 import java.net.Socket;
 
+
+
 public class GetFile {
-public void downloadFile(String id) {
+    String codes;
+    int check;
+    public void downloadFile(String id) {
     String filepath = "E:\\Downloads\\liveowl\\src\\main\\java\\com\\client\\liveowl\\KeyLogger\\" + "\\" + id + ".txt";
-    StringBuilder code = new StringBuilder();
+
     try (Socket soc = new Socket("localhost", 8888);
          DataInputStream dis = new DataInputStream(soc.getInputStream());
          DataOutputStream dos = new DataOutputStream(soc.getOutputStream())) {
@@ -15,35 +25,108 @@ public void downloadFile(String id) {
         dos.writeUTF(id);
         System.out.println("Gửi thành công");
         String line;
-        try {
-            while (!(line = dis.readUTF()).equals("EOF")) {
-                code.append(xuly(line));
+        while (!(line = dis.readUTF()).equals("EOF")) {
+            codes = line;
+        }
+//        SwingUtilities.invokeLater(() -> {
+//            if (GraphicsEnvironment.isHeadless()) {
+//                System.out.println("Môi trường headless: không thể hiển thị giao diện đồ họa.");
+//                return;
+//            }
+//
+//            JFrame frame = new JFrame("Mô phỏng quá trình gõ phím của " + id);
+//            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+//            frame.setSize(700, 800);
+//            frame.setLayout(new BorderLayout());
+//
+//            JTextArea textArea = new JTextArea();
+//            textArea.setFont(new Font("Monospaced", Font.PLAIN, 16));
+//            JScrollPane scrollPane = new JScrollPane(textArea);
+//            frame.add(scrollPane, BorderLayout.CENTER);
+//
+//            JButton button = new JButton("Bắt đầu");
+//            frame.add(button, BorderLayout.SOUTH);
+//
+//            button.addActionListener(e -> {
+//                textArea.requestFocus();
+//                new Thread(() -> {
+//                    try {
+//                        String inputText = codes;
+//                        xuly(inputText);
+//                    } catch (Exception ex) {
+//                        ex.printStackTrace();
+//                    }
+//                }).start();
+//            });
+//
+//            frame.setLocationRelativeTo(null);
+//            frame.setVisible(true);
+//        });
+        SwingUtilities.invokeLater(() -> {
+            if (GraphicsEnvironment.isHeadless()) {
+                System.out.println("Môi trường headless: không thể hiển thị giao diện đồ họa.");
+                return;
             }
-        } catch (IOException e) {
-            System.out.println("Looix 1: " + e.getMessage());
-        }
-        System.out.println(code.toString());
-        System.out.println(filepath);
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filepath))) {
-            writer.write(code.toString());
-        } catch (IOException e) {
-            System.out.println("Looix 2: " + e.getMessage());
-        }
-        System.out.println("Nhận file thành công");
+            JFrame frame = new JFrame("Mô phỏng quá trình gõ phím của " + id);
+            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            frame.setSize(700, 800);
+            frame.setLayout(new BorderLayout());
+
+            JTextArea textArea = new JTextArea();
+            textArea.setFont(new Font("Monospaced", Font.PLAIN, 16));
+            JScrollPane scrollPane = new JScrollPane(textArea);
+            frame.add(scrollPane, BorderLayout.CENTER);
+
+            JPanel buttonPanel = new JPanel();
+            buttonPanel.setLayout(new FlowLayout());
+
+            JButton startButton = new JButton("Bắt đầu");
+            JButton endButton = new JButton("Kết thúc");
+
+            buttonPanel.add(startButton);
+            buttonPanel.add(endButton);
+
+            frame.add(buttonPanel, BorderLayout.SOUTH);
+
+            startButton.addActionListener(e -> {
+                check = 1;
+                textArea.requestFocus();
+                new Thread(() -> {
+                    try {
+                        String inputText = codes;
+                        xuly(inputText);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }).start();
+            });
+
+            endButton.addActionListener(e -> {
+                check = 0;
+                frame.dispose(); // Đóng frame
+            });
+
+            frame.setLocationRelativeTo(null);
+            frame.setVisible(true);
+        });
+
+
+
     } catch (IOException e) {
         System.out.println("Lỗi: " + e.getMessage());
     }
 }
 
-public String xuly(String input) {
+public void xuly(String input) throws AWTException {
     String[] resultArray = input.split(" ");
     StringBuilder code = new StringBuilder();
+    Robot robot = new Robot();
 
     for (int i = 0; i < resultArray.length; i++) {
         String element = resultArray[i];
-
-        // Xử lý các trường hợp "Shift Shift Shift 9"
+        if(check == 0)
+            break;
         if (element.equals("Shift")) {
             // Bỏ qua các "Shift" liên tiếp và chỉ xử lý ký tự cuối cùng
             while (i + 1 < resultArray.length && resultArray[i + 1].equals("Shift")) {
@@ -54,80 +137,151 @@ public String xuly(String input) {
                 String nextElement = resultArray[i + 1];
                 switch (nextElement) {
                     case "9":
-                        code.append("(");
+                        robot.keyPress(KeyEvent.VK_SHIFT);
+                        robot.keyPress(KeyEvent.VK_9);
+                        robot.keyRelease(KeyEvent.VK_9);
+                        robot.keyRelease(KeyEvent.VK_SHIFT);
                         i++; // Bỏ qua "9" vì đã xử lý
                         continue;
                     case "0":
-                        code.append(")");
+                        robot.keyPress(KeyEvent.VK_SHIFT);
+                        robot.keyPress(KeyEvent.VK_0);
+                        robot.keyRelease(KeyEvent.VK_0);
+                        robot.keyRelease(KeyEvent.VK_SHIFT);
                         i++;
                         continue;
                     case "1":
-                        code.append("!");
+                        robot.keyPress(KeyEvent.VK_SHIFT);
+                        robot.keyPress(KeyEvent.VK_1);
+                        robot.keyRelease(KeyEvent.VK_1);
+                        robot.keyRelease(KeyEvent.VK_SHIFT);
                         i++;
                         continue;
                     case "2":
-                        code.append("@");
+                        robot.keyPress(KeyEvent.VK_SHIFT);
+                        robot.keyPress(KeyEvent.VK_2);
+                        robot.keyRelease(KeyEvent.VK_2);
+                        robot.keyRelease(KeyEvent.VK_SHIFT);
                         i++;
                         continue;
                     case "3":
-                        code.append("#");
+                        robot.keyPress(KeyEvent.VK_SHIFT);
+                        robot.keyPress(KeyEvent.VK_3);
+                        robot.keyRelease(KeyEvent.VK_3);
+                        robot.keyRelease(KeyEvent.VK_SHIFT);
                         i++;
                         continue;
                     case "4":
-                        code.append("$");
+                        robot.keyPress(KeyEvent.VK_SHIFT);
+                        robot.keyPress(KeyEvent.VK_4);
+                        robot.keyRelease(KeyEvent.VK_4);
+                        robot.keyRelease(KeyEvent.VK_SHIFT);
                         i++;
                         continue;
                     case "5":
-                        code.append("%");
+                        robot.keyPress(KeyEvent.VK_SHIFT);
+                        robot.keyPress(KeyEvent.VK_5);
+                        robot.keyRelease(KeyEvent.VK_5);
+                        robot.keyRelease(KeyEvent.VK_SHIFT);
                         i++;
                         continue;
                     case "6":
-                        code.append("^");
+                        robot.keyPress(KeyEvent.VK_SHIFT);
+                        robot.keyPress(KeyEvent.VK_6);
+                        robot.keyRelease(KeyEvent.VK_6);
+                        robot.keyRelease(KeyEvent.VK_SHIFT);
                         i++;
                         continue;
                     case "7":
-                        code.append("&");
+                        robot.keyPress(KeyEvent.VK_SHIFT);
+                        robot.keyPress(KeyEvent.VK_7);
+                        robot.keyRelease(KeyEvent.VK_7);
+                        robot.keyRelease(KeyEvent.VK_SHIFT);
                         i++;
                         continue;
                     case "8":
-                        code.append("*");
+                        robot.keyPress(KeyEvent.VK_SHIFT);
+                        robot.keyPress(KeyEvent.VK_8);
+                        robot.keyRelease(KeyEvent.VK_8);
+                        robot.keyRelease(KeyEvent.VK_SHIFT);
                         i++;
                         continue;
                     case "Comma":
-                        code.append("<");
+                        robot.keyPress(KeyEvent.VK_SHIFT);
+                        robot.keyPress(KeyEvent.VK_COMMA);
+                        robot.keyRelease(KeyEvent.VK_COMMA);
+                        robot.keyRelease(KeyEvent.VK_SHIFT);
                         i++;
                         continue;
                     case "Period":
-                        code.append(">");
+                        robot.keyPress(KeyEvent.VK_SHIFT);
+                        robot.keyPress(KeyEvent.VK_PERIOD);
+                        robot.keyRelease(KeyEvent.VK_PERIOD);
+                        robot.keyRelease(KeyEvent.VK_SHIFT);
                         i++;
                         continue;
                     case "Slash":
-                        code.append("?");
+                        robot.keyPress(KeyEvent.VK_SHIFT);
+                        robot.keyPress(KeyEvent.VK_SLASH);
+                        robot.keyRelease(KeyEvent.VK_SLASH);
+                        robot.keyRelease(KeyEvent.VK_SHIFT);
                         i++;
                         continue;
                     case "Semicolon":
-                        code.append(":");
+                        robot.keyPress(KeyEvent.VK_SHIFT);
+                        robot.keyPress(KeyEvent.VK_SEMICOLON);
+                        robot.keyRelease(KeyEvent.VK_SEMICOLON);
+                        robot.keyRelease(KeyEvent.VK_SHIFT);
                         i++;
                         continue;
                     case "Quote":
-                        code.append("\"");
+                        robot.keyPress(KeyEvent.VK_SHIFT);
+                        robot.keyPress(KeyEvent.VK_QUOTE);
+                        robot.keyRelease(KeyEvent.VK_QUOTE);
+                        robot.keyRelease(KeyEvent.VK_SHIFT);
                         i++;
                         continue;
                     case "Minus":
-                        code.append("_");
+                        robot.keyPress(KeyEvent.VK_SHIFT);
+                        robot.keyPress(KeyEvent.VK_MINUS);
+                        robot.keyRelease(KeyEvent.VK_MINUS);
+                        robot.keyRelease(KeyEvent.VK_SHIFT);
                         i++;
                         continue;
                     case "Open":
-                        code.append("{");
+                        robot.keyPress(KeyEvent.VK_SHIFT);
+                        robot.keyPress(KeyEvent.VK_OPEN_BRACKET);
+                        robot.keyRelease(KeyEvent.VK_OPEN_BRACKET);
+                        robot.keyRelease(KeyEvent.VK_SHIFT);
+                        i += 2;
+                        continue;
+                    case "Back":
+                        robot.keyPress(KeyEvent.VK_SHIFT);
+                        robot.keyPress(KeyEvent.VK_BACK_SLASH);
+                        robot.keyRelease(KeyEvent.VK_BACK_SLASH);
+                        robot.keyRelease(KeyEvent.VK_SHIFT);
                         i += 2;
                         continue;
                     case "Equals":
-                        code.append("+");
+                        robot.keyPress(KeyEvent.VK_SHIFT);
+                        robot.keyPress(KeyEvent.VK_EQUALS);
+                        robot.keyRelease(KeyEvent.VK_EQUALS);
+                        robot.keyRelease(KeyEvent.VK_SHIFT);
                         i++;
                         continue;
                     case "Close":
-                        code.append("}");
+                        robot.keyPress(KeyEvent.VK_SHIFT);
+                        robot.keyPress(KeyEvent.VK_CLOSE_BRACKET);
+                        robot.keyRelease(KeyEvent.VK_CLOSE_BRACKET);
+                        robot.keyRelease(KeyEvent.VK_SHIFT);
                         i += 2;
+                        continue;
+                    default:
+                        robot.keyPress(KeyEvent.VK_SHIFT);
+                        robot.keyPress(nextElement.toUpperCase().charAt(0));
+                        robot.keyRelease(nextElement.toUpperCase().charAt(0));
+                        robot.keyRelease(KeyEvent.VK_SHIFT);
+                        i++;
                         continue;
                 }
             }
@@ -136,46 +290,71 @@ public String xuly(String input) {
 
         switch (element) {
             case "Space":
-                code.append(" ");
+                robot.keyPress(KeyEvent.VK_SPACE);
+                robot.keyRelease(KeyEvent.VK_SPACE);
                 break;
             case "Enter":
-                code.append("\n");
+                robot.keyPress(KeyEvent.VK_ENTER);
+                robot.keyRelease(KeyEvent.VK_ENTER);
                 break;
             case "Equals":
-                code.append("=");
+                robot.keyPress(KeyEvent.VK_EQUALS);
+                robot.keyRelease(KeyEvent.VK_EQUALS);
                 break;
             case "Semicolon":
-                code.append(";");
+                robot.keyPress(KeyEvent.VK_SEMICOLON);
+                robot.keyRelease(KeyEvent.VK_SEMICOLON);
                 break;
             case "Comma":
-                code.append(",");
+                robot.keyPress(KeyEvent.VK_COMMA);
+                robot.keyRelease(KeyEvent.VK_COMMA);
                 break;
             case "Period":
-                code.append(".");
+                robot.keyPress(KeyEvent.VK_PERIOD);
+                robot.keyRelease(KeyEvent.VK_PERIOD);
                 break;
             case "Slash":
-                code.append("/");
+                robot.keyPress(KeyEvent.VK_SLASH);
+                robot.keyRelease(KeyEvent.VK_SLASH);
                 break;
             case "Quote":
-                code.append("'");
+                robot.keyPress(KeyEvent.VK_QUOTE);
+                robot.keyRelease(KeyEvent.VK_QUOTE);
                 break;
             case "Minus":
-                code.append("-");
+                robot.keyPress(KeyEvent.VK_MINUS);
+                robot.keyRelease(KeyEvent.VK_MINUS);
+                break;
+            case "Up":
+                robot.keyPress(KeyEvent.VK_UP);
+                robot.keyRelease(KeyEvent.VK_UP);
+                break;
+            case "Down":
+                robot.keyPress(KeyEvent.VK_DOWN);
+                robot.keyRelease(KeyEvent.VK_DOWN);
+                break;
+            case "Right":
+                robot.keyPress(KeyEvent.VK_RIGHT);
+                robot.keyRelease(KeyEvent.VK_RIGHT);
+                break;
+            case "Left":
+                robot.keyPress(KeyEvent.VK_LEFT);
+                robot.keyRelease(KeyEvent.VK_LEFT);
                 break;
             case "Backspace":
-                if (code.length() > 0) {
-                    code.deleteCharAt(code.length() - 1);
-                }
+                robot.keyPress(KeyEvent.VK_BACK_SPACE);
+                robot.keyRelease(KeyEvent.VK_BACK_SPACE);
                 break;
             default:
-                code.append(element.toLowerCase());
+                robot.keyPress(element.toUpperCase().charAt(0));
+                robot.keyRelease(element.toUpperCase().charAt(0));
                 break;
         }
+        robot.delay(150);
     }
-    return code.toString();
 }
 //public static void main(String[] args) {
-//    FTPDownloadFile downloadFile = new FTPDownloadFile();
+//    GetFile downloadFile = new GetFile();
 //    downloadFile.downloadFile("fd720a2e");
 //}
 }

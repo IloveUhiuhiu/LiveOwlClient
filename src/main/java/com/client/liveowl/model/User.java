@@ -2,6 +2,7 @@ package com.client.liveowl.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import javafx.scene.control.Alert;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -22,7 +23,7 @@ public class User implements Serializable {
     private String profileImgLocation;
     private String fullName;
     private Boolean gender;
-    private Date dateOfBirth;
+    private LocalDate dateOfBirth;
 
 
     public User() {
@@ -86,10 +87,10 @@ public class User implements Serializable {
     public void setGender(Boolean gender) {
         this.gender = gender;
     }
-    public Date getDateOfBirth() {
+    public LocalDate getDateOfBirth() {
         return dateOfBirth;
     }
-    public void setDateOfBirth(Date dateOfBirth) {
+    public void setDateOfBirth(LocalDate dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 

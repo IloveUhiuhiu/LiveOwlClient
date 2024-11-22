@@ -1,4 +1,5 @@
 package com.client.liveowl.util;
+import com.client.liveowl.model.User;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -11,14 +12,19 @@ import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class UserHandler {
-
+    private static final String BASE_URI = "http://localhost:9090";
+   // private static final String BASE_URI = "http://10.10.26.160:9090";
 
     public static String getUserId() {
-        String url = Authentication.BASE_URI + "/users/detail";
+        String url = BASE_URI + "/users/detail";
 
         String token = Authentication.getToken();
         System.out.println("token: " + token);
@@ -57,7 +63,7 @@ public class UserHandler {
     }
 
     public static List<String> getAllAccountID() {
-        String url = Authentication.BASE_URI + "/users/allaccoutid";
+        String url = BASE_URI + "/users/allaccoutid";
         System.out.println(Authentication.getToken());
         System.out.println(url);
         CloseableHttpClient httpClient = HttpClients.createDefault();
@@ -93,10 +99,60 @@ public class UserHandler {
             throw new RuntimeException(e);
         }
     }
+
+    public static User getDetailUser(){
+        String url = BASE_URI + "/users/detail";
+
+        String token = Authentication.getToken();
+        System.out.println("token: " + token);
+     //   String token = "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoxLCJzdWIiOiJndjZAZ21haWwuY29tIn0.F7sgNbU_fpERAARCXrf59bFvrMKzBqnyWJZe_Bk5mjY";
+        if (token == null || token.isEmpty()) {
+            System.err.println("Token không hợp lệ. Vui lòng đăng nhập lại.");
+            return null;
+        }
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        HttpPost post = new HttpPost(url);
+        post.setHeader("Authorization", "Bearer " + token);
+
+        try (CloseableHttpResponse response = httpClient.execute(post)) {
+            int statusCode = response.getStatusLine().getStatusCode();
+            System.out.println("StatusCode: " + statusCode);
+
+            if (statusCode == HttpStatus.OK.value()) {
+                HttpEntity responseEntity = response.getEntity();
+                String responseString = EntityUtils.toString(responseEntity);
+                JSONObject jsonResponse = new JSONObject(responseString);
+
+                User user = new User();
+                user.setFullName(jsonResponse.getJSONObject("data").getString("fullName"));
+                user.setEmail(jsonResponse.getJSONObject("data").getString("email"));
+                user.setDateOfBirth(LocalDate.parse(jsonResponse.getJSONObject("data").getString("dateOfBirth")));
+                user.setGender(Boolean.valueOf(jsonResponse.getJSONObject("data").getString("gender")));
+                user.setProfileImgLocation(jsonResponse.getJSONObject("data").getString("profile"));
+                return user;
+            } else {
+                System.err.println("Lỗi khi lấy thông tin tài khoản: " + statusCode);
+                return null;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 //    public  static  void main(String[] args) {
-//        List<String> allid = getAllAccountID();
-//        for (String id : allid) {
-//            System.out.println(id);
-//        }
+////        List<String> allid = getAllAccountID();
+////        for (String id : allid) {
+////            System.out.println(id);
+////        }
+//        User user = getDetailUser();
+//        System.out.println(user.getEmail());
+//        System.out.println(user.getFullName());
+//        System.out.println(user.getDateOfBirth());
+//        System.out.println(user.getGender());
+//        System.out.println(user.getProfileImgLocation());
+//
 //    }
 }
