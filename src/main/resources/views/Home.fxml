@@ -95,9 +95,9 @@
                <children>
                   <BorderPane prefHeight="612.0" prefWidth="568.0">
                      <top>
-                        <AnchorPane prefHeight="84.0" prefWidth="568.0" BorderPane.alignment="CENTER">
+                        <AnchorPane fx:id="phaiPN" prefHeight="84.0" prefWidth="568.0" BorderPane.alignment="CENTER">
                            <children>
-                              <Pane layoutX="-3.0" layoutY="26.0" prefHeight="34.0" prefWidth="365.0" style="-fx-background-color: white; -fx-background-radius: 15px;">
+                              <Pane fx:id="headPN" layoutX="-3.0" layoutY="26.0" prefHeight="34.0" prefWidth="365.0" style="-fx-background-color: white; -fx-background-radius: 15px;">
                                  <children>
                                     <ImageView fitHeight="25.0" fitWidth="29.0" layoutX="14.0" layoutY="4.0" pickOnBounds="true" preserveRatio="true">
                                        <image>
@@ -107,12 +107,12 @@
                                     <TextField layoutX="38.0" layoutY="4.0" prefHeight="25.0" prefWidth="320.0" style="-fx-background-color: none;" />
                                  </children>
                               </Pane>
-                              <Pane layoutX="576.0" layoutY="6.0" prefHeight="71.0" prefWidth="73.0" style="-fx-background-radius: 45; -fx-background-color: white;" />
                               <Label layoutX="412.0" layoutY="26.0" prefHeight="38.0" prefWidth="148.0" text="1:00 PM | Sun, Jun 6" textFill="#fff9f9">
                                  <font>
                                     <Font size="15.0" />
                                  </font>
                               </Label>
+                              <ImageView fx:id="avt" fitHeight="64.0" fitWidth="85.0" layoutX="555.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" style="-fx-background-radius: 90px;" />
                            </children>
                         </AnchorPane>
                      </top>

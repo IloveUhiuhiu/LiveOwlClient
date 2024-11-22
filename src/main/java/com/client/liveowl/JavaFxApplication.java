@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 import org.opencv.core.Core;
 
 import java.io.IOException;
+import java.util.function.Consumer;
 
 public class JavaFxApplication extends Application {
 
@@ -64,6 +65,15 @@ public class JavaFxApplication extends Application {
         stage.setScene(new Scene(pane)); // Tạo một scene mới
         stage.show();
     }
+
+//    public static void changeScene(String fxmlPath, Consumer<Object> initController) throws IOException {
+//        FXMLLoader loader = new FXMLLoader(JavaFxApplication.class.getResource(fxmlPath));
+//        Parent root = loader.load();
+//        if (initController != null) {
+//            initController.accept(loader.getController());
+//        }
+//        stage.setScene(new Scene(root));
+//    }
 
 
     public static void setMaximized() {

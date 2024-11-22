@@ -105,7 +105,7 @@ public class UserHandler {
 
         String token = Authentication.getToken();
         System.out.println("token: " + token);
-      //String token = "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoyLCJzdWIiOiJzdDRAZ21haWwuY29tIn0.atCALsZ0MhIbozc8w-4A-O3sLfVuxL528M7UIofmTrk";
+     //   String token = "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoxLCJzdWIiOiJndjZAZ21haWwuY29tIn0.F7sgNbU_fpERAARCXrf59bFvrMKzBqnyWJZe_Bk5mjY";
         if (token == null || token.isEmpty()) {
             System.err.println("Token không hợp lệ. Vui lòng đăng nhập lại.");
             return null;
@@ -128,6 +128,7 @@ public class UserHandler {
                 user.setEmail(jsonResponse.getJSONObject("data").getString("email"));
                 user.setDateOfBirth(LocalDate.parse(jsonResponse.getJSONObject("data").getString("dateOfBirth")));
                 user.setGender(Boolean.valueOf(jsonResponse.getJSONObject("data").getString("gender")));
+                user.setProfileImgLocation(jsonResponse.getJSONObject("data").getString("profile"));
                 return user;
             } else {
                 System.err.println("Lỗi khi lấy thông tin tài khoản: " + statusCode);
@@ -151,6 +152,7 @@ public class UserHandler {
 //        System.out.println(user.getFullName());
 //        System.out.println(user.getDateOfBirth());
 //        System.out.println(user.getGender());
+//        System.out.println(user.getProfileImgLocation());
 //
 //    }
 }

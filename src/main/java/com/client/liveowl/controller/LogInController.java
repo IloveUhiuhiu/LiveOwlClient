@@ -49,10 +49,12 @@ public class LogInController {
                     } else {
                         JavaFxApplication.changeScene("/views/Student.fxml");
                     }
+
                 } else {
                     wrongLogIn.setText("Email hoặc mật khẩu không hợp lệ!");
                 }
             } catch (Exception e) {
+                System.out.println(e);
                 wrongLogIn.setText("Lỗi phản hồi!");
             }
         });
