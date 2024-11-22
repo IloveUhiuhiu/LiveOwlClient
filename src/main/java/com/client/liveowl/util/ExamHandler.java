@@ -1,11 +1,12 @@
 package com.client.liveowl.util;
 
 import com.client.liveowl.model.Exam;
+import com.client.liveowl.request.ExamRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.*;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
@@ -73,4 +74,148 @@ public class ExamHandler {
             throw new RuntimeException(e);
         }
     }
+    public static Exam getExamById(String id) {
+        String url = BASE_URI + "/exams/" + id;
+        System.out.println("Token: " + Authentication.getToken());
+        System.out.println("Request URL: " + url);
+
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpGet get = new HttpGet(url);
+            get.setHeader("Authorization", "Bearer " + Authentication.getToken());
+
+            try (CloseableHttpResponse response = httpClient.execute(get)) {
+                int statusCode = response.getStatusLine().getStatusCode();
+                System.out.println("Status Code: " + statusCode);
+
+                if (statusCode == HttpStatus.OK.value()) {
+                    HttpEntity responseEntity = response.getEntity();
+                    String responseString = EntityUtils.toString(responseEntity);
+
+                    // Chuyển đổi từ JSON sang đối tượng Exam
+                    JSONObject jsonResponse = new JSONObject(responseString);
+                    JSONObject dataObject = jsonResponse.getJSONObject("data");
+                    return new ObjectMapper().readValue(dataObject.toString(), Exam.class);
+                } else {
+                    System.err.println("Failed to fetch exam: " + statusCode);
+                    return null;
+                }
+            } catch (IOException e) {
+                System.err.println("I/O error: " + e.getMessage());
+                return null;
+            } catch (JSONException e) {
+                System.err.println("JSON error: " + e.getMessage());
+                throw new RuntimeException(e);
+            }
+        } catch (IOException e) {
+            System.err.println("Error creating HTTP client: " + e.getMessage());
+            return null;
+        }
+    }
+    public static boolean deleteExam(String id) {
+        String url = BASE_URI + "/exams/delete/" + id;
+        System.out.println("Token: " + Authentication.getToken());
+        System.out.println("Request URL: " + url);
+
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpDelete delete = new HttpDelete(url);
+            delete.setHeader("Authorization", "Bearer " + Authentication.getToken());
+
+            try (CloseableHttpResponse response = httpClient.execute(delete)) {
+                int statusCode = response.getStatusLine().getStatusCode();
+                System.out.println("Status Code: " + statusCode);
+
+                if (statusCode == HttpStatus.OK.value()) {
+//                    HttpEntity responseEntity = response.getEntity();
+//                    String responseString = EntityUtils.toString(responseEntity);
+//
+//                    // Chuyển đổi từ JSON sang đối tượng Exam
+//                    JSONObject jsonResponse = new JSONObject(responseString);
+//                    JSONObject dataObject = jsonResponse.getJSONObject("data");
+//                    return new ObjectMapper().readValue(dataObject.toString(), Exam.class);
+                    return true;
+                } else {
+                    System.err.println("Failed to fetch exam: " + statusCode);
+                    return false;
+                }
+            } catch (IOException e) {
+                System.err.println("I/O error: " + e.getMessage());
+                return false;
+            }
+        } catch (IOException e) {
+            System.err.println("Error creating HTTP client: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public static boolean addExam(ExamRequest examRequest) {
+        String url = BASE_URI + "/exams/add";
+        System.out.println(Authentication.getToken());
+        System.out.println(url);
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        HttpPost post = new HttpPost(url);
+        post.setHeader("Content-Type", "application/json");
+        post.setHeader("Authorization", "Bearer " + Authentication.getToken());
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new JavaTimeModule());
+            String json = objectMapper.writeValueAsString(examRequest);
+            post.setEntity(new StringEntity(json));
+
+            try (CloseableHttpResponse response = httpClient.execute(post)) {
+                int statusCode = response.getStatusLine().getStatusCode();
+                System.out.println("statusCode: " + statusCode);
+
+                if (statusCode == HttpStatus.OK.value()) {
+                  return true;
+                } else {
+                    System.err.println("Failed to fetch exams: " + statusCode);
+                    return false;
+                }
+            } catch (Exception e) {
+                System.err.println("Failed to fetch exams: " + e.getMessage());
+                throw new RuntimeException(e);
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to fetch exams: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static boolean updateExam(ExamRequest examRequest, String id) {
+        String url = BASE_URI + "/exams/update/" + id;
+        System.out.println(Authentication.getToken());
+        System.out.println(url);
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        HttpPut put = new HttpPut(url);
+        put.setHeader("Content-Type", "application/json");
+        put.setHeader("Authorization", "Bearer " + Authentication.getToken());
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new JavaTimeModule());
+            String json = objectMapper.writeValueAsString(examRequest);
+            put.setEntity(new StringEntity(json));
+
+            try (CloseableHttpResponse response = httpClient.execute(put)) {
+                int statusCode = response.getStatusLine().getStatusCode();
+                System.out.println("statusCode: " + statusCode);
+
+                if (statusCode == HttpStatus.OK.value()) {
+                    return true;
+                } else {
+                    System.err.println("Failed to fetch exams: " + statusCode);
+                    return false;
+                }
+            } catch (Exception e) {
+                System.err.println("Failed to fetch exams: " + e.getMessage());
+                throw new RuntimeException(e);
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to fetch exams: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+
+
+
 }

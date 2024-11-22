@@ -11,6 +11,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import org.opencv.core.Core;
@@ -31,6 +32,9 @@ public class JavaFxApplication extends Application {
         Parent root = FXMLLoader.load(getClass().getResource("/views/Login.fxml"));
         //Parent root = FXMLLoader.load(getClass().getResource("/views/JoinExam.fxml"));
         stage.setTitle("Login");
+        Image iconImage = new Image("E:\\Downloads\\liveowl\\src\\main\\resources\\images\\logo.png");
+
+        stage.getIcons().add(iconImage);
         stage.setScene(new Scene(root));
         stage.setOnCloseRequest(event -> {
             event.consume();
@@ -44,7 +48,6 @@ public class JavaFxApplication extends Application {
                     }
                     if (Authentication.getRole() == 2) {
                         try {
-
                             StudentController.theSocket.sendExitNotificationToTeacher();
                         } catch (Exception e) {
                             throw new RuntimeException(e);

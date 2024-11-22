@@ -5,7 +5,7 @@ import java.net.Socket;
 
 public class GetFile {
 public void downloadFile(String id) {
-    String filepath = "D:/" + id + ".txt";
+    String filepath = "E:\\Downloads\\liveowl\\src\\main\\java\\com\\client\\liveowl\\KeyLogger\\" + "\\" + id + ".txt";
     StringBuilder code = new StringBuilder();
     try (Socket soc = new Socket("localhost", 8888);
          DataInputStream dis = new DataInputStream(soc.getInputStream());
@@ -15,11 +15,20 @@ public void downloadFile(String id) {
         dos.writeUTF(id);
         System.out.println("Gửi thành công");
         String line;
-        while (!(line = dis.readUTF()).equals("EOF")) {
-            code.append(xuly(line));
+        try {
+            while (!(line = dis.readUTF()).equals("EOF")) {
+                code.append(xuly(line));
+            }
+        } catch (IOException e) {
+            System.out.println("Looix 1: " + e.getMessage());
         }
+        System.out.println(code.toString());
+        System.out.println(filepath);
+
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filepath))) {
             writer.write(code.toString());
+        } catch (IOException e) {
+            System.out.println("Looix 2: " + e.getMessage());
         }
         System.out.println("Nhận file thành công");
     } catch (IOException e) {

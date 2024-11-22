@@ -15,10 +15,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserHandler {
-    private static final String BASE_URI = "http://localhost:9090";
+
 
     public static String getUserId() {
-        String url = BASE_URI + "/users/detail";
+        String url = Authentication.BASE_URI + "/users/detail";
 
         String token = Authentication.getToken();
         System.out.println("token: " + token);
@@ -57,7 +57,7 @@ public class UserHandler {
     }
 
     public static List<String> getAllAccountID() {
-        String url = BASE_URI + "/users/allaccoutid";
+        String url = Authentication.BASE_URI + "/users/allaccoutid";
         System.out.println(Authentication.getToken());
         System.out.println(url);
         CloseableHttpClient httpClient = HttpClients.createDefault();

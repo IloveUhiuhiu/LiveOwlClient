@@ -1,10 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
 
-<Pane xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      prefHeight="200.0" prefWidth="300.0">
-    <Label text="This is the Detail Content!" />
-</Pane>
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.client.liveowl.controller.DetailExamController">
+    <children>
+
+        <Label layoutX="123.0" layoutY="62.0" prefHeight="18.0" prefWidth="86.0" text="Tên cuộc thi" />
+        <Label layoutX="126.0" layoutY="108.0" prefHeight="18.0" prefWidth="74.0" text="Môn thi" />
+        <Label layoutX="120.0" layoutY="193.0" text="Thời gian bắt đầu" />
+        <Label layoutX="123.0" layoutY="273.0" text="Khoảng thời gian" />
+        <TextField fx:id="nameOfExam" layoutX="270.0" layoutY="58.0" prefHeight="26.0" prefWidth="290.0" />
+        <TextField fx:id="subjectOfExam" layoutX="270.0" layoutY="104.0" prefHeight="26.0" prefWidth="290.0" />
+        <TextField fx:id="durationOfExam" layoutX="270.0" layoutY="268.0" prefHeight="26.0" prefWidth="142.0" />
+        <DatePicker fx:id="date" layoutX="270.0" layoutY="185.0" prefHeight="26.0" prefWidth="142.0" />
+      <Label layoutX="123.0" layoutY="231.0" text="Giờ: Phút" />
+      <TextField fx:id="timeOfExam" layoutX="270.0" layoutY="224.0" prefHeight="26.0" prefWidth="142.0" />
+      <TextField fx:id="codeOfExam" layoutX="270.0" layoutY="143.0" />
+      <Label layoutX="123.0" layoutY="150.0" text="Mã cuộc thi" />
+    </children>
+</AnchorPane>

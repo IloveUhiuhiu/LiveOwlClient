@@ -15,7 +15,7 @@ import java.io.IOException;
 
 
 public class Authentication {
-private static final String BASE_URI = "http://127.0.0.1:9090";
+public static final String BASE_URI = "http://127.0.0.1:9090";
 private static boolean isAuthenticated;
 private static String token;
 private static int role;

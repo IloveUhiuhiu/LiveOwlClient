@@ -2,10 +2,15 @@ package com.client.liveowl.controller;
 
 import com.client.liveowl.JavaFxApplication;
 import com.client.liveowl.model.Exam;
+import com.client.liveowl.request.ExamRequest;
+import com.client.liveowl.util.AlertDialog;
+import com.client.liveowl.util.Authentication;
 import com.client.liveowl.util.ExamHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -19,18 +24,16 @@ import java.util.List;
 
 public class ContestController {
     @FXML
-    private Button addButton;
-    @FXML
-    private Button preButton;
-    @FXML
-    private Button nextButton;
-    @FXML
     private Pane contentContainer;
     @FXML
     private VBox contentList;
     private List<Exam> exams;
     @FXML
     public void initialize() {
+        reloadContent();
+    }
+    public void reloadContent() {
+
         exams = ExamHandler.getExamsByAccount();
         for (Exam exam : exams) {
 
@@ -38,9 +41,10 @@ public class ContestController {
             contentList.getChildren().add(examPane);
 
         }
-
-
+        addAddButton(contentContainer);
     }
+
+
     private Pane createExamPane(Exam exam) {
         Pane pane = new Pane();
         pane.setLayoutX(25.0);
@@ -85,7 +89,13 @@ public class ContestController {
 
         detailButton.setOnAction(event -> {
                 try {
-                    loadContent("/views/DetailExam/fxml");
+                    DetailExamController.examRequest.setNameOfExam(exam.getNameOfExam());
+                    DetailExamController.examRequest.setSubjectOfExam(exam.getSubjectOfExam());
+                    DetailExamController.examRequest.setCodeOfExam(exam.getCodeOfExam());
+                    DetailExamController.examRequest.setStartTimeOfExam(exam.getStartTimeOfExam());
+                    DetailExamController.examRequest.setDurationOfExam(exam.getDurationOfExam());
+                    loadContent("/views/DetailExam.fxml");
+                    addBackButton(contentContainer,270,320);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -97,7 +107,13 @@ public class ContestController {
         updateButton.setStyle("-fx-background-color: #006D6E; -fx-text-fill: white;");
         updateButton.setOnAction(event -> {
             try {
+                UpdateExamController.updateId = exam.getExamId();
+                UpdateExamController.examRequest.setNameOfExam(exam.getNameOfExam());
+                UpdateExamController.examRequest.setSubjectOfExam(exam.getSubjectOfExam());
+                UpdateExamController.examRequest.setStartTimeOfExam(exam.getStartTimeOfExam());
+                UpdateExamController.examRequest.setDurationOfExam(exam.getDurationOfExam());
                 loadContent("/views/UpdateExam.fxml");
+                addBackButton(contentContainer,325,250);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -107,6 +123,16 @@ public class ContestController {
         deleteButton.setLayoutY(70);
         deleteButton.setPrefWidth(80);
         deleteButton.setStyle("-fx-background-color: #FF0000; -fx-text-fill: white;");
+        deleteButton.setOnAction(event -> {
+            AlertDialog alertDialog = new AlertDialog("Xác nhận","","Bạn có chắc chắn xóa không?", Alert.AlertType.CONFIRMATION);
+            Alert alert =  alertDialog.getConfirmationDialog();
+            alert.showAndWait().ifPresent(response -> {
+                if (response == ButtonType.OK) {
+                    ExamHandler.deleteExam(exam.getExamId());
+                    goBack();
+                }
+            });
+        });
 
 
         liveButton.setLayoutX(460);
@@ -132,18 +158,42 @@ public class ContestController {
         System.out.println("finished");
 
     }
+    private void addBackButton(Pane content,int x,int y) {
+        Button backButton = new Button("Quay lại");
+        backButton.setOnAction(event -> goBack());
+        backButton.setLayoutX(x);
+        backButton.setLayoutY(y);
+        backButton.setPrefWidth(80);
+        backButton.setPrefHeight(20);
+        content.getChildren().add(backButton);
+    }
+    private void addAddButton(Pane content) {
+        Button addButton = new Button("Thêm mới");
+        addButton.setOnAction(event -> {
+            try {
+                clickAddButton();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        addButton.setLayoutX(25);
+        addButton.setLayoutY(10);
+        addButton.setPrefWidth(80);
+        addButton.setPrefHeight(20);
+        content.getChildren().add(addButton);
+    }
+    private void goBack() {
+        contentContainer.getChildren().clear();
+        contentList.getChildren().clear();
+        contentContainer.getChildren().add(contentList);
+        reloadContent();
+    }
     @FXML
     private void clickAddButton() throws IOException {
         System.out.println("clickAddButton");
         loadContent("/views/AddExam.fxml");
+        addBackButton(contentContainer,325,250);
     }
-    @FXML
-    private void clickPreButton() {
 
-    }
-    @FXML
-    private void clickNextButton() {
-
-    }
 
 }

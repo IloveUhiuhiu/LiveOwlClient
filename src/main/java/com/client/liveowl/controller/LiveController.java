@@ -17,7 +17,11 @@ import javafx.scene.layout.VBox;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
+
+import static com.client.liveowl.socket.TeacherSocket.sendList;
 
 public class LiveController {
 
@@ -34,8 +38,18 @@ public class LiveController {
     private double widthMax = 800;
     private int numImages = 0;
     private AnimationTimer animationTimer;
-    private long lastUpdate = 0;
-    private static final long UPDATE_INTERVAL = 16_666_667;
+    private Queue<ImageData> imageBuffer = new LinkedList<>();
+
+    private void processImageUpdates() {
+        while (!sendList.isEmpty()) {
+            imageBuffer.add(sendList.poll());
+        }
+
+        if (!imageBuffer.isEmpty()) {
+            ImageData imageData = imageBuffer.poll();
+            updateImage(imageData.getClientId(), imageData.getImage());
+        }
+    }
 
 
     @FXML
@@ -58,12 +72,16 @@ public class LiveController {
         animationTimer = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                ImageData imageData = TeacherSocket.sendList.poll();
-                if (imageData != null) {
-                    updateImage(imageData.getClientId(), imageData.getImage());
-                }
+//                if (now - lastUpdate >= UPDATE_INTERVAL) {
+//                    ImageData imageData = sendList.poll();
+//                    if (imageData != null) {
+//                        updateImage(imageData.getClientId(), imageData.getImage());
+//                    }
+//                    lastUpdate = now;
+//                }
+                processImageUpdates();
                 int clientIdExit = TeacherSocket.getExit();
-                if( clientIdExit >= 0) {
+                if (clientIdExit >= 0) {
                     handleStudentExitRequest(clientIdExit);
                     TeacherSocket.setExit(-1);
                 }
@@ -74,28 +92,32 @@ public class LiveController {
     }
     public void updateImage(int number,Image newImage) {
         Platform.runLater(() -> {
-            if (imageViews.containsKey(number)) {
-                if (imageViews.get(number).getImage() != newImage) {
-                    imageViews.get(number).setImage(newImage);
-                }
-            } else {
-                ImageView currentImage = new ImageView(newImage);
-
-                imageViews.put(number, currentImage);
-                Button buttonView = new Button("TurnOn/TurnOff");
-                final int index = number;
-                buttonView.setOnAction(event -> {
-                    System.out.println("Button " + index + " đã được nhấn");
-                    try {
-                        TeacherSocket.clickBtnCamera(index);
-                    } catch (Exception e) {
-                        System.out.println("Lỗi khi nhấn button: " + e.getMessage());
+            if (newImage != null) {
+                if (imageViews.containsKey(number)) {
+                    if (imageViews.get(number).getImage() != newImage) {
+                        imageViews.get(number).setImage(newImage);
                     }
-                });
-                buttonViews.put(number, buttonView);
-                ++numImages;
-                updateGridLayout();
+                } else {
+
+                    ImageView currentImage = new ImageView(newImage);
+
+                    imageViews.put(number, currentImage);
+                    Button buttonView = new Button("TurnOn/TurnOff");
+                    final int index = number;
+                    buttonView.setOnAction(event -> {
+                        System.out.println("Button " + index + " đã được nhấn");
+                        try {
+                            TeacherSocket.clickBtnCamera(index);
+                        } catch (Exception e) {
+                            System.out.println("Lỗi khi nhấn button: " + e.getMessage());
+                        }
+                    });
+                    buttonViews.put(number, buttonView);
+                    ++numImages;
+                    updateGridLayout();
+                }
             }
+
         });
 
     }
@@ -124,11 +146,11 @@ public class LiveController {
             imageView.setFitWidth(widthMax);
             imageView.setFitHeight(heightMax);
         } else if (rows == 1 && columns == 2) {
-            imageView.setFitWidth(widthMax / 2);
-            imageView.setFitHeight(2 * heightMax / 3);
+            imageView.setFitWidth(4 * widthMax / 5);
+            imageView.setFitHeight(4 * heightMax / 5);
         } else {
-            imageView.setFitWidth(widthMax / 3);
-            imageView.setFitHeight(heightMax / 2);
+            imageView.setFitWidth(3 * widthMax / 4);
+            imageView.setFitHeight(3 * heightMax / 4);
         }
     }
     @FXML
