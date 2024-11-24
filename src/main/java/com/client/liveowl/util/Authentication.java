@@ -20,14 +20,13 @@ private static boolean isAuthenticated;
 private static String token;
 private static int role;
 private static String code;
+public static String usedId;
 public Authentication() {
 
 }
-
 public boolean isAuthenticated() {
     return isAuthenticated;
 }
-
 private void setAuthenticated(boolean authenticated) {
     isAuthenticated = authenticated;
 }
@@ -37,21 +36,14 @@ public static String getCode() {
 public static void setCode(String code) {
     Authentication.code = code;
 }
-
 public static String getToken() {
     return token;
 }
-
-public void setToken(String token) {
-    this.token = token;
-}
-
 public static int getRole() {
     return role;
 }
-public void setRole(int role) {
-    this.role = role;
-}
+public static String getUserId() {return usedId;}
+
 public static boolean login(String email, String password) throws Exception {
     String url = BASE_URI + "/users/signin?email=" + email + "&password=" + password;
     CloseableHttpClient httpClient = HttpClients.createDefault();
@@ -65,9 +57,10 @@ public static boolean login(String email, String password) throws Exception {
         String responseString = EntityUtils.toString(responseEntity);
         JSONObject jsonResponse = new JSONObject(responseString);
         JSONObject data = jsonResponse.getJSONObject("data");
-
+        usedId = data.getString("userId");
         token = data.getString("token");
         role = data.getInt("role");
+        System.out.println("Id là" + usedId);
         return true;
     } else  {
         return false;
@@ -88,6 +81,8 @@ public boolean logout() {
     }
     this.setAuthenticated(false);
     this.token = null;
+    this.role = 0;
+    this.usedId = null;
     return true;
 }
 }

@@ -54,7 +54,7 @@ public class LogInController {
                     wrongLogIn.setText("Email hoặc mật khẩu không hợp lệ!");
                 }
             } catch (Exception e) {
-                System.out.println(e);
+                e.printStackTrace();
                 wrongLogIn.setText("Lỗi phản hồi!");
             }
         });

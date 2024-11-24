@@ -16,6 +16,7 @@ import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -111,6 +112,45 @@ public class ExamHandler {
             return null;
         }
     }
+    public static Exam getExamByCode(String code) {
+        String url = BASE_URI + "/exams/getByCode/" + code;
+        System.out.println("Token: " + Authentication.getToken());
+        System.out.println("Request URL: " + url);
+
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpGet get = new HttpGet(url);
+            get.setHeader("Authorization", "Bearer " + Authentication.getToken());
+
+            try (CloseableHttpResponse response = httpClient.execute(get)) {
+                int statusCode = response.getStatusLine().getStatusCode();
+                System.out.println("Status Code: " + statusCode);
+
+                if (statusCode == HttpStatus.OK.value()) {
+                    HttpEntity responseEntity = response.getEntity();
+                    String responseString = EntityUtils.toString(responseEntity);
+
+                    // Chuyển đổi từ JSON sang đối tượng Exam
+                    JSONObject jsonResponse = new JSONObject(responseString);
+                    JSONObject dataObject = jsonResponse.getJSONObject("data");
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    objectMapper.registerModule(new JavaTimeModule());
+                    return objectMapper.readValue(dataObject.toString(), Exam.class);
+                } else {
+                    System.err.println("Failed to fetch exam: " + statusCode);
+                    return null;
+                }
+            } catch (IOException e) {
+                System.err.println("I/O error: " + e.getMessage());
+                return null;
+            } catch (JSONException e) {
+                System.err.println("JSON error: " + e.getMessage());
+                throw new RuntimeException(e);
+            }
+        } catch (IOException e) {
+            System.err.println("Error creating HTTP client: " + e.getMessage());
+            return null;
+        }
+    }
     public static boolean deleteExam(String id) {
         String url = BASE_URI + "/exams/delete/" + id;
         System.out.println("Token: " + Authentication.getToken());
@@ -159,7 +199,7 @@ public class ExamHandler {
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.registerModule(new JavaTimeModule());
             String json = objectMapper.writeValueAsString(examRequest);
-            post.setEntity(new StringEntity(json));
+            post.setEntity(new StringEntity(json, StandardCharsets.UTF_8));
 
             try (CloseableHttpResponse response = httpClient.execute(post)) {
                 int statusCode = response.getStatusLine().getStatusCode();
@@ -193,7 +233,7 @@ public class ExamHandler {
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.registerModule(new JavaTimeModule());
             String json = objectMapper.writeValueAsString(examRequest);
-            put.setEntity(new StringEntity(json));
+            put.setEntity(new StringEntity(json, StandardCharsets.UTF_8));
 
             try (CloseableHttpResponse response = httpClient.execute(put)) {
                 int statusCode = response.getStatusLine().getStatusCode();

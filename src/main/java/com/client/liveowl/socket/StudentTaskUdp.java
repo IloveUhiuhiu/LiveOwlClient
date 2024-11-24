@@ -1,25 +1,23 @@
 package com.client.liveowl.socket;
 
+import com.client.liveowl.util.Authentication;
 import com.client.liveowl.util.ImageData;
 import com.client.liveowl.util.UdpHandler;
-import javafx.scene.image.Image;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.videoio.VideoCapture;
-
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import static com.client.liveowl.socket.StudentSocket.camera;
 
 class StudentTaskUdp extends Thread {
     private DatagramSocket socketSend;
     private DatagramSocket socketRecieve;
     private static Robot robot = null;
+    private static int isCamera = 0;
     public StudentTaskUdp(DatagramSocket socketSend, DatagramSocket socketRecieve)  {
         this.socketSend = socketSend;
         this.socketRecieve = socketRecieve;
@@ -29,14 +27,14 @@ class StudentTaskUdp extends Thread {
         try {
             Thread thread = new Thread(() -> {
                 try {
-                    while (true) {
+                    while (StudentSocket.isLive) {
                         String request = UdpHandler.receiveMsg(socketRecieve, InetAddress.getByName(StudentSocket.serverHostName),StudentSocket.serverPort);
                         System.out.println("msg: " + request);
-                        if (request.equals("camera")) StudentSocket.updateCamera();
+                        if (request.equals("camera")) isCamera = 1;
                         else if (request.equals("exit")) {
                             socketSend.close();
                             socketRecieve.close();
-                            if (StudentSocket.camera != null) StudentSocket.camera.release();
+                            if (camera != null) camera.release();
                         }
                     }
                 } catch (IOException e) {
@@ -45,24 +43,25 @@ class StudentTaskUdp extends Thread {
             });
             thread.start();
             robot = new Robot();
-            captureImages(socketSend, StudentSocket.camera);
+            captureImages(socketSend, camera);
         } catch (Exception e) {
             System.out.println("Loi ham run: " + e.getMessage());
         } finally {
+            System.out.println("Đóng socket thành công!!!");
             socketSend.close();
             socketRecieve.close();
-            if (StudentSocket.camera != null)StudentSocket.camera.release();
+            if (camera != null)  camera.release();
         }
     }
     private static void captureImages(DatagramSocket socket, VideoCapture camera){
         try {
             Mat frame;
             BufferedImage screenCapture;
-            while (true) {
+            while (StudentSocket.isLive) {
                 ++StudentSocket.imageCount;
                 System.out.println("Gửi ảnh thứ " + StudentSocket.imageCount);
-                if (StudentSocket.isLive) {
-                    if (StudentSocket.captureFromCamera == 1) {
+
+                if (isCamera == 1) {
                         if (camera == null) {
                             camera = new VideoCapture(0);
                         }
@@ -76,34 +75,20 @@ class StudentTaskUdp extends Thread {
                                 sendImage(socket, frame);
                             }
                         }
-                    } else {
+                } else {
                         if (camera != null) {
                             camera.release();
                             camera = null;
                         }
                         screenCapture = robot.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
                         sendImage(socket, screenCapture);
-                    }
-                } else {
-                    if (camera == null) {
-                        camera = new VideoCapture(0);
-                    }
-                    if (!camera.isOpened()) {
-                        System.err.println("Error: Không mở được camera!");
-                        return;
-                    }
-                    frame = new Mat();
-                    if (camera.read(frame)) {
-                        if (!frame.empty()) {
-                            updateImage(frame);
-                        }
-                    }
                 }
             }
+
         } catch (Exception e) {
             System.out.println(e.getMessage());
         } finally {
-            if (camera!= null) camera.release();
+            if (camera != null) camera.release();
         }
     }
     private static void sendImage(DatagramSocket socket, Mat frame) {
@@ -121,69 +106,38 @@ class StudentTaskUdp extends Thread {
         }
     }
 
-    //    private static void sendImage(DatagramSocket socket, BufferedImage image) throws IOException {
-//        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-//            ImageIO.write(image, "jpg", baos); // Sử dụng định dạng JPEG
-//            byte[] imageBytes = baos.toByteArray();
-//            System.out.println("Đã gửi ảnh kích thước: " + imageBytes.length + " bytes");
-//            sendPacketImage(socket, imageBytes);
-//
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-    private static void updateImage(Mat frame) {
-        Imgproc.cvtColor(frame, frame, Imgproc.COLOR_BGR2RGB);
-        BufferedImage bufferedImage = ImageData.matToBufferedImage(frame);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try {
-            ImageIO.write(bufferedImage, "png", baos);
-            baos.flush();
-            byte[] imageBytes = baos.toByteArray();
-            javafx.scene.image.Image newImage = new Image(new ByteArrayInputStream(imageBytes));
-            StudentSocket.cache.add(newImage);
-        } catch (Exception e) {
-            System.out.println("Loi ham upateImage: " + e.getMessage());
-        } finally {
-            try {
-                baos.close();
-            } catch (Exception e) {
-                System.out.println("Loi ham updateImage: " + e.getMessage());
-            }
-        }
-    }
     private static void sendPacketImage(DatagramSocket socket, byte[] imageByteArray) throws Exception {
 
         int sequenceNumber = 0;
         boolean flag;
-        byte[] lengthBytes = new byte[7];
+        byte[] lengthBytes = new byte[13];
         int length = imageByteArray.length;
         lengthBytes[0] = (byte) 0;
-        lengthBytes[1] = (byte) (StudentSocket.studentId);
-        lengthBytes[2] = (byte) (StudentSocket.imageId);
-        lengthBytes[3] = (byte) (length >> 16);
-        lengthBytes[4] = (byte) (length >> 8);
-        lengthBytes[5] = (byte) (length);
-        lengthBytes[6] = (byte) ((length + StudentSocket.maxDatagramPacketLength - 6)/(StudentSocket.maxDatagramPacketLength - 5));
+        System.arraycopy(Authentication.getUserId().getBytes(), 0,lengthBytes, 1, 8);
+        lengthBytes[9] = (byte) (StudentSocket.imageId);
+        lengthBytes[10] = (byte) (length >> 16);
+        lengthBytes[11] = (byte) (length >> 8);
+        lengthBytes[12] = (byte) (length);
+
         UdpHandler.sendBytesArray(socket,lengthBytes,InetAddress.getByName(StudentSocket.serverHostName),StudentSocket.serverPort);
-        for (int i = 0; i < imageByteArray.length; i = i + StudentSocket.maxDatagramPacketLength - 5) {
+        for (int i = 0; i < imageByteArray.length; i = i + StudentSocket.maxDatagramPacketLength - 12) {
             sequenceNumber += 1;
             byte[] message = new byte[StudentSocket.maxDatagramPacketLength];
             message[0] = (byte)(1);
-            message[1] = (byte)(StudentSocket.studentId);
-            message[2] = (byte)(StudentSocket.imageId);
-            message[3] = (byte) (sequenceNumber);
-            if ((i + StudentSocket.maxDatagramPacketLength-5) >= imageByteArray.length) {
+            System.arraycopy(Authentication.getUserId().getBytes(), 0,message , 1, 8);
+            message[9] = (byte)(StudentSocket.imageId);
+            message[10] = (byte) (sequenceNumber);
+            if ((i + StudentSocket.maxDatagramPacketLength-12) >= imageByteArray.length) {
                 flag = true;
-                message[4] = (byte) (1);
+                message[11] = (byte) (1);
             } else {
                 flag = false;
-                message[4] = (byte) (0);
+                message[11] = (byte) (0);
             }
             if (!flag) {
-                System.arraycopy(imageByteArray, i, message, 5, StudentSocket.maxDatagramPacketLength - 5);
+                System.arraycopy(imageByteArray, i, message, 12, StudentSocket.maxDatagramPacketLength - 12);
             } else {
-                System.arraycopy(imageByteArray, i, message, 5, imageByteArray.length - i);
+                System.arraycopy(imageByteArray, i, message, 12, imageByteArray.length - i);
             }
             UdpHandler.sendBytesArray(socket,message,InetAddress.getByName(StudentSocket.serverHostName),StudentSocket.serverPort);
         }

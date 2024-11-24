@@ -1,10 +1,14 @@
 package com.client.liveowl.util;
 
+import com.client.liveowl.JavaFxApplication;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -84,7 +88,6 @@ public class AlertDialog {
         expContent.add(label, 0, 0);
         expContent.add(textArea, 0, 1);
 
-        // Thêm phẩn mở rộng
         alert.getDialogPane().setExpandableContent(expContent);
 
         alert.showAndWait();
@@ -95,7 +98,6 @@ public class AlertDialog {
         alert.setTitle(title);
         alert.setHeaderText(headerText);
         alert.setContentText(contentText);
-
         alert.showAndWait();
     }
 

@@ -6,107 +6,158 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" style="-fx-background-image: url('/images/bg.png');" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.client.liveowl.controller.StudentController">
-    <children>
-        <HBox prefHeight="100.0" prefWidth="200.0">
-            <children>
-                <ImageView fitHeight="130.0" fitWidth="75.0" pickOnBounds="true" preserveRatio="true">
-                    <image>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="612.0" prefWidth="910.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.client.liveowl.controller.StudentController">
+   <children>
+      <ImageView fitHeight="612.0" fitWidth="910.0">
+         <image>
+            <Image url="@../images/bg.png" />
+         </image>
+      </ImageView>
+      <VBox layoutX="10.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" style="-fx-background-image: url('/images/bg.png');">
+         <children>
+            <HBox prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <ImageView fitHeight="130.0" fitWidth="75.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
                         <Image url="@../images/logo.png" />
-                    </image>
-                </ImageView>
-                <Label text="LiveOwl" textFill="WHITE">
-                    <font>
+                     </image>
+                  </ImageView>
+                  <Label text="LiveOwl" textFill="WHITE">
+                     <font>
                         <Font name="System Bold" size="18.0" />
-                    </font>
-                    <padding>
+                     </font>
+                     <padding>
                         <Insets top="10.0" />
-                    </padding>
-                </Label>
-                <Label text="1:00 PM | Sun, Jun 6" textFill="WHITE">
-                    <font>
+                     </padding>
+                  </Label>
+                  <Label text="1:00 PM | Sun, Jun 6" textFill="WHITE">
+                     <font>
                         <Font name="System Bold" size="14.0" />
-                    </font>
-                    <HBox.margin>
+                     </font>
+                     <HBox.margin>
                         <Insets left="480.0" top="15.0" />
-                    </HBox.margin></Label>
-                <Circle fill="WHITE" radius="30.0" stroke="BLACK" strokeType="INSIDE">
-                    <HBox.margin>
+                     </HBox.margin>
+                  </Label>
+                  <Circle fill="WHITE" radius="30.0" stroke="BLACK" strokeType="INSIDE">
+                     <HBox.margin>
                         <Insets left="20.0" />
-                    </HBox.margin></Circle>
-            </children>
-            <padding>
-                <Insets left="11.0" top="10.0" />
-            </padding>
-        </HBox>
-        <HBox prefHeight="475.0" prefWidth="900.0">
-            <children>
-                <Pane opacity="0.6" prefHeight="402.0" prefWidth="351.0" style="-fx-background-color: white; -fx-background-radius: 10px;">
-                    <HBox.margin>
+                     </HBox.margin>
+                  </Circle>
+               </children>
+               <padding>
+                  <Insets left="11.0" top="10.0" />
+               </padding>
+            </HBox>
+            <HBox prefHeight="475.0" prefWidth="900.0">
+               <children>
+                  <Pane opacity="0.6" prefHeight="297.0" prefWidth="355.0" style="-fx-background-color: white; -fx-background-radius: 10px;">
+                     <HBox.margin>
                         <Insets left="40.0" />
-                    </HBox.margin>
-                </Pane>
-                <Pane opacity="0.6" prefHeight="270.0" prefWidth="420.0" style="-fx-background-color: white; -fx-background-radius: 10px;">
-                    <HBox.margin>
+                     </HBox.margin>
+                  </Pane>
+                  <Pane opacity="0.6" prefHeight="252.0" prefWidth="420.0" style="-fx-background-color: white; -fx-background-radius: 10px;">
+                     <HBox.margin>
                         <Insets left="50.0" />
-                    </HBox.margin>
-                </Pane>
-            </children>
-            <padding>
-                <Insets bottom="50.0" top="50.0" />
-            </padding></HBox>
-        <HBox prefHeight="252.0" prefWidth="900.0">
-            <children>
-                <VBox opacity="0.6" prefHeight="133.0" prefWidth="430.0" style="-fx-background-color: white; -fx-background-radius: 10px;">
-                    <children>
+                     </HBox.margin>
+                     <children>
+                        <ImageView fitHeight="280.0" fitWidth="420.0" layoutY="-2.0">
+                           <image>
+                              <Image url="@../images/Group29.png" />
+                           </image>
+                        </ImageView>
+                     </children>
+                  </Pane>
+               </children>
+               <padding>
+                  <Insets bottom="50.0" top="50.0" />
+               </padding>
+            </HBox>
+            <HBox prefHeight="252.0" prefWidth="900.0">
+               <children>
+                  <VBox opacity="0.6" prefHeight="133.0" prefWidth="430.0" style="-fx-background-color: white; -fx-background-radius: 10px;">
+                     <children>
                         <Label text="Tham gia thi" textFill="#050505">
-                            <font>
-                                <Font name="System Bold" size="13.0" />
-                            </font>
-                            <VBox.margin>
-                                <Insets left="30.0" top="30.0" />
-                            </VBox.margin>
+                           <font>
+                              <Font name="System Bold" size="13.0" />
+                           </font>
+                           <VBox.margin>
+                              <Insets left="30.0" top="30.0" />
+                           </VBox.margin>
                         </Label>
                         <HBox prefHeight="100.0" prefWidth="402.0">
-                            <children>
-                                <TextField fx:id="codeTextField" prefHeight="32.0" prefWidth="246.0" promptText="Nhâp mã" />
-                                <Button fx:id="joinButton" mnemonicParsing="false" prefHeight="32.0" prefWidth="124.0" style="-fx-background-color: #1b98e0;" text="Tham gia" textFill="WHITE">
-                                    <HBox.margin>
-                                        <Insets left="10.0" />
-                                    </HBox.margin>
-                           <font>
-                              <Font name="System Bold" size="14.0" />
-                           </font>
-                                </Button>
-                            </children>
-                            <padding>
-                                <Insets left="30.0" />
-                            </padding>
-                            <VBox.margin>
-                                <Insets top="30.0" />
-                            </VBox.margin>
+                           <children>
+                              <TextField fx:id="codeTextField" prefHeight="32.0" prefWidth="246.0" promptText="Nhâp mã" />
+                              <Button fx:id="joinButton" mnemonicParsing="false" prefHeight="32.0" prefWidth="124.0" style="-fx-background-color: #1b98e0;" text="Tham gia" textFill="WHITE">
+                                 <HBox.margin>
+                                    <Insets left="10.0" />
+                                 </HBox.margin>
+                                 <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font>
+                                 <graphic>
+                                    <ImageView fitHeight="20.0" fitWidth="20.0">
+                                       <image>
+                                          <Image url="@../images/icons8-add-50.png" />
+                                       </image>
+                                    </ImageView>
+                                 </graphic>
+                              </Button>
+                           </children>
+                           <padding>
+                              <Insets left="30.0" />
+                           </padding>
+                           <VBox.margin>
+                              <Insets top="30.0" />
+                           </VBox.margin>
                         </HBox>
-                    </children>
-                </VBox>
-                <VBox opacity="0.6" prefHeight="133.0" prefWidth="338.0" style="-fx-background-color: white; -fx-background-radius: 10px;">
+                     </children>
+                  </VBox>
+                  <VBox opacity="0.6" prefHeight="133.0" prefWidth="338.0" style="-fx-background-color: white; -fx-background-radius: 10px;">
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <HBox.margin>
+                        <Insets left="48.0" />
+                     </HBox.margin>
+                     <children>
+                        <Pane prefHeight="200.0" prefWidth="200.0">
+                           <children>
+                              <Label layoutX="23.0" layoutY="22.0" text="Phần Mềm Giám Sát Thi Trực Tuyến !">
+                                 <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font>
+                              </Label>
+                              <Label layoutX="23.0" layoutY="52.0" text="mang đến một môi trường an toàn và công bằng">
+                                 <font>
+                                    <Font size="10.0" />
+                                 </font>
+                              </Label>
+                              <Button layoutX="23.0" layoutY="89.0" mnemonicParsing="false" style="-fx-background-color:  #192841;" text="Tìm hiểu rõ hơn về LiveOwl" textFill="WHITE">
+                                 <font>
+                                    <Font name="System Bold" size="12.0" />
+                                 </font>
+                              </Button>
+                           </children>
+                        </Pane>
+                     </children>
+                  </VBox>
+               </children>
+               <padding>
+                  <Insets bottom="10.0" left="40.0" top="10.0" />
+               </padding>
                <opaqueInsets>
                   <Insets />
                </opaqueInsets>
-               <HBox.margin>
-                  <Insets left="48.0" />
-               </HBox.margin></VBox>
-            </children>
-            <padding>
-                <Insets bottom="10.0" left="40.0" top="10.0" />
-            </padding>
-            <opaqueInsets>
-                <Insets />
-            </opaqueInsets></HBox>
-    </children>
-</VBox>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

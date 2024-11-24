@@ -1,5 +1,6 @@
 
 package com.client.liveowl.socket;
+import com.client.liveowl.util.Authentication;
 import com.client.liveowl.util.UdpHandler;
 import com.github.kwhat.jnativehook.NativeHookException;
 import javafx.scene.image.Image;
@@ -8,7 +9,6 @@ import org.opencv.videoio.VideoCapture;
 import java.io.*;
 import java.net.*;
 import java.util.Random;
-import com.client.liveowl.util.UserHandler;
 import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
@@ -26,24 +26,20 @@ public class StudentSocket{
     public static int clientPortSend = 8000;
     public static int clientPortReceive = 7000;
     public static int imageId = 0;
-    public static int studentId = 0;
     public static int imageCount = 0;
     public static Random rand = new Random();
-    public static boolean isLive = false;
-    public static int captureFromCamera = 0;
-    private static String CLIENT_ID;
     private static final StringBuilder keyLogBuffer = new StringBuilder();
     private static final int SEND_INTERVAL = 7000;
     public static final int SERVER_PORT_LOGGER = 12345;
     public static ConcurrentLinkedQueue<Image> cache = new ConcurrentLinkedQueue<>();
-    static {
-        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-    }
     public static final VideoCapture camera = null;
     public static DatagramSocket socketSend;
     public static DatagramSocket socketReceive;
+    public static boolean isLive = true;
     public StudentSocket() {
         try {
+            serverPort = 9000;
+            isLive = true;
             clientPortSend = rand.nextInt(100)+8000;
             clientPortReceive = clientPortSend - 1000;
             System.out.println("Client port send: " + clientPortSend);
@@ -53,28 +49,21 @@ public class StudentSocket{
             System.out.println("Lỗi khi khởi tạo Socket: " + e.getMessage());
         }
     }
-    public void sendExitNotificationToTeacher() throws Exception {
-        System.out.println("Send exit for teacher");
-        DatagramSocket socketExit = new DatagramSocket(8765);
-        UdpHandler.sendRequestExitToTeacher(socketExit,studentId,InetAddress.getByName(serverHostName),serverPort);
-        if (camera != null) camera.release();
-        socketReceive.close();
-        socketSend.close();
-        socketExit.close();
-    }
+
     public boolean CheckConnect(String code) throws IOException {
-        UdpHandler.sendMsg(socketSend,"connect",InetAddress.getByName(serverHostName),serverPort);
+        System.out.println(socketSend + ", " + Authentication.getUserId() + serverPort);
+        UdpHandler.sendMsg(socketSend,Authentication.getUserId(),InetAddress.getByName(serverHostName),serverPort);
         System.out.println("Gửi thành công chuỗi connect đến server!");
         UdpHandler.sendMsg(socketSend,"student",InetAddress.getByName(serverHostName),serverPort);
         System.out.println("Gửi role student!");
         UdpHandler.sendMsg(socketSend,code,InetAddress.getByName(serverHostName),serverPort);
         System.out.println("Gửi mã " + code + " cuộc thi thành công!");
+        System.out.println(socketSend + ", " + serverHostName + ", " + serverPort);
         String message = UdpHandler.receiveMsg(socketSend,InetAddress.getByName(serverHostName),serverPort);
         System.out.println(message);
         if (message.equals("fail")) {
             return false;
         }
-        studentId += UdpHandler.receivePort(socketSend);
         serverPort += UdpHandler.receivePort(socketSend);
         System.out.println("Port mới là: " + StudentSocket.serverPort);
         return true;
@@ -91,9 +80,9 @@ public class StudentSocket{
 
         try (Socket socket = new Socket(serverHostName, SERVER_PORT_LOGGER);
              PrintWriter writer = new PrintWriter(socket.getOutputStream(), true)) {
-            CLIENT_ID = UserHandler.getUserId();
-            System.out.println(CLIENT_ID);
-            writer.println(CLIENT_ID);
+//            CLIENT_ID = UserHandler.getUserId();
+            System.out.println(Authentication.getUserId());
+            writer.println(Authentication.getUserId());
             writer.println(dataToSend);
             System.out.println("Dữ liệu đã được gửi: " + dataToSend);
         } catch (IOException e) {
@@ -135,16 +124,4 @@ public class StudentSocket{
         }
     }
 
-    public static synchronized void updateCamera() {
-        captureFromCamera^=1;
-    }
-    public static synchronized void updateLive() {
-        isLive = !isLive;
-    }
-    public static synchronized int getCamera() {
-        return captureFromCamera;
-    }
-    public static synchronized boolean getLive() {
-        return isLive;
-    }
 }
