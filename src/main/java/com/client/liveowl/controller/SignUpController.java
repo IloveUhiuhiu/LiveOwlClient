@@ -190,7 +190,7 @@ public class SignUpController {
 
         if(ismale)
             gender = true;
-        if(isteacher)
+        if(isstudent)
             role = 2;
         // Gọi API đăng ký nếu tất cả các điều kiện đều thỏa mãn
         sendSignupRequest(emailText, passwordText,fullnameText, dateofbirths, gender, role);

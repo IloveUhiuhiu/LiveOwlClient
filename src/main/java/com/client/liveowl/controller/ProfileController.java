@@ -5,8 +5,15 @@ import com.client.liveowl.util.UserHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.Base64;
 
 public class ProfileController
 {
@@ -23,6 +30,8 @@ public class ProfileController
     private TextField txtNgaySinh;
     @FXML
     private TextField txtGioiTinh;
+    @FXML
+    private ImageView avt;
 
     @FXML
     public void initialize()
@@ -41,6 +50,17 @@ public class ProfileController
             txtEmail.setText(user.getEmail());
             txtNgaySinh.setText(user.getDateOfBirth().toString());
             txtGioiTinh.setText(user.getGender() ? "Nam" : "Nữ");
+            byte[] imageBytes = Base64.getDecoder().decode(user.getProfileImgLocation());
+            Image image = new Image(new ByteArrayInputStream(imageBytes));
+            avt.setImage(image);
+            avt.setFitWidth(100.0);
+            avt.setFitHeight(100.0);
+            avt.setPreserveRatio(false);
+            double radius = avt.getFitWidth() / 2;
+            Circle circle = new Circle(radius);
+            circle.setCenterX(avt.getFitWidth() / 2);
+            circle.setCenterY(avt.getFitHeight() / 2);
+            avt.setClip(circle);
         }
     }
 
@@ -54,12 +74,21 @@ public class ProfileController
         java.io.File selectedFile = fileChooser.showOpenDialog(stage);
         if (selectedFile != null)
         {
-            String imagePath = selectedFile.toURI().toString();
-            HomeController homeController = HomeController.getInstance();
-            if (homeController != null)
+            try
             {
-                homeController.setAvatarImage(imagePath);
+                byte[] fileBytes = java.nio.file.Files.readAllBytes(selectedFile.toPath());
+                String profile = java.util.Base64.getEncoder().encodeToString(fileBytes);
+                HomeController homeController = HomeController.getInstance();
+                if (homeController != null)
+                {
+                    homeController.setAvatarImage(profile);
+                }
             }
+            catch (IOException e)
+            {
+                throw new RuntimeException(e);
+            }
+
         }
     }
 

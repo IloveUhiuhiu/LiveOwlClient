@@ -11,8 +11,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class TeacherSocket{
     public static int maxDatagramPacketLength = 1500;
     public static int serverPort = 9000;
-   // public static String serverHostName = "10.10.26.160";
-   public static String serverHostName = "localhost";
+   // public static String serverHostName = "10.10.27.116";
+    public static String serverHostName = "localhost";
     public static int clientPortSend = 6000;
     public static int clientPortReceive = 5000;
     public static Map<String, byte[]> imageBuffer = new HashMap<>();

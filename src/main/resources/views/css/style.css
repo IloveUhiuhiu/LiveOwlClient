@@ -21,3 +21,6 @@
 .exampn:hover{
     -fx-cursor: hand;
 }
+.profile-txt{
+    -fx-text-fill:#6e6a6e;
+}
