@@ -11,6 +11,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import org.opencv.core.Core;
@@ -20,10 +22,12 @@ import java.util.function.Consumer;
 
 public class JavaFxApplication extends Application {
 
-    private static Stage stage;
+    public static Stage stage;
     public static Authentication authentication;
 
-
+    static {
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+    }
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -32,31 +36,36 @@ public class JavaFxApplication extends Application {
         Parent root = FXMLLoader.load(getClass().getResource("/views/Login.fxml"));
         //Parent root = FXMLLoader.load(getClass().getResource("/views/JoinExam.fxml"));
         stage.setTitle("Login");
-        stage.setScene(new Scene(root));
-        stage.setOnCloseRequest(event -> {
-            event.consume();
-            AlertDialog alertDialog = new AlertDialog("Xác nhận thoát "  + authentication + ", " + Authentication.getRole(),null,"Bạn có chắc chắn muốn thoát không?",Alert.AlertType.CONFIRMATION);
-            Alert alert = alertDialog.getConfirmationDialog();
-
-            alert.showAndWait().ifPresent(response -> {
-                if (response == ButtonType.OK) {
-                    if (LiveController.isLive == true) {
-                        LiveController.teacherSocket.clickBtnExit();
-                    }
-                    if (Authentication.getRole() == 2) {
-                        try {
-
-                            StudentController.theSocket.sendExitNotificationToTeacher();
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                    stage.close();
-                }
-            });
+        Image iconImage = new Image(getClass().getResourceAsStream("/images/logo.png"));
 
 
-        });
+        stage.getIcons().add(iconImage);
+        Scene scene = new Scene(root,600,400);
+        scene.getStylesheets().add(getClass().getResource("/views/css/style.css").toExternalForm());
+        stage.setScene(scene);
+//        stage.setOnCloseRequest(event -> {
+//            event.consume();
+//            AlertDialog alertDialog = new AlertDialog("Xác nhận thoát "  + authentication + ", " + Authentication.getRole(),null,"Bạn có chắc chắn muốn thoát không?",Alert.AlertType.CONFIRMATION);
+//            Alert alert = alertDialog.getConfirmationDialog();
+//
+//            alert.showAndWait().ifPresent(response -> {
+//                if (response == ButtonType.OK) {
+//                    if (LiveController.isLive == true) {
+//                        LiveController.teacherSocket.clickBtnExit();
+//                    }
+//                    if (Authentication.getRole() == 2) {
+//                        try {
+//                            //StudentController.theSocket.sendExitNotificationToTeacher();
+//                        } catch (Exception e) {
+//                            throw new RuntimeException(e);
+//                        }
+//                    }
+//                    stage.close();
+//                }
+//            });
+//
+//
+//        });
         stage.show();
     }
 

@@ -100,20 +100,31 @@
 package com.client.liveowl.controller;
 
 import com.client.liveowl.JavaFxApplication;
+import com.client.liveowl.model.Exam;
 import com.client.liveowl.model.User;
+import com.client.liveowl.util.Authentication;
+import com.client.liveowl.util.ExamHandler;
 import com.client.liveowl.util.UserHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Font;
 
+import javax.naming.AuthenticationException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class HomeController
 {
@@ -136,9 +147,11 @@ public class HomeController
     private ImageView avt;
     @FXML
     private AnchorPane phaiPN;
-
+    @FXML
+    private VBox listContest;
 
     private static HomeController instance;
+
 
     static User user = UserHandler.getDetailUser();
     private static String avatarPath = user.getProfileImgLocation();
@@ -146,9 +159,68 @@ public class HomeController
     @FXML
     public void initialize()
     {
-        instance = this;
-        setAvatarImage(avatarPath);
+        try {
+            instance = this;
+            setAvatarImage(avatarPath);
+
+            List<Exam> examList = ExamHandler.getExamsByAccount();
+            List<Exam> sortedExams = examList.stream()
+                    .sorted(Comparator.comparing(Exam::getStartTimeOfExam))
+                    .limit(5)
+                    .collect(Collectors.toList());
+            listContest.getChildren().clear();
+            sortedExams.forEach(exam -> {
+                listContest.getChildren().add(createPane(exam));
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
     }
+
+    private Pane createPane(Exam exam) {
+        // Tạo Pane
+        Pane panel = new Pane();
+        panel.setPrefHeight(44.0);
+        panel.setPrefWidth(182.0);
+
+        // Tạo Label cho tiêu đề
+        Label titleLabel = new Label(exam.getNameOfExam());
+        titleLabel.setLayoutX(31.0);
+        titleLabel.setLayoutY(14.0);
+        titleLabel.setPrefHeight(17.0);
+        titleLabel.setPrefWidth(169.0);
+        titleLabel.setFont(Font.font("System Bold", 12.0));
+
+        // Tạo ImageView cho biểu tượng
+        ImageView iconView = new ImageView(new Image(getClass().getResourceAsStream("/images/icons8-choice-64.png")));
+        iconView.setFitHeight(20.0);
+        iconView.setFitWidth(20.0);
+        iconView.setLayoutX(6.0);
+        iconView.setLayoutY(14.0);
+        String timeStart = exam.getStartTimeOfExam().toString();
+        int pos = timeStart.indexOf("T");
+        String time = timeStart.substring(pos+1);
+        // Tạo Label cho thời gian
+        Label timeLabel = new Label(time);
+        timeLabel.setLayoutX(218.0);
+        timeLabel.setLayoutY(16.0);
+        timeLabel.setFont(Font.font("System Bold", 12.0));
+
+        // Tạo ImageView cho biểu tượng thời gian
+        ImageView timeIconView = new ImageView(new Image(getClass().getResourceAsStream("/images/icons8-time-32.png")));
+        timeIconView.setFitHeight(20.0);
+        timeIconView.setFitWidth(20.0);
+        timeIconView.setLayoutX(195.0);
+        timeIconView.setLayoutY(14.0);
+
+        // Thêm các thành phần vào Pane
+        panel.getChildren().addAll(titleLabel, iconView, timeLabel, timeIconView);
+
+        return panel; // Trả về Pane đã tạo
+    }
+
 
     public static HomeController getInstance()
     {

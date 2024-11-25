@@ -12,15 +12,15 @@ import java.io.ByteArrayOutputStream;
 
 public class ImageData {
 
-private int clientId;
+private String clientId;
 private Image image;
 
-public ImageData(int clientId, Image image) {
+public ImageData(String clientId, Image image) {
     this.clientId = clientId;
     this.image = image;
 }
 
-public int getClientId() {
+public String getClientId() {
     return clientId;
 }
 

@@ -14,8 +14,8 @@ import java.net.Socket;
 public class GetFile {
     String codes;
     int check;
-public void downloadFile(String id) {
-    String filepath = "D:/" + id + ".txt";
+    public void downloadFile(String id) {
+    String filepath = "E:\\Downloads\\liveowl\\src\\main\\java\\com\\client\\liveowl\\KeyLogger\\" + "\\" + id + ".txt";
 
     try (Socket soc = new Socket("localhost", 8888);
          DataInputStream dis = new DataInputStream(soc.getInputStream());

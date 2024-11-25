@@ -27,10 +27,10 @@ public class UdpHandler {
         soc.receive(packet);
         return new String(packet.getData(), 0, packet.getLength());
     }
-    public static void sendRequestCamera(DatagramSocket soc,int number, InetAddress addr, int port) throws IOException {
-        byte[] bytesArr = new byte[2];
+    public static void sendRequestCamera(DatagramSocket soc,String number, InetAddress addr, int port) throws IOException {
+        byte[] bytesArr = new byte[9];
         bytesArr[0] = (byte)(2);
-        bytesArr[1] = (byte) number;
+        System.arraycopy(number.getBytes(), 0, bytesArr, 1, 8);
         DatagramPacket packet = new DatagramPacket(bytesArr, bytesArr.length, addr, port);
         soc.send(packet);
     }
@@ -40,10 +40,10 @@ public class UdpHandler {
         DatagramPacket packet = new DatagramPacket(bytesArr, bytesArr.length, addr, port);
         soc.send(packet);
     }
-    public static void sendRequestExitToTeacher(DatagramSocket soc,int number, InetAddress addr, int port) throws IOException {
-        byte[] bytesArr = new byte[2];
+    public static void sendRequestExitToTeacher(DatagramSocket soc,String clientId, InetAddress addr, int port) throws IOException {
+        byte[] bytesArr = new byte[9];
         bytesArr[0] = (byte)(4);
-        bytesArr[1] = (byte) number;
+        System.arraycopy(clientId.getBytes(), 0, bytesArr, 1, 8);
         DatagramPacket packet = new DatagramPacket(bytesArr, bytesArr.length, addr, port);
         soc.send(packet);
     }

@@ -1,5 +1,6 @@
 package com.client.liveowl.socket;
 import com.client.liveowl.controller.LiveController;
+import com.client.liveowl.util.Authentication;
 import com.client.liveowl.util.ImageData;
 import com.client.liveowl.util.UdpHandler;
 import java.io.IOException;
@@ -22,10 +23,13 @@ public class TeacherSocket{
     public static DatagramSocket socketSend;
     public static DatagramSocket socketRecieve;
     public static ConcurrentLinkedQueue<ImageData> sendList = new ConcurrentLinkedQueue<>();
-    public static int isExit = -1;
+    public static Map<String,Boolean> isExit = new HashMap<>();
+    public static ConcurrentLinkedQueue<String> clientExit = new ConcurrentLinkedQueue<>();
+    public static volatile boolean isLive = true;
     public TeacherSocket() {
         try {
             serverPort = 9000;
+            isLive = true;
             socketSend = new DatagramSocket(clientPortSend);
             socketRecieve = new DatagramSocket(clientPortReceive);
         } catch (SocketException e) {
@@ -33,42 +37,20 @@ public class TeacherSocket{
         }
     }
     public void LiveStream(String code) throws IOException {
-            UdpHandler.sendMsg(socketSend,"connect",InetAddress.getByName(serverHostName),serverPort);
+
+            UdpHandler.sendMsg(socketSend, Authentication.getUserId(), InetAddress.getByName(serverHostName), serverPort);
             System.out.println("Gửi thành công chuỗi connect đến server!");
-            UdpHandler.sendMsg(socketSend,"teacher",InetAddress.getByName(serverHostName),serverPort);
+            UdpHandler.sendMsg(socketSend, "teacher", InetAddress.getByName(serverHostName), serverPort);
             System.out.println("Gửi role teacher!");
-            UdpHandler.sendMsg(socketSend,code,InetAddress.getByName(serverHostName),serverPort);
+            UdpHandler.sendMsg(socketSend, code, InetAddress.getByName(serverHostName), serverPort);
             System.out.println("Gửi mã " + code + " cuộc thi thành công!");
-            serverPort +=  UdpHandler.receivePort(socketSend);
+            serverPort += UdpHandler.receivePort(socketSend);
             System.out.println("Port mới là :" + serverPort);
             System.out.println("Chờ mọi người tham gia!");
-            new Thread(new TeacherTaskUdp(socketSend,socketRecieve)).start();
-            //new Thread(new getImage()).start();
+            TeacherTaskUdp task = new TeacherTaskUdp(socketSend, socketRecieve);
+            Thread thread = new Thread(task);thread.start();
+
     }
-    public static void clickBtnCamera(int number) {
-        try {
-            UdpHandler.sendRequestCamera(socketRecieve,number,InetAddress.getByName(serverHostName),serverPort);
-            System.out.println("Gửi thành công yêu cầu button camera");
-        } catch (IOException e) {
-            System.out.println("Lỗi khi nhấn button camera" + e.getMessage());
-        }
-    }
-    public void clickBtnExit() {
-        try {
-            UdpHandler.sendRequestExitToStudents(socketRecieve,InetAddress.getByName(serverHostName),serverPort);
-            System.out.println("Gửi thành công yêu cầu exit");
-            socketSend.close();
-            socketRecieve.close();
-            imageBuffer.clear();
-        } catch (IOException e) {
-            System.out.println("Lỗi khi gửi thông điệp exit " + e.getMessage());
-        }
-    }
-    public static synchronized int getExit() {
-        return isExit;
-    }
-    public static synchronized void setExit(int exit) {
-        isExit = exit;
-    }
+
 }
 
