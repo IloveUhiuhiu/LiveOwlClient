@@ -23,7 +23,8 @@ public class TeacherSocket{
     public static DatagramSocket socketSend;
     public static DatagramSocket socketRecieve;
     public static ConcurrentLinkedQueue<ImageData> sendList = new ConcurrentLinkedQueue<>();
-    public static String isExit = null;
+    public static Map<String,Boolean> isExit = new HashMap<>();
+    public static ConcurrentLinkedQueue<String> clientExit = new ConcurrentLinkedQueue<>();
     public static volatile boolean isLive = true;
     public TeacherSocket() {
         try {
@@ -50,11 +51,6 @@ public class TeacherSocket{
             Thread thread = new Thread(task);thread.start();
 
     }
-    public static synchronized String getExit() {
-        return isExit;
-    }
-    public static synchronized void setExit(String exit) {
-        isExit = exit;
-    }
+
 }
 

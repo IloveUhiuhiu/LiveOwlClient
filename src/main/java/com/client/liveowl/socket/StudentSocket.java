@@ -15,6 +15,7 @@ import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,9 +36,11 @@ public class StudentSocket{
     public static final VideoCapture camera = null;
     public static DatagramSocket socketSend;
     public static DatagramSocket socketReceive;
+    public static CountDownLatch latch;
     public static boolean isLive = true;
     public StudentSocket() {
         try {
+            latch = new CountDownLatch(1);
             serverPort = 9000;
             isLive = true;
             clientPortSend = rand.nextInt(100)+8000;
@@ -93,7 +96,17 @@ public class StudentSocket{
         }
     }
     public void LiveStream() throws IOException {
-        new Thread(new StudentTaskUdp(socketSend, socketReceive)).start();
+        // Tạo một luồng mới cho StudentTaskUdp
+        Thread taskThread = new Thread(new StudentTaskUdp(socketSend, socketReceive));
+        try {
+            taskThread.start(); // Khởi động luồng
+            taskThread.join();  // Chờ cho luồng hoàn thành
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            // Giảm giá trị latch khi hoàn tất
+            latch.countDown(); // Chuyển đến latch để theo dõi
+        }
         try {
             Timer timer = new Timer();
             timer.schedule(new TimerTask() {
@@ -119,6 +132,8 @@ public class StudentSocket{
                     keyLogBuffer.append(ketText + " ");
                 }
             });
+
+
         } catch (NativeHookException e) {
             throw new RuntimeException(e);
         }

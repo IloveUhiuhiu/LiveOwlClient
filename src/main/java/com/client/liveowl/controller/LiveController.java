@@ -15,11 +15,9 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.Socket;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -43,6 +41,7 @@ public class LiveController {
     private AnimationTimer animationTimer;
     private Queue<ImageData> imageBuffer = new LinkedList<>();
 
+
     private void processImageUpdates() {
         while (!sendList.isEmpty()) {
             imageBuffer.add(sendList.poll());
@@ -50,7 +49,9 @@ public class LiveController {
 
         if (!imageBuffer.isEmpty()) {
             ImageData imageData = imageBuffer.poll();
-            updateImage(imageData.getClientId(), imageData.getImage());
+            if (!isExit.containsKey(imageData.getClientId()))
+                updateImage(imageData.getClientId(), imageData.getImage());
+
         }
     }
 
@@ -59,6 +60,7 @@ public class LiveController {
     public void initialize() {
         teacherSocket = new TeacherSocket();
         try {
+            System.out.println("livestream thoi");
             teacherSocket.LiveStream(code);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -81,10 +83,9 @@ public class LiveController {
 //                    lastUpdate = now;
 //                }
                 processImageUpdates();
-                String clientIdExit = TeacherSocket.getExit();
-                if (clientIdExit != null) {
+                if (!clientExit.isEmpty()) {
+                    String clientIdExit = clientExit.poll();
                     handleStudentExitRequest(clientIdExit);
-                    TeacherSocket.setExit(null);
                 }
             }
 
@@ -92,37 +93,39 @@ public class LiveController {
         animationTimer.start();
     }
     public void updateImage(String clientId,Image newImage) {
-        Platform.runLater(() -> {
-            if (newImage != null) {
-                if (imageViews.containsKey(clientId)) {
-                    if (imageViews.get(clientId).getImage() != newImage) {
-                        imageViews.get(clientId).setImage(newImage);
-                    }
-                } else {
-
-                    ImageView currentImage = new ImageView(newImage);
-
-                    imageViews.put(clientId, currentImage);
-                    Button buttonView = new Button("TurnOn/TurnOff");
-                    final String index = clientId;
-                    buttonView.setOnAction(event -> {
-                        System.out.println("Button " + index + " đã được nhấn");
-                        try {
-                            DatagramSocket cameraSocket = new DatagramSocket(2543);
-                            UdpHandler.sendRequestCamera(cameraSocket,index,InetAddress.getByName(serverHostName),serverPort);
-                            System.out.println("Gửi thành công yêu cầu button camera");
-                            cameraSocket.close();
-                        } catch (Exception e) {
-                            System.out.println("Lỗi khi nhấn button: " + e.getMessage());
+        if (!isExit.containsKey(clientId)) {
+            Platform.runLater(() -> {
+                if (newImage != null) {
+                    if (imageViews.containsKey(clientId)) {
+                        if (imageViews.get(clientId).getImage() != newImage) {
+                            imageViews.get(clientId).setImage(newImage);
                         }
-                    });
-                    buttonViews.put(clientId, buttonView);
-                    ++numImages;
-                    updateGridLayout();
-                }
-            }
+                    } else {
+                        System.out.println("Thêm người mới");
+                        ImageView currentImage = new ImageView(newImage);
 
-        });
+                        imageViews.put(clientId, currentImage);
+                        Button buttonView = new Button("TurnOn/TurnOff");
+                        final String index = clientId;
+                        buttonView.setOnAction(event -> {
+                            System.out.println("Button " + index + " đã được nhấn");
+                            try {
+                                DatagramSocket cameraSocket = new DatagramSocket(2543);
+                                UdpHandler.sendRequestCamera(cameraSocket, index, InetAddress.getByName(serverHostName), serverPort);
+                                System.out.println("Gửi thành công yêu cầu button camera");
+                                cameraSocket.close();
+                            } catch (Exception e) {
+                                System.out.println("Lỗi khi nhấn button: " + e.getMessage());
+                            }
+                        });
+                        buttonViews.put(clientId, buttonView);
+                        ++numImages;
+                        updateGridLayout();
+                    }
+                }
+
+            });
+        }
 
     }
     private void updateGridLayout() {
@@ -176,7 +179,10 @@ public class LiveController {
                     } catch (IOException e) {
                         System.out.println("Lỗi khi gửi thông điệp exit " + e.getMessage());
                     }
-
+                    imageViews.clear();
+                    buttonViews.clear();
+                    imageBuffer.clear();
+                    sendList.clear();
                     if (animationTimer != null) {
                         animationTimer.stop();
                     }
@@ -189,8 +195,10 @@ public class LiveController {
 
     }
     public void handleStudentExitRequest(String number) {
+        System.out.println("client " + number);
         if (imageViews.containsKey(number)) {
             numImages--;
+            System.out.println("So luong image " + numImages);
             imageViews.remove(number);
             buttonViews.remove(number);
             updateGridLayout();

@@ -32,6 +32,8 @@ class StudentTaskUdp extends Thread {
                         System.out.println("msg: " + request);
                         if (request.equals("camera")) isCamera = 1;
                         else if (request.equals("exit")) {
+                            System.out.println("Đã exit");
+                            StudentSocket.isLive = false;
                             socketSend.close();
                             socketRecieve.close();
                             if (camera != null) camera.release();

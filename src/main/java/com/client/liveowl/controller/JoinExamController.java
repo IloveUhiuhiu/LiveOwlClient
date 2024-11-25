@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
+import static com.client.liveowl.socket.StudentSocket.latch;
+
 
 public class JoinExamController {
 @FXML
@@ -42,21 +44,37 @@ private Button buttonCancel;
 private Label isActive;
 private boolean cameraIsActive = false;
 private VideoCapture camera = null;
+
 @FXML
 public void initialize() throws IOException {
-
 
     buttonRequest.setOnAction(e -> {
         image.setImage(null);
         StudentSocket studentSocket = new StudentSocket();
         try {
             if (studentSocket.CheckConnect(Authentication.getCode())) {
-                isActive.setText("...Bạn đang được giám sát");
+                isActive.setText("...Bạn đang được giám sát.");
                 isActive.setStyle("-fx-text-fill: #00FF00;");
 
-                studentSocket.LiveStream();
+                new Thread(() -> {
+                    try {
+                        studentSocket.LiveStream(); // Chạy livestream
+                        latch.await();
+                        Platform.runLater(() -> {
+                            try {
+                                JavaFxApplication.changeScene("/views/Student.fxml");
+                                System.out.println("Livestream đã kết thúc. Tiến hành các thao tác tiếp theo!");
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
+                        });
+                    } catch (InterruptedException | IOException ex) {
+                        System.out.println("Đã xảy ra lỗi khi chờ livestream kết thúc.");
+                    }
+                }).start();
+
             } else {
-                isActive.setText("...Có lỗi gì đó");
+                isActive.setText("...Oops, Lỗi kết nối !!!");
                 isActive.setStyle("-fx-text-fill: red;");
             }
         } catch (Exception ex) {

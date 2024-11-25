@@ -22,7 +22,7 @@ class TeacherTaskUdp extends Thread {
         try {
 
             while (TeacherSocket.isLive) {
-                System.out.println("Bắt đầu nhận ảnh");
+                //System.out.println("Bắt đầu nhận ảnh");
                 byte[] message = new byte[TeacherSocket.maxDatagramPacketLength];
                 try {
                     UdpHandler.receiveBytesArr(socketSend, message);
@@ -34,7 +34,7 @@ class TeacherTaskUdp extends Thread {
                 }
 
                 int packetType = (message[0] & 0xff);
-                System.out.println(packetType);
+                //System.out.println(packetType);
                 if (packetType == 0) {
                     String clientId = new String(message, 1, 8);
                     int imageId = (message[9] & 0xff);
@@ -90,12 +90,21 @@ class TeacherTaskUdp extends Thread {
                 } else if (packetType == 4) {
                     String clientId = new String(message,1,8);
                     System.out.println("Nhận exit từ" + clientId);
-                    TeacherSocket.setExit(clientId);
+                    TeacherSocket.isExit.put(clientId,true);
+                    TeacherSocket.clientExit.add(clientId);
+                    new Thread(() -> {
+                        try {
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                        TeacherSocket.isExit.remove(clientId);
+                    }).start();
                 } else {
 
                 }
             }
-            System.out.println("Thoát while");
+            //System.out.println("Thoát while");
 
         } catch (Exception e) {
             System.err.println(e.getMessage());
