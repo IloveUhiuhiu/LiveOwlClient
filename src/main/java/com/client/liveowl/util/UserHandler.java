@@ -220,8 +220,6 @@ public class UserHandler {
     }
 
 
-
-
 //    public  static  void main(String[] args) {
 ////        List<String> allid = getAllAccountID();
 ////        for (String id : allid) {
