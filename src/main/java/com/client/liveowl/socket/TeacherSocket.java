@@ -38,11 +38,12 @@ public class TeacherSocket{
     }
     public void LiveStream(String code) throws IOException {
 
-            UdpHandler.sendMsg(socketSend, Authentication.getUserId(), InetAddress.getByName(serverHostName), serverPort);
+        String connect = Authentication.getUserId() + ":teacher:" + code;
+            //UdpHandler.sendMsg(socketSend, Authentication.getUserId(), InetAddress.getByName(serverHostName), serverPort);
             System.out.println("Gửi thành công chuỗi connect đến server!");
-            UdpHandler.sendMsg(socketSend, "teacher", InetAddress.getByName(serverHostName), serverPort);
+            //UdpHandler.sendMsg(socketSend, "teacher", InetAddress.getByName(serverHostName), serverPort);
             System.out.println("Gửi role teacher!");
-            UdpHandler.sendMsg(socketSend, code, InetAddress.getByName(serverHostName), serverPort);
+            UdpHandler.sendMsg(socketSend, connect, InetAddress.getByName(serverHostName), serverPort);
             System.out.println("Gửi mã " + code + " cuộc thi thành công!");
             serverPort += UdpHandler.receivePort(socketSend);
             System.out.println("Port mới là :" + serverPort);

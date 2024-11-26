@@ -54,14 +54,15 @@ public class StudentSocket{
     }
 
     public boolean CheckConnect(String code) throws IOException {
+        String connect = Authentication.getUserId() + ":student:" + code;
         System.out.println(socketSend + ", " + Authentication.getUserId() + serverPort);
-        UdpHandler.sendMsg(socketSend,Authentication.getUserId(),InetAddress.getByName(serverHostName),serverPort);
+        //UdpHandler.sendMsg(socketSend,Authentication.getUserId(),InetAddress.getByName(serverHostName),serverPort);
         System.out.println("Gửi thành công chuỗi connect đến server!");
-        UdpHandler.sendMsg(socketSend,"student",InetAddress.getByName(serverHostName),serverPort);
+        //UdpHandler.sendMsg(socketSend,"student",InetAddress.getByName(serverHostName),serverPort);
         System.out.println("Gửi role student!");
-        UdpHandler.sendMsg(socketSend,code,InetAddress.getByName(serverHostName),serverPort);
+        UdpHandler.sendMsg(socketSend,connect,InetAddress.getByName(serverHostName),serverPort);
         System.out.println("Gửi mã " + code + " cuộc thi thành công!");
-        System.out.println(socketSend + ", " + serverHostName + ", " + serverPort);
+        //System.out.println(socketSend + ", " + serverHostName + ", " + serverPort);
         String message = UdpHandler.receiveMsg(socketSend,InetAddress.getByName(serverHostName),serverPort);
         System.out.println(message);
         if (message.equals("fail")) {

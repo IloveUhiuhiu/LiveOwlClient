@@ -24,3 +24,26 @@
 .profile-txt{
     -fx-text-fill:#6e6a6e;
 }
+
+
+.table-view {
+    -fx-background-color: #f5f5f5; /* Màu nền cho TableView */
+}
+
+.table-view .table-header {
+    -fx-background-color: #4caf50; /* Màu nền cho header */
+    -fx-text-fill: white; /* Màu chữ trong header */
+}
+
+.table-view .table-header-column {
+    -fx-background-color: #4caf50; /* Màu nền cho từng cột trong header */
+    -fx-text-fill: white; /* Màu chữ cho từng cột trong header */
+}
+
+.table-view .table-row-cell {
+    -fx-background-color: white; /* Màu nền cho các hàng */
+}
+
+.table-view .table-row-cell:hover {
+    -fx-background-color: #CED1E6; /* Màu nền khi di chuột qua hàng */
+}

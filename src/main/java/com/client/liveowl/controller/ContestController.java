@@ -100,21 +100,21 @@ public class ContestController {
         contestImageView.setLayoutY(31.0);
 
         // Hình ảnh thời gian
-        ImageView timeImageView = new ImageView(new Image(getClass().getResourceAsStream("/images/icons8-time-50.png")));
+        ImageView timeImageView = new ImageView(new Image(getClass().getResourceAsStream("/images/clock.png")));
         timeImageView.setFitHeight(20.0);
         timeImageView.setFitWidth(20.0);
         timeImageView.setLayoutX(236.0);
         timeImageView.setLayoutY(57.0);
 
         // Hình ảnh lịch
-        ImageView calendarImageView = new ImageView(new Image(getClass().getResourceAsStream("/images/icons8-calender-64.png")));
+        ImageView calendarImageView = new ImageView(new Image(getClass().getResourceAsStream("/images/calendar.png")));
         calendarImageView.setFitHeight(20.0);
         calendarImageView.setFitWidth(20.0);
         calendarImageView.setLayoutX(236.0);
         calendarImageView.setLayoutY(89.0);
 
         // Hình ảnh mã
-        ImageView codeImageView = new ImageView(new Image(getClass().getResourceAsStream("/images/icons8-code-50.png")));
+        ImageView codeImageView = new ImageView(new Image(getClass().getResourceAsStream("/images/code.png")));
         codeImageView.setFitHeight(20.0);
         codeImageView.setFitWidth(20.0);
         codeImageView.setLayoutX(236.0);

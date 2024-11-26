@@ -13,7 +13,6 @@
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
 
-
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="612.0" prefWidth="910.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.client.liveowl.controller.StudentController">
    <children>
       <ImageView fitHeight="612.0" fitWidth="910.0">
@@ -95,7 +94,7 @@
                         <HBox prefHeight="100.0" prefWidth="402.0">
                            <children>
                               <TextField fx:id="codeTextField" prefHeight="32.0" prefWidth="246.0" promptText="Nhâp mã" />
-                              <Button fx:id="joinButton" mnemonicParsing="false" prefHeight="32.0" prefWidth="124.0" style="-fx-background-color: #1b98e0;" text="Tham gia" textFill="WHITE">
+                              <Button fx:id="joinButton" mnemonicParsing="false" prefHeight="32.0" prefWidth="124.0" style="-fx-background-color: #192841;" text="Tham gia" textFill="WHITE">
                                  <HBox.margin>
                                     <Insets left="10.0" />
                                  </HBox.margin>

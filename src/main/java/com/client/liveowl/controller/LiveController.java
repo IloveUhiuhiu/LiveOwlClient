@@ -183,6 +183,7 @@ public class LiveController {
                     buttonViews.clear();
                     imageBuffer.clear();
                     sendList.clear();
+
                     if (animationTimer != null) {
                         animationTimer.stop();
                     }

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.client.liveowl.controller.ListStudentsController">
+   <children>
+      <TableView fx:id="tableContent" layoutX="37.0" layoutY="57.0" prefHeight="290.0" prefWidth="582.0" stylesheets="@css/style.css">
+        <columns>
+          <TableColumn fx:id="stt" prefWidth="50.0" text="STT" />
+          <TableColumn fx:id="name" prefWidth="230.0" text="Tên Học Sinh" />
+            <TableColumn fx:id="detail" prefWidth="100.0" />
+            <TableColumn fx:id="video" prefWidth="100.0" />
+            <TableColumn fx:id="keyboard" prefWidth="100.0" />
+        </columns>
+      </TableView>
+   </children>
+</AnchorPane>
