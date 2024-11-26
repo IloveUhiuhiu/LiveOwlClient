@@ -1,5 +1,6 @@
 package com.client.liveowl.controller;
 
+import com.client.liveowl.JavaFxApplication;
 import com.client.liveowl.model.User;
 import com.client.liveowl.util.UserHandler;
 import javafx.fxml.FXML;
@@ -10,9 +11,20 @@ import javafx.scene.image.ImageView;
 import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.springframework.http.HttpStatus;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Base64;
 
 public class ProfileController
@@ -32,13 +44,24 @@ public class ProfileController
     private TextField txtGioiTinh;
     @FXML
     private ImageView avt;
+    @FXML
+    private Button btnSave;
+    @FXML
+    private Button btnUpdate;
 
     @FXML
     public void initialize()
     {
         loadData();
         btnThayDoi.setOnAction(event -> chooseAvatar());
-        btnTroVe.setOnAction(event -> goBack());
+        btnTroVe.setOnAction(event -> {
+            try {
+                goBack();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        btnUpdate.setOnAction(actionEvent -> updateInfo());
     }
 
     private void loadData()
@@ -78,11 +101,16 @@ public class ProfileController
             {
                 byte[] fileBytes = java.nio.file.Files.readAllBytes(selectedFile.toPath());
                 String profile = java.util.Base64.getEncoder().encodeToString(fileBytes);
-                HomeController homeController = HomeController.getInstance();
-                if (homeController != null)
-                {
-                    homeController.setAvatarImage(profile);
-                }
+                Image image = new Image(new ByteArrayInputStream(fileBytes));
+                avt.setImage(image);
+                btnSave.setOnAction(event ->{
+                    UserHandler.sendImage(profile);
+                    HomeController homeController = HomeController.getInstance();
+                    if (homeController != null)
+                    {
+                        homeController.setAvatarImage(profile);
+                    }
+                });
             }
             catch (IOException e)
             {
@@ -92,9 +120,25 @@ public class ProfileController
         }
     }
 
-    private void goBack()
-    {
+    private void goBack() throws IOException {
+        JavaFxApplication.changeScene("/views/Home.fxml");
+    }
 
+    private void updateInfo()
+    {
+        String name = txtName.getText();
+        String email = txtEmail.getText();
+        String genderStr = txtGioiTinh.getText();
+        String dateOfBirthStr = txtNgaySinh.getText();
+        Boolean genderBol;
+        if(genderStr.equals("Nam"))
+            genderBol = true;
+        else if (genderStr.equals("Nữ"))
+            genderBol = false;
+        else
+            return;
+        LocalDate dateofbirth = LocalDate.parse(dateOfBirthStr);
+        UserHandler.sendÌnor(name, email, dateofbirth, genderBol);
     }
 
 }

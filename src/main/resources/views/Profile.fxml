@@ -10,20 +10,20 @@
 
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="661.0" style="-fx-background-color: CCD1E7; -fx-background-radius: 20px;" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.client.liveowl.controller.ProfileController">
    <children>
-      <Button fx:id="btnThayDoi" layoutX="260.0" layoutY="154.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="45.0" style="-fx-background-radius: 10px; -fx-background-color: #853E93;" text="Edit" textFill="#fffcfc">
+      <Button fx:id="btnThayDoi" layoutX="260.0" layoutY="154.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="45.0" style="-fx-background-radius: 10px; -fx-background-color: #853E93;" styleClass="btnprofile" stylesheets="@css/style.css" text="Edit" textFill="#fffcfc">
          <font>
             <Font name="System Bold" size="12.0" />
          </font></Button>
-      <Button fx:id="btnTroVe" layoutX="549.0" layoutY="445.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="66.0" style="-fx-background-radius: 10px; -fx-background-color: #853E93;" text="Back" textFill="#fffcfc">
+      <Button fx:id="btnTroVe" layoutX="549.0" layoutY="445.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="66.0" style="-fx-background-radius: 10px; -fx-background-color: #853E93;" styleClass="btnprofile" stylesheets="@css/style.css" text="Back" textFill="#fffcfc">
          <font>
             <Font name="System Bold" size="12.0" />
          </font></Button>
-      <Button fx:id="btnSave" layoutX="315.0" layoutY="154.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="45.0" style="-fx-background-radius: 10px; -fx-background-color: #853E93;" text="Save" textFill="#fffefe">
+      <Button fx:id="btnSave" layoutX="315.0" layoutY="154.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="45.0" style="-fx-background-radius: 10px; -fx-background-color: #853E93;" styleClass="btnprofile" stylesheets="@css/style.css" text="Save" textFill="#fffefe">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
       </Button>
-      <Button fx:id="btnUpdate" layoutX="473.0" layoutY="445.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="66.0" style="-fx-background-radius: 10px; -fx-background-color: #853E93;" text="Update" textFill="WHITE">
+      <Button fx:id="btnUpdate" layoutX="473.0" layoutY="445.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="66.0" style="-fx-background-radius: 10px; -fx-background-color: #853E93;" styleClass="btnprofile" stylesheets="@css/style.css" text="Update" textFill="WHITE">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>

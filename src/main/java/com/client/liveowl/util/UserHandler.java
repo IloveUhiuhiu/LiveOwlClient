@@ -3,6 +3,7 @@ import com.client.liveowl.model.User;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
@@ -20,8 +21,9 @@ import java.util.Date;
 import java.util.List;
 
 public class UserHandler {
-    private static final String BASE_URI = "http://localhost:9090";
+   // private static final String BASE_URI = "http://localhost:9090";
    // private static final String BASE_URI = "http://10.10.26.160:9090";
+    private static final String BASE_URI = Authentication.getBaseUri();
 
     public static String getUserId() {
         String url = BASE_URI + "/users/detail";
@@ -141,6 +143,82 @@ public class UserHandler {
             throw new RuntimeException(e);
         }
     }
+
+    public static void sendImage(String profile) {
+        String url = BASE_URI + "/users/uploadavt";
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        HttpPost post = new HttpPost(url);
+        post.setHeader("Content-Type", "application/json; charset=UTF-8");
+        post.setHeader("Authorization", "Bearer " + Authentication.getToken());
+
+        try {
+            JSONObject json = new JSONObject();
+            json.put("image", profile);
+            StringEntity entity = new StringEntity(json.toString(), "UTF-8");
+            post.setEntity(entity);
+            try (CloseableHttpResponse response = httpClient.execute(post)) {
+                int statusCode = response.getStatusLine().getStatusCode();
+                HttpEntity responseEntity = response.getEntity();
+                if (responseEntity != null) {
+                    String responseString = EntityUtils.toString(responseEntity);
+                    if (statusCode == HttpStatus.OK.value()) {
+                        System.out.println("Thay đổi thành công.");
+                    } else {
+                        System.out.println("Lỗi: " + statusCode + " - " + response.getStatusLine().getReasonPhrase());
+                        System.out.println("Chi tiết: " + responseString);
+                    }
+                } else {
+                    System.out.println("Phản hồi từ server rỗng.");
+                }
+            }
+        } catch (JSONException e) {
+            System.out.println("Lỗi khi tạo JSON: " + e.getMessage());
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.out.println("Lỗi khi gửi yêu cầu HTTP: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public static void sendÌnor(String name, String email, LocalDate dateofbirth, Boolean gender) {
+        String url = BASE_URI + "/users/updateinfo";
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        HttpPost post = new HttpPost(url);
+        post.setHeader("Content-Type", "application/json; charset=UTF-8");
+        post.setHeader("Authorization", "Bearer " + Authentication.getToken());
+
+        try {
+            JSONObject json = new JSONObject();
+            json.put("name", name);
+            json.put("email", email);
+            json.put("dateofbirth", dateofbirth);
+            json.put("gender", gender);
+            StringEntity entity = new StringEntity(json.toString(), "UTF-8");
+            post.setEntity(entity);
+            try (CloseableHttpResponse response = httpClient.execute(post)) {
+                int statusCode = response.getStatusLine().getStatusCode();
+                HttpEntity responseEntity = response.getEntity();
+                if (responseEntity != null) {
+                    String responseString = EntityUtils.toString(responseEntity);
+                    if (statusCode == HttpStatus.OK.value()) {
+                        System.out.println("Thay đổi thành công.");
+                    } else {
+                        System.out.println("Lỗi: " + statusCode + " - " + response.getStatusLine().getReasonPhrase());
+                        System.out.println("Chi tiết: " + responseString);
+                    }
+                } else {
+                    System.out.println("Phản hồi từ server rỗng.");
+                }
+            }
+        } catch (JSONException e) {
+            System.out.println("Lỗi khi tạo JSON: " + e.getMessage());
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.out.println("Lỗi khi gửi yêu cầu HTTP: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
 
 //    public  static  void main(String[] args) {
 ////        List<String> allid = getAllAccountID();

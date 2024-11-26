@@ -47,3 +47,8 @@
 .table-view .table-row-cell:hover {
     -fx-background-color: #CED1E6; /* Màu nền khi di chuột qua hàng */
 }
+.btnprofile:hover{
+    -fx-cursor: hand;
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 1.1;
+}

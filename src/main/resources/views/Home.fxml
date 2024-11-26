@@ -113,7 +113,7 @@
                                     <Font size="15.0" />
                                  </font>
                               </Label>
-                              <ImageView fx:id="avt" fitHeight="64.0" fitWidth="85.0" layoutX="555.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" style="-fx-background-radius: 90px;" />
+                              <ImageView fx:id="avt" fitHeight="80.0" fitWidth="80.0" layoutX="572.0" layoutY="7.0" pickOnBounds="true" preserveRatio="true" style="-fx-background-radius: 90px;" />
                            </children>
                         </AnchorPane>
                      </top>
