@@ -23,7 +23,9 @@ private static int role;
 private static String code;
 public static String usedId;
 public Authentication() {
-
+}
+public static String getBaseUri(){
+    return BASE_URI;
 }
 public boolean isAuthenticated() {
     return isAuthenticated;

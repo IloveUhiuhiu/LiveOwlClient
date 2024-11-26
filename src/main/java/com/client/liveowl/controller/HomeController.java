@@ -234,10 +234,13 @@ public class HomeController
             byte[] imageBytes = Base64.getDecoder().decode(avatarPath);
             Image image = new Image(new ByteArrayInputStream(imageBytes));
             avt.setImage(image);
-            Circle circle = new Circle();
-            circle.setRadius(32.0);
-            circle.setCenterX(32.0);
-            circle.setCenterY(32.0);
+            avt.setFitWidth(80.0);
+            avt.setFitHeight(80.0);
+            avt.setPreserveRatio(false);
+            double radius = avt.getFitWidth() / 2;
+            Circle circle = new Circle(radius);
+            circle.setCenterX(avt.getFitWidth() / 2);
+            circle.setCenterY(avt.getFitHeight() / 2);
             avt.setClip(circle);
         }
     }
