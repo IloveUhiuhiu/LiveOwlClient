@@ -5,22 +5,17 @@ import com.client.liveowl.util.AlertDialog;
 import com.client.liveowl.util.Authentication;
 import com.client.liveowl.util.ImageData;
 import com.client.liveowl.util.UdpHandler;
-import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.Camera;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.videoio.VideoCapture;
-
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -28,6 +23,7 @@ import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
+import static com.client.liveowl.AppConfig.serverHostName;
 import static com.client.liveowl.socket.StudentSocket.latch;
 
 
@@ -55,7 +51,6 @@ public void initialize() throws IOException {
             if (studentSocket.CheckConnect(Authentication.getCode())) {
                 isActive.setText("...Bạn đang được giám sát.");
                 isActive.setStyle("-fx-text-fill: #00FF00;");
-
                 new Thread(() -> {
                     try {
                         studentSocket.LiveStream(); // Chạy livestream
@@ -88,9 +83,9 @@ public void initialize() throws IOException {
 
             alert.showAndWait().ifPresent(response -> {
                 if (response == ButtonType.OK) {
-                    if (StudentSocket.isLive) {
+                    if (StudentSocket.isLive()) {
                         try {
-                            StudentSocket.isLive = false;
+                            StudentSocket.setLive(false);
                             sendExitNotificationToTeacher();
                         } catch (Exception ex) {
                             System.out.println("Lỗi khi gui exit " + ex.getMessage());
@@ -154,7 +149,7 @@ public void initialize() throws IOException {
     public void sendExitNotificationToTeacher() throws Exception {
         System.out.println("Send exit for teacher");
         DatagramSocket socketExit = new DatagramSocket(8765);
-        UdpHandler.sendRequestExitToTeacher(socketExit, Authentication.getUserId(), InetAddress.getByName(StudentSocket.serverHostName),StudentSocket.serverPort);
+        UdpHandler.sendRequestExitToTeacher(socketExit, Authentication.getUserId(), InetAddress.getByName(serverHostName),StudentSocket.newServerPort);
         if (camera != null) camera.release();
         socketExit.close();
     }

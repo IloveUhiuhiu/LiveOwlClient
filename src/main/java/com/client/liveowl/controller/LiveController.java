@@ -2,6 +2,7 @@ package com.client.liveowl.controller;
 
 import com.client.liveowl.JavaFxApplication;
 import com.client.liveowl.socket.TeacherSocket;
+import com.client.liveowl.util.Authentication;
 import com.client.liveowl.util.ImageData;
 import com.client.liveowl.util.AlertDialog;
 import com.client.liveowl.util.UdpHandler;
@@ -24,11 +25,13 @@ import java.util.Map;
 import java.util.Queue;
 
 import static com.client.liveowl.socket.TeacherSocket.*;
+import static com.client.liveowl.AppConfig.*;
 
 public class LiveController {
 
     private TeacherSocket teacherSocket;
     public static String code;
+    public static String examId;
     @FXML
     private Button exitButton;
     @FXML
@@ -43,13 +46,13 @@ public class LiveController {
 
 
     private void processImageUpdates() {
-        while (!sendList.isEmpty()) {
-            imageBuffer.add(sendList.poll());
+        while (!queueImage.isEmpty()) {
+            imageBuffer.add(queueImage.poll());
         }
 
         if (!imageBuffer.isEmpty()) {
             ImageData imageData = imageBuffer.poll();
-            if (!isExit.containsKey(imageData.getClientId()))
+            //if (!isExit.containsKey(imageData.getClientId()))
                 updateImage(imageData.getClientId(), imageData.getImage());
 
         }
@@ -61,7 +64,7 @@ public class LiveController {
         teacherSocket = new TeacherSocket();
         try {
             System.out.println("livestream thoi");
-            teacherSocket.LiveStream(code);
+            teacherSocket.LiveStream(examId,code);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -75,16 +78,9 @@ public class LiveController {
         animationTimer = new AnimationTimer() {
             @Override
             public void handle(long now) {
-//                if (now - lastUpdate >= UPDATE_INTERVAL) {
-//                    ImageData imageData = sendList.poll();
-//                    if (imageData != null) {
-//                        updateImage(imageData.getClientId(), imageData.getImage());
-//                    }
-//                    lastUpdate = now;
-//                }
                 processImageUpdates();
-                if (!clientExit.isEmpty()) {
-                    String clientIdExit = clientExit.poll();
+                if (!queueExit.isEmpty()) {
+                    String clientIdExit = queueExit.poll();
                     handleStudentExitRequest(clientIdExit);
                 }
             }
@@ -93,7 +89,7 @@ public class LiveController {
         animationTimer.start();
     }
     public void updateImage(String clientId,Image newImage) {
-        if (!isExit.containsKey(clientId)) {
+
             Platform.runLater(() -> {
                 if (newImage != null) {
                     if (imageViews.containsKey(clientId)) {
@@ -111,7 +107,7 @@ public class LiveController {
                             System.out.println("Button " + index + " đã được nhấn");
                             try {
                                 DatagramSocket cameraSocket = new DatagramSocket(2543);
-                                UdpHandler.sendRequestCamera(cameraSocket, index, InetAddress.getByName(serverHostName), serverPort);
+                                UdpHandler.sendRequestCamera(cameraSocket, index, InetAddress.getByName(serverHostName), newserverPort);
                                 System.out.println("Gửi thành công yêu cầu button camera");
                                 cameraSocket.close();
                             } catch (Exception e) {
@@ -125,7 +121,7 @@ public class LiveController {
                 }
 
             });
-        }
+
 
     }
     private void updateGridLayout() {
@@ -170,20 +166,16 @@ public class LiveController {
         alert.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
                 try {
-                    isLive = false;
+                    TeacherSocket.setLive(false);
                     try {
                         DatagramSocket exitSocket = new DatagramSocket(2190);
-                        UdpHandler.sendRequestExitToStudents(exitSocket, InetAddress.getByName(serverHostName),serverPort);
+                        UdpHandler.sendRequestExitToStudents(exitSocket, Authentication.getToken(), InetAddress.getByName(serverHostName), newserverPort);
                         System.out.println("Gửi thành công yêu cầu exit");
                         exitSocket.close();
                     } catch (IOException e) {
                         System.out.println("Lỗi khi gửi thông điệp exit " + e.getMessage());
                     }
-                    imageViews.clear();
-                    buttonViews.clear();
-                    imageBuffer.clear();
-                    sendList.clear();
-
+                    cleanResources();
                     if (animationTimer != null) {
                         animationTimer.stop();
                     }
@@ -195,7 +187,7 @@ public class LiveController {
         });
 
     }
-    public void handleStudentExitRequest(String number) {
+    private void handleStudentExitRequest(String number) {
         System.out.println("client " + number);
         if (imageViews.containsKey(number)) {
             numImages--;
@@ -203,6 +195,18 @@ public class LiveController {
             imageViews.remove(number);
             buttonViews.remove(number);
             updateGridLayout();
+        }
+    }
+    private void cleanResources() {
+        try {
+            code = null;
+            examId = null;
+            if (TeacherSocket.imageBuffer != null) TeacherSocket.imageBuffer.clear();
+            if (TeacherSocket.queueExit != null) TeacherSocket.queueExit.clear();
+            if (TeacherSocket.queueImage != null) TeacherSocket.queueImage.clear();
+            System.out.println("Đóng LiveController thành công");
+        } catch (Exception e) {
+            System.err.println("Lỗi khi đóng socket: " + e.getMessage());
         }
     }
 }

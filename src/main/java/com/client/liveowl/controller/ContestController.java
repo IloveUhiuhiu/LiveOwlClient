@@ -198,6 +198,7 @@ public class ContestController {
         monitorButton.setOnAction(event -> {
             try {
                 LiveController.code = exam.getCodeOfExam();
+                LiveController.examId = exam.getExamId();
                 JavaFxApplication.changeScene("/views/Live.fxml");
             } catch (IOException e) {
                 throw new RuntimeException(e);

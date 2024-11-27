@@ -46,7 +46,7 @@ public class WatchedVideo {
         System.out.println("Chờ mọi người tham gia!");
         try {
         while (isLivestream()) {
-            byte[] message = new byte[TeacherSocket.maxDatagramPacketLength];
+            byte[] message = new byte[maxDatagramPacketLength];
             try {
                 UdpHandler.receiveBytesArr(socket, message);
             } catch (SocketTimeoutException e) {

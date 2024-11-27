@@ -1,8 +1,11 @@
 package com.client.liveowl.controller;
 
 import com.client.liveowl.KeyLogger.GetFile;
+import com.client.liveowl.model.Result;
+import com.client.liveowl.model.ResultDTO;
 import com.client.liveowl.model.ResultItem;
 import com.client.liveowl.util.Authentication;
+import com.client.liveowl.util.ResultHandler;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -19,6 +22,8 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
+import java.util.List;
+
 public class ListStudentsController {
     @FXML
     private TableView<ResultItem> tableContent;
@@ -32,6 +37,8 @@ public class ListStudentsController {
     private TableColumn<ResultItem, String> keyboard;
     @FXML
     private TableColumn<ResultItem, String> detail;
+    public static String examId;
+    public static String code;
 
     @FXML
     public void initialize() {
@@ -81,7 +88,7 @@ public class ListStudentsController {
                             try {
                                 Platform.runLater(() -> {
                                     try {
-                                        openVideoPlayer("94e653ee","7662fa54");
+                                        openVideoPlayer(resultItem.getCode(), resultItem.getStudentId());
                                     } catch (Exception e) {
                                         throw new RuntimeException(e);
                                     }
@@ -117,7 +124,7 @@ public class ListStudentsController {
                             ResultItem resultItem = getTableView().getItems().get(getIndex());
                             System.out.println("Bàn phím cho " + resultItem.getName());
                             GetFile getFile = new GetFile();
-                            getFile.downloadFile("ad05e17c");
+                            //getFile.downloadFile(resultItem.getCode(),resultItem.getStudentId());
                         });
                     }
                     @Override
@@ -130,13 +137,19 @@ public class ListStudentsController {
             }
         });
 
-        // Tạo danh sách dữ liệu
-        ObservableList<ResultItem> data = FXCollections.observableArrayList(
-                new ResultItem(1, "Nguyễn Văn A"),
-                new ResultItem(2, "Trần Thị B"),
-                new ResultItem(3, "Lê Văn C")
-        );
+        List<ResultDTO> resultList = ResultHandler.getResultsByExamId(examId);
 
+        int cnt = 1;
+        ObservableList<ResultItem> data = FXCollections.observableArrayList();
+
+        for (ResultDTO rs: resultList) {
+            data.add(new ResultItem(
+                    cnt,
+                    code,
+                    rs.getStudentId(),
+                    rs.getName()
+            ));
+        }
         tableContent.setItems(data);
     }
 
