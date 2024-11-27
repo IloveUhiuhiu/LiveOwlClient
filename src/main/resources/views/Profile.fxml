@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
+<?import javafx.collections.FXCollections?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
@@ -35,7 +39,7 @@
                   <Font name="System Bold" size="14.0" />
                </font>
             </Label>
-            <TextField fx:id="txtName" layoutX="89.0" layoutY="4.0" prefHeight="30.0" prefWidth="301.0" style="-fx-background-color: transparent;" styleClass="profile-txt" stylesheets="@css/style.css" text="Thái Viết Quốc Hưng">
+            <TextField fx:id="txtName" editable="false" layoutX="89.0" layoutY="4.0" prefHeight="30.0" prefWidth="301.0" style="-fx-background-color: transparent;" styleClass="profile-txt" stylesheets="@css/style.css" text="Thái Viết Quốc Hưng">
                <font>
                   <Font name="System Bold" size="14.0" />
                </font>
@@ -59,7 +63,7 @@
                   <Image url="@../images/email.png" />
                </image>
             </ImageView>
-            <TextField fx:id="txtEmail" layoutX="88.0" layoutY="3.0" prefHeight="25.0" prefWidth="301.0" style="-fx-background-color: transparent;" styleClass="profile-txt" stylesheets="@css/style.css" text="hung55555hung@gmail.com">
+            <TextField fx:id="txtEmail" editable="false" layoutX="88.0" layoutY="3.0" prefHeight="25.0" prefWidth="301.0" style="-fx-background-color: transparent;" styleClass="profile-txt" stylesheets="@css/style.css" text="hung55555hung@gmail.com">
                <font>
                   <Font name="System Bold" size="14.0" />
                </font>
@@ -78,11 +82,7 @@
                   <Font name="System Bold" size="14.0" />
                </font>
             </Label>
-            <TextField fx:id="txtNgaySinh" layoutX="136.0" layoutY="3.0" prefHeight="30.0" prefWidth="252.0" style="-fx-background-color: transparent;" styleClass="profile-txt" stylesheets="@css/style.css" text="21/01/2004">
-               <font>
-                  <Font name="System Bold" size="14.0" />
-               </font>
-            </TextField>
+            <DatePicker fx:id="dateofbirth" layoutX="148.0" layoutY="3.0" pickOnBounds="false" prefHeight="25.0" prefWidth="144.0" styleClass="date" stylesheets="@css/style.css" />
          </children>
       </Pane>
       <Pane layoutX="128.0" layoutY="379.0" prefHeight="35.0" prefWidth="398.0" style="-fx-background-color: white; -fx-background-radius: 50px;">
@@ -97,13 +97,36 @@
                   <Font name="System Bold" size="14.0" />
                </font>
             </Label>
-            <TextField fx:id="txtGioiTinh" layoutX="99.0" layoutY="3.0" prefHeight="25.0" prefWidth="287.0" style="-fx-background-color: transparent;" styleClass="profile-txt" stylesheets="@css/style.css" text="Nam">
-               <font>
-                  <Font name="System Bold" size="14.0" />
-               </font>
-            </TextField>
+            <ChoiceBox fx:id="Sex" layoutX="107.0" layoutY="3.0" prefHeight="24.0" prefWidth="54.0" styleClass="sex" stylesheets="@css/style.css">
+               <items>
+                  <FXCollections fx:factory="observableArrayList">
+                     <String fx:value="Nam" />
+                     <String fx:value="Nữ" />
+                  </FXCollections>
+               </items>
+            </ChoiceBox>
          </children>
       </Pane>
       <ImageView fx:id="avt" fitHeight="100.0" fitWidth="100.0" layoutX="260.0" layoutY="38.0" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fx:id="editDate" fitHeight="24.0" fitWidth="24.0" layoutX="538.0" layoutY="332.0" pickOnBounds="true" preserveRatio="true" style="-fx-cursor: hand;">
+         <image>
+            <Image url="@../images/writing.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="editGender" fitHeight="24.0" fitWidth="24.0" layoutX="540.0" layoutY="385.0" pickOnBounds="true" preserveRatio="true" style="-fx-cursor: hand;">
+         <image>
+            <Image url="@../images/writing.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="editEmail" fitHeight="24.0" fitWidth="24.0" layoutX="537.0" layoutY="281.0" pickOnBounds="true" preserveRatio="true" style="-fx-cursor: hand;">
+         <image>
+            <Image url="@../images/writing.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="editName" fitHeight="24.0" fitWidth="24.0" layoutX="537.0" layoutY="227.0" pickOnBounds="true" preserveRatio="true" style="-fx-cursor: hand;">
+         <image>
+            <Image url="@../images/writing.png" />
+         </image>
+      </ImageView>
    </children>
 </Pane>
