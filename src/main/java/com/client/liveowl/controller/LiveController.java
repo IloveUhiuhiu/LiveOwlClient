@@ -2,6 +2,7 @@ package com.client.liveowl.controller;
 
 import com.client.liveowl.JavaFxApplication;
 import com.client.liveowl.socket.TeacherSocket;
+import com.client.liveowl.util.Authentication;
 import com.client.liveowl.util.ImageData;
 import com.client.liveowl.util.AlertDialog;
 import com.client.liveowl.util.UdpHandler;
@@ -30,6 +31,7 @@ public class LiveController {
 
     private TeacherSocket teacherSocket;
     public static String code;
+    public static String examId;
     @FXML
     private Button exitButton;
     @FXML
@@ -62,7 +64,7 @@ public class LiveController {
         teacherSocket = new TeacherSocket();
         try {
             System.out.println("livestream thoi");
-            teacherSocket.LiveStream(code);
+            teacherSocket.LiveStream(examId,code);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -164,10 +166,10 @@ public class LiveController {
         alert.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
                 try {
-                    isLive = false;
+                    TeacherSocket.setLive(false);
                     try {
                         DatagramSocket exitSocket = new DatagramSocket(2190);
-                        UdpHandler.sendRequestExitToStudents(exitSocket, InetAddress.getByName(serverHostName), newserverPort);
+                        UdpHandler.sendRequestExitToStudents(exitSocket, Authentication.getToken(), InetAddress.getByName(serverHostName), newserverPort);
                         System.out.println("Gửi thành công yêu cầu exit");
                         exitSocket.close();
                     } catch (IOException e) {
@@ -197,6 +199,8 @@ public class LiveController {
     }
     private void cleanResources() {
         try {
+            code = null;
+            examId = null;
             if (TeacherSocket.imageBuffer != null) TeacherSocket.imageBuffer.clear();
             if (TeacherSocket.queueExit != null) TeacherSocket.queueExit.clear();
             if (TeacherSocket.queueImage != null) TeacherSocket.queueImage.clear();

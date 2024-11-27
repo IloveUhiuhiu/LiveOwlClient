@@ -40,6 +40,8 @@ class TeacherTaskUdp extends Thread {
 
     private void processMessage(byte[] message) {
         int packetType = (message[0] & 0xff);
+        String clientId = new String(message, 1, 8).trim();
+
         switch (packetType) {
             case 0:
                 handleImageLengthPacket(message);
@@ -137,6 +139,7 @@ class TeacherTaskUdp extends Thread {
             if (TeacherSocket.imageBuffer != null) TeacherSocket.imageBuffer.clear();
             if (TeacherSocket.queueExit != null) TeacherSocket.queueExit.clear();
             if (TeacherSocket.queueImage != null) TeacherSocket.queueImage.clear();
+            TeacherSocket.setLive(false);
             System.out.println("Đóng TeacherTaskUdp thành công");
         } catch (Exception e) {
             System.err.println("Lỗi khi đóng socket: " + e.getMessage());

@@ -73,6 +73,8 @@ public Pane createPane(Exam exam) {
         resultButton.setFont(Font.font("System Bold", 12));
         resultButton.setOnAction(event -> {
             try {
+                ListStudentsController.examId = exam.getExamId();
+                ListStudentsController.code = exam.getCodeOfExam();
                 loadContent("/views/ListStudents.fxml");
                 addBackButton(contentContainer,5,5);
             } catch (IOException e) {

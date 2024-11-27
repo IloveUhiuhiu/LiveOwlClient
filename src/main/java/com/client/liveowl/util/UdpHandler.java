@@ -34,9 +34,11 @@ public class UdpHandler {
         DatagramPacket packet = new DatagramPacket(bytesArr, bytesArr.length, addr, port);
         soc.send(packet);
     }
-    public static void sendRequestExitToStudents(DatagramSocket soc,InetAddress addr, int port) throws IOException {
-        byte[] bytesArr = new byte[1];
+    public static void sendRequestExitToStudents(DatagramSocket soc,String token, InetAddress addr, int port) throws IOException {
+        byte[] messageBytes = token.getBytes();
+        byte[] bytesArr = new byte[1 + messageBytes.length];
         bytesArr[0] = (byte)(3);
+        System.arraycopy(messageBytes, 0, bytesArr, 1, messageBytes.length);
         DatagramPacket packet = new DatagramPacket(bytesArr, bytesArr.length, addr, port);
         soc.send(packet);
     }

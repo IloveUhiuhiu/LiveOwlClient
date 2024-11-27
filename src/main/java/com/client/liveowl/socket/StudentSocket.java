@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 
 public class StudentSocket{
 
-    private static Random rand = new Random();
+    public static Random rand = new Random();
     private static final StringBuilder keyLogBuffer = new StringBuilder();
     //public static ConcurrentLinkedQueue<Image> cache = new ConcurrentLinkedQueue<>();
     public static final VideoCapture camera = null;
@@ -98,12 +98,17 @@ public class StudentSocket{
         } finally {
             latch.countDown();
             cleanupResources();
+            System.out.println("Close Livestream");
         }
         try {
             Timer timer = new Timer();
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
+                    if (!TeacherSocket.isLive()) {
+                        timer.cancel();
+                        return;
+                    }
                     sendKeyData();
                 }
             }, 0, SEND_INTERVAL);
@@ -126,6 +131,8 @@ public class StudentSocket{
             });
         } catch (NativeHookException e) {
             throw new RuntimeException(e);
+        } finally {
+            System.out.println("Close Send KeyLogger");
         }
     }
     private void cleanupResources() {

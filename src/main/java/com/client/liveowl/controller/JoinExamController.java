@@ -5,14 +5,11 @@ import com.client.liveowl.util.AlertDialog;
 import com.client.liveowl.util.Authentication;
 import com.client.liveowl.util.ImageData;
 import com.client.liveowl.util.UdpHandler;
-import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.Camera;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import org.opencv.core.Mat;
@@ -54,7 +51,6 @@ public void initialize() throws IOException {
             if (studentSocket.CheckConnect(Authentication.getCode())) {
                 isActive.setText("...Bạn đang được giám sát.");
                 isActive.setStyle("-fx-text-fill: #00FF00;");
-
                 new Thread(() -> {
                     try {
                         studentSocket.LiveStream(); // Chạy livestream
