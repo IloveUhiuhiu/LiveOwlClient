@@ -4,6 +4,8 @@ import com.client.liveowl.JavaFxApplication;
 import com.client.liveowl.model.User;
 import com.client.liveowl.util.UserHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -105,11 +107,18 @@ public class ProfileController
                 avt.setImage(image);
                 btnSave.setOnAction(event ->{
                     UserHandler.sendImage(profile);
-                    HomeController homeController = HomeController.getInstance();
-                    if (homeController != null)
+                    if(UserHandler.getDetailUser().getRole().equals("1"))
                     {
-                        homeController.setAvatarImage(profile);
+                        HomeController homeController = HomeController.getInstance();
+                        homeController.setAvatarImage(profile, homeController.getAvt(), 80.0, 80.0);
                     }
+                    else
+                    {
+                        StudentController studentController = StudentController.getInstance();
+                        studentController.setAvatarImage(profile, studentController.getAvt(), 80.0, 80.0);
+                    }
+
+
                 });
             }
             catch (IOException e)
@@ -121,7 +130,17 @@ public class ProfileController
     }
 
     private void goBack() throws IOException {
-        JavaFxApplication.changeScene("/views/Home.fxml");
+        if(UserHandler.getDetailUser().getRole().equals("2"))
+        {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Student.fxml"));
+            Parent root = loader.load();
+            StudentController studentController = loader.getController();
+            studentController.setAvatarImage(UserHandler.getDetailUser().getProfileImgLocation(),
+                    studentController.getAvt(), 70.0, 70.0);
+            JavaFxApplication.stage.getScene().setRoot(root);
+        }
+        else
+            JavaFxApplication.changeScene("/views/Home.fxml");
     }
 
     private void updateInfo()

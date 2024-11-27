@@ -10,7 +10,10 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -20,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@Service
 public class UserHandler {
    // private static final String BASE_URI = "http://localhost:9090";
    // private static final String BASE_URI = "http://10.10.26.160:9090";
@@ -131,6 +135,7 @@ public class UserHandler {
                 user.setDateOfBirth(LocalDate.parse(jsonResponse.getJSONObject("data").getString("dateOfBirth")));
                 user.setGender(Boolean.valueOf(jsonResponse.getJSONObject("data").getString("gender")));
                 user.setProfileImgLocation(jsonResponse.getJSONObject("data").getString("profile"));
+                user.setRole(jsonResponse.getJSONObject("data").getString("role"));
                 return user;
             } else {
                 System.err.println("Lỗi khi lấy thông tin tài khoản: " + statusCode);

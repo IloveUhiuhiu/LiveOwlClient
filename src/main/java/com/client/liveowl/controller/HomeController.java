@@ -116,6 +116,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
+import org.springframework.stereotype.Component;
 
 import javax.naming.AuthenticationException;
 import java.io.ByteArrayInputStream;
@@ -126,9 +127,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
 public class HomeController
 {
-
     @FXML
     private Button homeButton;
     @FXML
@@ -151,17 +152,14 @@ public class HomeController
     private VBox listContest;
 
     private static HomeController instance;
-
-
-    static User user = UserHandler.getDetailUser();
-    private static String avatarPath = user.getProfileImgLocation();
+    private static String avatarPath = UserHandler.getDetailUser().getProfileImgLocation();
 
     @FXML
     public void initialize()
     {
         try {
             instance = this;
-            setAvatarImage(avatarPath);
+            setAvatarImage(avatarPath, avt, 80.0, 80.0);
 
             List<Exam> examList = ExamHandler.getExamsByAccount();
             List<Exam> sortedExams = examList.stream()
@@ -175,8 +173,6 @@ public class HomeController
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
     }
 
     private Pane createPane(Exam exam) {
@@ -227,15 +223,15 @@ public class HomeController
         return instance;
     }
 
-    public void setAvatarImage(String imagePath)
+    public void setAvatarImage(String imagePath, ImageView avt, Double with, Double height)
     {
         avatarPath = imagePath;
         if (avt != null) {
             byte[] imageBytes = Base64.getDecoder().decode(avatarPath);
             Image image = new Image(new ByteArrayInputStream(imageBytes));
             avt.setImage(image);
-            avt.setFitWidth(80.0);
-            avt.setFitHeight(80.0);
+            avt.setFitWidth(with);
+            avt.setFitHeight(with);
             avt.setPreserveRatio(false);
             double radius = avt.getFitWidth() / 2;
             Circle circle = new Circle(radius);
@@ -286,5 +282,9 @@ public class HomeController
         Pane content = FXMLLoader.load(getClass().getResource(url));
         contentContainer.getChildren().clear();
         contentContainer.getChildren().add(content);
+    }
+
+    public ImageView getAvt() {
+        return avt;
     }
 }
