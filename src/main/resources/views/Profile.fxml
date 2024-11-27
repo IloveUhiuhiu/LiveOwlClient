@@ -70,7 +70,7 @@
          <children>
             <ImageView fitHeight="25.0" fitWidth="24.0" layoutX="14.0" layoutY="6.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../images/calendar.png" />
+                  <Image url="@../images/date.png" />
                </image>
             </ImageView>
             <Label fx:id="lblNgaySinh" layoutX="47.0" layoutY="3.0" prefHeight="30.0" prefWidth="101.0" text="Date of birth:" textFill="#6e6a6e">

@@ -1,5 +1,6 @@
 package com.client.liveowl.controller;
 
+import com.client.liveowl.KeyLogger.GetFile;
 import com.client.liveowl.model.ResultItem;
 import com.client.liveowl.util.Authentication;
 import javafx.application.Platform;
@@ -115,6 +116,8 @@ public class ListStudentsController {
                         button.setOnAction(event -> {
                             ResultItem resultItem = getTableView().getItems().get(getIndex());
                             System.out.println("Bàn phím cho " + resultItem.getName());
+                            GetFile getFile = new GetFile();
+                            getFile.downloadFile("ad05e17c");
                         });
                     }
                     @Override

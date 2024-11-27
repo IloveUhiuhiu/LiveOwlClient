@@ -1,28 +1,61 @@
 package com.client.liveowl.controller;
 
 import com.client.liveowl.JavaFxApplication;
+import com.client.liveowl.model.User;
 import com.client.liveowl.socket.StudentSocket;
 import com.client.liveowl.util.AlertDialog;
 import com.client.liveowl.util.Authentication;
 import com.client.liveowl.util.ExamHandler;
+import com.client.liveowl.util.UserHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Cursor;
+import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 
 
 import java.io.IOException;
 
-public class StudentController {
+public class StudentController extends HomeController{
 @FXML
 private TextField codeTextField;
 @FXML
 private Button joinButton;
+@FXML
+private ImageView avt;
+@FXML
+private Pane main;
+@FXML
+private Pane header;
+
+private static StudentController instance;
 public static StudentSocket theSocket = null;
+private static String avatarPath = UserHandler.getDetailUser().getProfileImgLocation();
+
 
 @FXML
 public void initialize() {
+    instance = this;
+    avatarPath = UserHandler.getDetailUser().getProfileImgLocation();
+    setAvatarImage(avatarPath, avt, 70.0, 70.0);
     joinButton.setOnAction(event -> handleJoinButtonClick());
+    avt.setOnMouseEntered(event -> avt.setCursor(Cursor.HAND));
+    avt.setOnMouseClicked(event -> {
+        try {
+            avtClick();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    });
 }
 private void handleJoinButtonClick() {
     String code = codeTextField.getText();
@@ -43,8 +76,33 @@ private void handleJoinButtonClick() {
     } catch (IOException e) {
         e.printStackTrace();
     }
+}
 
-
+private void avtClick() throws Exception {
+    try {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Profile.fxml"));
+        Parent newContent = loader.load();
+        main.getChildren().setAll(newContent);
+        AnchorPane.setTopAnchor(newContent, null);
+        AnchorPane.setBottomAnchor(newContent, null);
+        AnchorPane.setLeftAnchor(newContent, null);
+        AnchorPane.setRightAnchor(newContent, null);
+        newContent.layoutBoundsProperty().addListener((obs, oldBounds, newBounds) -> {
+            double xOffset = (main.getWidth() - newBounds.getWidth()) / 2;
+            double yOffset = (main.getHeight() - newBounds.getHeight()) / 2;
+            newContent.setTranslateX(xOffset);
+            newContent.setTranslateY(yOffset);
+        });
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+}
+public static StudentController getInstance()
+{
+    return instance;
+}
+public ImageView getAvt() {
+    return avt;
 }
 
 }
