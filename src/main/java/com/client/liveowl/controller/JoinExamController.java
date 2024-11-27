@@ -18,9 +18,7 @@ import javafx.scene.image.ImageView;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.videoio.VideoCapture;
-
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -28,6 +26,7 @@ import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
+import static com.client.liveowl.AppConfig.serverHostName;
 import static com.client.liveowl.socket.StudentSocket.latch;
 
 
@@ -88,9 +87,9 @@ public void initialize() throws IOException {
 
             alert.showAndWait().ifPresent(response -> {
                 if (response == ButtonType.OK) {
-                    if (StudentSocket.isLive) {
+                    if (StudentSocket.isLive()) {
                         try {
-                            StudentSocket.isLive = false;
+                            StudentSocket.setLive(false);
                             sendExitNotificationToTeacher();
                         } catch (Exception ex) {
                             System.out.println("Lỗi khi gui exit " + ex.getMessage());
@@ -154,7 +153,7 @@ public void initialize() throws IOException {
     public void sendExitNotificationToTeacher() throws Exception {
         System.out.println("Send exit for teacher");
         DatagramSocket socketExit = new DatagramSocket(8765);
-        UdpHandler.sendRequestExitToTeacher(socketExit, Authentication.getUserId(), InetAddress.getByName(StudentSocket.serverHostName),StudentSocket.serverPort);
+        UdpHandler.sendRequestExitToTeacher(socketExit, Authentication.getUserId(), InetAddress.getByName(serverHostName),StudentSocket.newServerPort);
         if (camera != null) camera.release();
         socketExit.close();
     }

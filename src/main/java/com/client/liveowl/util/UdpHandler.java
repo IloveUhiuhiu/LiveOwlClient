@@ -21,7 +21,7 @@ public class UdpHandler {
         soc.receive(packet);
         return (messageBytes[0] & 0xff);
     }
-    public static String receiveMsg(DatagramSocket soc, InetAddress addr, int port) throws IOException {
+    public static String receiveMsg(DatagramSocket soc) throws IOException {
         byte[] messageBytes = new byte[1024];
         DatagramPacket packet = new DatagramPacket(messageBytes, messageBytes.length);
         soc.receive(packet);

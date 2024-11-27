@@ -1,54 +1,46 @@
 
 package com.client.liveowl.socket;
+import static com.client.liveowl.AppConfig.*;
+import java.io.*;
+import java.net.*;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.Random;
 import com.client.liveowl.util.Authentication;
 import com.client.liveowl.util.UdpHandler;
 import com.github.kwhat.jnativehook.NativeHookException;
-import javafx.scene.image.Image;
-import org.opencv.core.Core;
 import org.opencv.videoio.VideoCapture;
-import java.io.*;
-import java.net.*;
-import java.util.Random;
 import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class StudentSocket{
-    public static int maxDatagramPacketLength = 1500;
-    public static int serverPort = 9000;
-  //  public static final String serverHostName = "10.10.26.165";
-    public static final String serverHostName = "localhost";
-    public static int clientPortSend = 8000;
-    public static int clientPortReceive = 7000;
-    public static int imageId = 0;
-    public static int imageCount = 0;
-    public static Random rand = new Random();
+
+    private static Random rand = new Random();
     private static final StringBuilder keyLogBuffer = new StringBuilder();
-    private static final int SEND_INTERVAL = 7000;
-    public static final int SERVER_PORT_LOGGER = 12345;
-    public static ConcurrentLinkedQueue<Image> cache = new ConcurrentLinkedQueue<>();
+    //public static ConcurrentLinkedQueue<Image> cache = new ConcurrentLinkedQueue<>();
     public static final VideoCapture camera = null;
-    public static DatagramSocket socketSend;
-    public static DatagramSocket socketReceive;
+    private static DatagramSocket socketSend;
+    private static DatagramSocket socketReceive;
     public static CountDownLatch latch;
-    public static boolean isLive = true;
+    private static volatile boolean isLive = true;
+    private int clientPortReceive;
+    private int clientPortSend;
+    public static int newServerPort;
     public StudentSocket() {
         try {
             latch = new CountDownLatch(1);
-            serverPort = 9000;
+            newServerPort = serverPort;
             isLive = true;
-            clientPortSend = rand.nextInt(100)+8000;
+            clientPortSend = rand.nextInt(999)+studentPort;
             clientPortReceive = clientPortSend - 1000;
-            System.out.println("Client port send: " + clientPortSend);
+            System.out.println("Client port: " + clientPortSend +", " + clientPortReceive);
             socketSend = new DatagramSocket(clientPortSend);
             socketReceive = new DatagramSocket(clientPortReceive);
-        } catch (SocketException e) {
+        } catch (Exception e) {
             System.out.println("Lỗi khi khởi tạo Socket: " + e.getMessage());
         }
     }
@@ -63,13 +55,13 @@ public class StudentSocket{
         UdpHandler.sendMsg(socketSend,connect,InetAddress.getByName(serverHostName),serverPort);
         System.out.println("Gửi mã " + code + " cuộc thi thành công!");
         //System.out.println(socketSend + ", " + serverHostName + ", " + serverPort);
-        String message = UdpHandler.receiveMsg(socketSend,InetAddress.getByName(serverHostName),serverPort);
+        String message = UdpHandler.receiveMsg(socketSend);
         System.out.println(message);
         if (message.equals("fail")) {
             return false;
         }
-        serverPort += UdpHandler.receivePort(socketSend);
-        System.out.println("Port mới là: " + StudentSocket.serverPort);
+        newServerPort += UdpHandler.receivePort(socketSend);
+        System.out.println("Port mới là: " + newServerPort);
         return true;
     }
     private static void sendKeyData() {
@@ -97,16 +89,15 @@ public class StudentSocket{
         }
     }
     public void LiveStream() throws IOException {
-        // Tạo một luồng mới cho StudentTaskUdp
         Thread taskThread = new Thread(new StudentTaskUdp(socketSend, socketReceive));
         try {
-            taskThread.start(); // Khởi động luồng
-            taskThread.join();  // Chờ cho luồng hoàn thành
+            taskThread.start();
+            taskThread.join();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } finally {
-            // Giảm giá trị latch khi hoàn tất
-            latch.countDown(); // Chuyển đến latch để theo dõi
+            latch.countDown();
+            cleanupResources();
         }
         try {
             Timer timer = new Timer();
@@ -133,11 +124,18 @@ public class StudentSocket{
                     keyLogBuffer.append(ketText + " ");
                 }
             });
-
-
         } catch (NativeHookException e) {
             throw new RuntimeException(e);
         }
     }
+    private void cleanupResources() {
+        if (socketReceive != null) socketReceive.close();
+        if (socketSend != null) socketSend.close();
+        if (camera != null) camera.release();
+        setLive(false);
+    }
+
+    public static synchronized void setLive(boolean live) {isLive = live;}
+    public static synchronized boolean isLive() {return isLive;}
 
 }
