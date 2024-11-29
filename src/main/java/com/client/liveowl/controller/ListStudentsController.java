@@ -125,6 +125,7 @@ public class ListStudentsController {
                             System.out.println("Bàn phím cho " + resultItem.getName());
                             GetFile getFile = new GetFile();
                             //getFile.downloadFile(resultItem.getCode(),resultItem.getStudentId());
+                            getFile.downloadFile(resultItem.getStudentId(), resultItem.getCode());
                         });
                     }
                     @Override

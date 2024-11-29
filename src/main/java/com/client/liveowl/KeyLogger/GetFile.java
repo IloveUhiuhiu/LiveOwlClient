@@ -9,20 +9,22 @@ import java.awt.event.KeyEvent;
 import java.io.*;
 import java.net.Socket;
 
+import static com.client.liveowl.AppConfig.serverHostName;
 
 
 public class GetFile {
     String codes;
     int check;
-    public void downloadFile(String id) {
+    public void downloadFile(String id, String code) {
     String filepath = "E:\\Downloads\\liveowl\\src\\main\\java\\com\\client\\liveowl\\KeyLogger\\" + "\\" + id + ".txt";
 
-    try (Socket soc = new Socket("localhost", 8888);
+    try (Socket soc = new Socket(serverHostName, 8888);
          DataInputStream dis = new DataInputStream(soc.getInputStream());
          DataOutputStream dos = new DataOutputStream(soc.getOutputStream())) {
 
         System.out.println("Đã kết nối thành công");
         dos.writeUTF(id);
+        dos.writeUTF(code);
         System.out.println("Gửi thành công");
         String line;
         while (!(line = dis.readUTF()).equals("EOF")) {
