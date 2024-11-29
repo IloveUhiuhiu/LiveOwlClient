@@ -70,7 +70,9 @@ public class JavaFxApplication extends Application {
     }
 
     public static void changeScene(String fxml) throws IOException {
+        String title = fxml.substring(fxml.lastIndexOf("/") + 1, fxml.lastIndexOf(".fxml"));
         Parent pane = FXMLLoader.load(JavaFxApplication.class.getResource(fxml));
+        stage.setTitle(title);
         stage.setScene(new Scene(pane)); // Tạo một scene mới
         stage.show();
     }
