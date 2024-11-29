@@ -21,9 +21,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-
+import static com.client.liveowl.AppConfig.*;
 public class ExamHandler {
-    private static final String BASE_URI = "http://localhost:9090";
+    private static final String BASE_URI = "http://"+serverHostName+":9090";
     public static List<Exam> getExamsByAccount() {
         String url = BASE_URI + "/exams/all";
         System.out.println(Authentication.getToken());
