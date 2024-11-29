@@ -24,6 +24,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 
+import static com.client.liveowl.JavaFxApplication.stage;
 import static com.client.liveowl.socket.TeacherSocket.*;
 import static com.client.liveowl.AppConfig.*;
 
@@ -61,6 +62,7 @@ public class LiveController {
 
     @FXML
     public void initialize() {
+        stage.setTitle("LiveStream - " + code);
         teacherSocket = new TeacherSocket();
         try {
             System.out.println("livestream thoi");
@@ -128,7 +130,7 @@ public class LiveController {
         gridImage.getChildren().clear(); // Xóa các node hiện tại
         int columns = Math.min(numImages, 3);
         int rows = (int) Math.ceil((double) numImages / columns);
-        exitButton.setText(numImages + ", " + rows + ", " + columns);
+        //exitButton.setText(numImages + ", " + rows + ", " + columns);
         int i = 0;
         for (String Key: imageViews.keySet()) {
             ImageView imageView = imageViews.get(Key);
