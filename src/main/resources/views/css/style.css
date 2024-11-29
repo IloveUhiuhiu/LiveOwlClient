@@ -52,3 +52,15 @@
     -fx-scale-x: 1.1;
     -fx-scale-y: 1.1;
 }
+.date:disabled{
+    -fx-opacity: 1.0;
+    -fx-text-fill: #252424; 
+    -fx-font-weight: bold; 
+    -fx-font-size: 14px; 
+}
+.sex:disabled{
+    -fx-opacity: 1.0;
+    -fx-text-fill: #252424; 
+    -fx-font-weight: bold; 
+    -fx-font-size: 14px; 
+}

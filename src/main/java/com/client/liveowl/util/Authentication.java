@@ -13,10 +13,12 @@ import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import java.io.IOException;
 
+import static com.client.liveowl.AppConfig.serverHostName;
+
 
 public class Authentication {
 //private static final String BASE_URI = "http://192.168.1.21:9090";
-private static final String BASE_URI = "http://localhost:9090";
+private static final String BASE_URI = "http://"+serverHostName+":9090";
 private static boolean isAuthenticated;
 private static String token;
 private static int role;

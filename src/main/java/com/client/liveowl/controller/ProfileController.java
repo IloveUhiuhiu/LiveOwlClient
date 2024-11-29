@@ -6,13 +6,19 @@ import com.client.liveowl.util.UserHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -27,6 +33,7 @@ import org.springframework.http.HttpStatus;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 
 public class ProfileController
@@ -50,7 +57,18 @@ public class ProfileController
     private Button btnSave;
     @FXML
     private Button btnUpdate;
-
+    @FXML
+    private ImageView editName;
+    @FXML
+    private ImageView editEmail;
+    @FXML
+    private ImageView editDate;
+    @FXML
+    private ImageView editGender;
+    @FXML
+    private DatePicker dateofbirth;
+    @FXML
+    private ChoiceBox Sex;
     @FXML
     public void initialize()
     {
@@ -64,6 +82,10 @@ public class ProfileController
             }
         });
         btnUpdate.setOnAction(actionEvent -> updateInfo());
+        editName.setOnMouseClicked(event -> editName());
+        editEmail.setOnMouseClicked(event -> editEmail());
+        editDate.setOnMouseClicked(event -> editDate());
+        editGender.setOnMouseClicked(event -> editGender());
     }
 
     private void loadData()
@@ -73,8 +95,10 @@ public class ProfileController
         {
             txtName.setText(user.getFullName());
             txtEmail.setText(user.getEmail());
-            txtNgaySinh.setText(user.getDateOfBirth().toString());
-            txtGioiTinh.setText(user.getGender() ? "Nam" : "Nữ");
+            dateofbirth.setValue(user.getDateOfBirth());
+            dateofbirth.setDisable(true);
+            Sex.setValue(user.getGender() ? "Nam" : "Nữ");
+            Sex.setDisable(true);
             byte[] imageBytes = Base64.getDecoder().decode(user.getProfileImgLocation());
             Image image = new Image(new ByteArrayInputStream(imageBytes));
             avt.setImage(image);
@@ -147,8 +171,8 @@ public class ProfileController
     {
         String name = txtName.getText();
         String email = txtEmail.getText();
-        String genderStr = txtGioiTinh.getText();
-        String dateOfBirthStr = txtNgaySinh.getText();
+        String genderStr = (String) Sex.getValue();
+        LocalDate dateOfBirth = dateofbirth.getValue();
         Boolean genderBol;
         if(genderStr.equals("Nam"))
             genderBol = true;
@@ -156,8 +180,26 @@ public class ProfileController
             genderBol = false;
         else
             return;
-        LocalDate dateofbirth = LocalDate.parse(dateOfBirthStr);
-        UserHandler.sendÌnor(name, email, dateofbirth, genderBol);
+        UserHandler.sendÌnor(name, email, dateOfBirth, genderBol);
     }
-
+    private void editName()
+    {
+        txtName.setEditable(true);
+        txtName.requestFocus();
+    }
+    private void editEmail()
+    {
+        txtEmail.setEditable(true);
+        txtEmail.requestFocus();
+    }
+    private void editGender()
+    {
+        Sex.setDisable(false);
+        Sex.requestFocus();
+    }
+    private void editDate()
+    {
+        dateofbirth.setDisable(false);
+        dateofbirth.requestFocus();
+    }
 }
