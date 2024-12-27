@@ -1,6 +1,6 @@
 package com.client.liveowl.controller;
 
-import com.client.liveowl.socket.WatchedVideo;
+import com.client.liveowl.video.ProcessPlayVideo;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -21,7 +21,7 @@ public class VideoPlayerController {
     @FXML
     private Button stopButton;
     private AnimationTimer animationTimer;
-    private WatchedVideo watchedVideo;
+    private ProcessPlayVideo watchedVideo;
     private static final int TARGET_FPS = 10; // Đặt FPS mong muốn
     private static final long NANOSECONDS_PER_SECOND = 1_000_000_000L;
     private long lastUpdate = 0;
@@ -30,7 +30,7 @@ public class VideoPlayerController {
         System.out.println(code + "," + clientId + ",dda vao");
         new Thread(() -> {
             try {
-                watchedVideo = new WatchedVideo();
+                watchedVideo = new ProcessPlayVideo();
                 watchedVideo.getVideo(code, clientId);
                 System.out.println("WatchedVideo initialized successfully");
             } catch (IOException e) {
@@ -40,7 +40,7 @@ public class VideoPlayerController {
         animationTimer = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                if (!WatchedVideo.isLivestream()) {
+                if (!ProcessPlayVideo.isLivestream()) {
                     animationTimer.stop();
                 }
                 if (now - lastUpdate >= NANOSECONDS_PER_SECOND / TARGET_FPS) {

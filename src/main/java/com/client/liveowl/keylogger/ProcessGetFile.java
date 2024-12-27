@@ -1,10 +1,8 @@
-package com.client.liveowl.KeyLogger;
+package com.client.liveowl.keylogger;
 
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.*;
 import java.net.Socket;
@@ -12,7 +10,7 @@ import java.net.Socket;
 import static com.client.liveowl.AppConfig.serverHostName;
 
 
-public class GetFile {
+public class ProcessGetFile {
     String codes;
     int check;
     public void downloadFile(String id, String code) {

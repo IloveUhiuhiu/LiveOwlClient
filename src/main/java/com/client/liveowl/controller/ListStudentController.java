@@ -1,10 +1,8 @@
 package com.client.liveowl.controller;
 
-import com.client.liveowl.KeyLogger.GetFile;
-import com.client.liveowl.model.Result;
+import com.client.liveowl.keylogger.ProcessGetFile;
 import com.client.liveowl.model.ResultDTO;
 import com.client.liveowl.model.ResultItem;
-import com.client.liveowl.util.Authentication;
 import com.client.liveowl.util.ResultHandler;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -24,7 +22,7 @@ import javafx.util.Callback;
 
 import java.util.List;
 
-public class ListStudentsController {
+public class ListStudentController {
     @FXML
     private TableView<ResultItem> tableContent;
     @FXML
@@ -123,7 +121,7 @@ public class ListStudentsController {
                         button.setOnAction(event -> {
                             ResultItem resultItem = getTableView().getItems().get(getIndex());
                             System.out.println("Bàn phím cho " + resultItem.getName());
-                            GetFile getFile = new GetFile();
+                            ProcessGetFile getFile = new ProcessGetFile();
                             //getFile.downloadFile(resultItem.getCode(),resultItem.getStudentId());
                             getFile.downloadFile(resultItem.getStudentId(), resultItem.getCode());
                         });

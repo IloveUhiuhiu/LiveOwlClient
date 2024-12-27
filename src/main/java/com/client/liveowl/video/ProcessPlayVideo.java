@@ -1,4 +1,4 @@
-package com.client.liveowl.socket;
+package com.client.liveowl.video;
 import com.client.liveowl.util.UdpHandler;
 import javafx.scene.image.Image;
 import java.io.ByteArrayInputStream;
@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class WatchedVideo {
+public class ProcessPlayVideo {
     public static int maxDatagramPacketLength = 1500;
     public static int serverPort = 9512;
     public static String serverHostName = "localhost";
@@ -24,7 +24,7 @@ public class WatchedVideo {
     public static synchronized void setLivestream(boolean isLivestream) {
         _isLivestream = isLivestream;
     }
-    public WatchedVideo() {
+    public ProcessPlayVideo() {
         try {
             serverPort = 9512;
             socket = new DatagramSocket(port);

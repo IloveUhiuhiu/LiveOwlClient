@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<Pane fx:id="contentContainer" layoutX="-2.0" prefHeight="500.0" prefWidth="661.0" style="-fx-background-color: white; -fx-background-radius: 15px;" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.client.liveowl.controller.ContestController">
+<Pane fx:id="contentContainer" layoutX="-2.0" prefHeight="500.0" prefWidth="661.0" style="-fx-background-color: white; -fx-background-radius: 15px;" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.client.liveowl.controller.ExamController">
    <children>
       <VBox fx:id="contentList" layoutX="2.0" layoutY="52.0" prefHeight="402.0" prefWidth="634.0" spacing="10">
          <children>
