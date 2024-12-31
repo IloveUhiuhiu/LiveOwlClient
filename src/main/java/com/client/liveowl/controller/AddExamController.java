@@ -7,7 +7,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -31,11 +30,9 @@ public class AddExamController {
     private ComboBox<Integer> minutes;
     @FXML
     public void initialize() {
-
         for (int i = 0; i < 24; i++) {
             hour.getItems().add(i);
         }
-
         for (int i = 0; i < 60; i++) {
             minutes.getItems().add(i);
         }

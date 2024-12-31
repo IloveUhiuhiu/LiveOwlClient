@@ -28,11 +28,10 @@ public class User implements Serializable {
 
     public User() {
     }
-
-    public User(String email, String password, String role) {
+    public User(String accountId, String email, String fullName) {
+        this.accountId = accountId;
         this.email = email;
-        this.password = password;
-        this.role = role;
+        this.fullName = fullName;
     }
 
     public String getAccountId() {

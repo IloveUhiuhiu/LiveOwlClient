@@ -1,24 +1,19 @@
 package com.client.liveowl.util;
 
 import org.apache.http.HttpEntity;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
-import java.io.IOException;
 
-import static com.client.liveowl.AppConfig.serverHostName;
+import static com.client.liveowl.AppConfig.BASE_URI;
 
 
 public class Authentication {
-//private static final String BASE_URI = "http://192.168.1.21:9090";
-private static final String BASE_URI = "http://"+serverHostName+":9090";
+
 private static boolean isAuthenticated;
 private static String token;
 private static int role;
@@ -26,9 +21,7 @@ private static String code;
 public static String usedId;
 public Authentication() {
 }
-public static String getBaseUri(){
-    return BASE_URI;
-}
+
 public boolean isAuthenticated() {
     return isAuthenticated;
 }

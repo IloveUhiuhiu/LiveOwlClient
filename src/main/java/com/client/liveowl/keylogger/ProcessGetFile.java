@@ -7,16 +7,15 @@ import java.awt.event.KeyEvent;
 import java.io.*;
 import java.net.Socket;
 
-import static com.client.liveowl.AppConfig.serverHostName;
+import static com.client.liveowl.AppConfig.SERVER_HOST_NAME;
 
 
 public class ProcessGetFile {
     String codes;
     int check;
     public void downloadFile(String id, String code) {
-    String filepath = "E:\\Downloads\\liveowl\\src\\main\\java\\com\\client\\liveowl\\KeyLogger\\" + "\\" + id + ".txt";
 
-    try (Socket soc = new Socket(serverHostName, 8888);
+    try (Socket soc = new Socket(SERVER_HOST_NAME, 8888);
          DataInputStream dis = new DataInputStream(soc.getInputStream());
          DataOutputStream dos = new DataOutputStream(soc.getOutputStream())) {
 
@@ -28,40 +27,7 @@ public class ProcessGetFile {
         while (!(line = dis.readUTF()).equals("EOF")) {
             codes = line;
         }
-//        SwingUtilities.invokeLater(() -> {
-//            if (GraphicsEnvironment.isHeadless()) {
-//                System.out.println("Môi trường headless: không thể hiển thị giao diện đồ họa.");
-//                return;
-//            }
-//
-//            JFrame frame = new JFrame("Mô phỏng quá trình gõ phím của " + id);
-//            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-//            frame.setSize(700, 800);
-//            frame.setLayout(new BorderLayout());
-//
-//            JTextArea textArea = new JTextArea();
-//            textArea.setFont(new Font("Monospaced", Font.PLAIN, 16));
-//            JScrollPane scrollPane = new JScrollPane(textArea);
-//            frame.add(scrollPane, BorderLayout.CENTER);
-//
-//            JButton button = new JButton("Bắt đầu");
-//            frame.add(button, BorderLayout.SOUTH);
-//
-//            button.addActionListener(e -> {
-//                textArea.requestFocus();
-//                new Thread(() -> {
-//                    try {
-//                        String inputText = codes;
-//                        xuly(inputText);
-//                    } catch (Exception ex) {
-//                        ex.printStackTrace();
-//                    }
-//                }).start();
-//            });
-//
-//            frame.setLocationRelativeTo(null);
-//            frame.setVisible(true);
-//        });
+
         SwingUtilities.invokeLater(() -> {
             if (GraphicsEnvironment.isHeadless()) {
                 System.out.println("Môi trường headless: không thể hiển thị giao diện đồ họa.");

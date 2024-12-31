@@ -1,12 +1,14 @@
 package com.client.liveowl.socket;
-import com.client.liveowl.controller.LiveController;
-import com.client.liveowl.util.Authentication;
+import com.client.liveowl.model.User;
 import com.client.liveowl.util.ImageData;
 import com.client.liveowl.util.UdpHandler;
 import java.io.IOException;
 import java.net.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentMap;
+
 import static com.client.liveowl.AppConfig.*;
 
 public class TeacherSocket{
@@ -18,26 +20,25 @@ public class TeacherSocket{
     public DatagramSocket socketSend;
     public DatagramSocket socketRecieve;
     public static ConcurrentLinkedQueue<ImageData> queueImage = new ConcurrentLinkedQueue<>();
-    //public static Map<String,Boolean> isExit = new HashMap<>();
     public static ConcurrentLinkedQueue<String> queueExit = new ConcurrentLinkedQueue<>();
-    public static volatile boolean isLive = true;
+
+    public static Map<String, User> listUsers = new ConcurrentHashMap<>();
+    public static volatile boolean isRunning = true;
     public TeacherSocket() {
         try {
-            newserverPort = serverPort;
-            isLive = true;
-            socketSend = new DatagramSocket(teacherPort + rand.nextInt(999));
-            socketRecieve = new DatagramSocket(teacherPort - 1000);
+            newserverPort = SERVER_PORT;
+            isRunning = true;
+            socketSend = new DatagramSocket(TEACHER_PORT + rand.nextInt(999));
+            socketRecieve = new DatagramSocket(TEACHER_PORT - 1000);
         } catch (SocketException e) {
             System.err.println("Lỗi trong khi khởi tạo Socket :" + e.getMessage());
         }
     }
     public void LiveStream(String examId, String code) throws IOException {
             String connect = examId + ":teacher:" + code;
-            //UdpHandler.sendMsg(socketSend, Authentication.getUserId(), InetAddress.getByName(serverHostName), serverPort);
             System.out.println("Gửi thành công chuỗi connect đến server!");
-            //UdpHandler.sendMsg(socketSend, "teacher", InetAddress.getByName(serverHostName), serverPort);
             System.out.println("Gửi role teacher!");
-            UdpHandler.sendMsg(socketSend, connect, InetAddress.getByName(serverHostName), serverPort);
+            UdpHandler.sendMsg(socketSend, connect, InetAddress.getByName(SERVER_HOST_NAME), SERVER_PORT);
             System.out.println("Gửi mã " + code + " cuộc thi thành công!");
             newserverPort += UdpHandler.receivePort(socketSend);
             System.out.println("Port mới là :" + newserverPort);
@@ -46,11 +47,11 @@ public class TeacherSocket{
             Thread thread = new Thread(task);thread.start();
 
     }
-    public static synchronized boolean isLive() {
-        return isLive;
+    public static synchronized boolean isRunning() {
+        return isRunning;
     }
-    public static synchronized void setLive(boolean isLive) {
-        TeacherSocket.isLive = isLive;
+    public static synchronized void setRunning(boolean isRunning) {
+        TeacherSocket.isRunning = isRunning;
     }
 
 }

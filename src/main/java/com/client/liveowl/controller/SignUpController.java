@@ -221,7 +221,7 @@ private void sendSignupRequest(String email, String password, String fullname, L
             System.out.println("Response: " + responseString);
 
             if (statusCode == HttpStatus.OK.value()) {
-                JavaFxApplication.changeScene("/views/Login.fxml");
+                JavaFxApplication.changeScene("/views/Login.fxml", "Login");
             } else {
                 System.out.println("Error: " + statusCode + " - " + response.getStatusLine().getReasonPhrase());
                 wrongSignup.setText("Có lỗi xảy ra: " + response.getStatusLine().getReasonPhrase());
@@ -236,7 +236,7 @@ private void sendSignupRequest(String email, String password, String fullname, L
     @FXML
     public void SignupToLogin() throws IOException {
         JavaFxApplication javaFxApplication = new JavaFxApplication();
-        JavaFxApplication.changeScene("/views/Login.fxml");
+        JavaFxApplication.changeScene("/views/Login.fxml", "Login");
     }
 //    public static  void main(String[] args) throws IOException {
 //        SignUpController controller = new SignUpController();

@@ -197,7 +197,7 @@ public class ExamController {
             try {
                 LiveController.code = exam.getCodeOfExam();
                 LiveController.examId = exam.getExamId();
-                JavaFxApplication.changeScene("/views/Live.fxml");
+                JavaFxApplication.changeScene("/views/Live.fxml", "LiveStream");
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

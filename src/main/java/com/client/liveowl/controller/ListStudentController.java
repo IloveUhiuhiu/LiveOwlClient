@@ -188,7 +188,7 @@ public class ListStudentController {
         videoStage.show();
         VideoPlayerController controller = loader.getController();
         controller.initialize(code,clientId);
-        System.out.println("Sucess");
+        System.out.println("Success");
     }
 
 }

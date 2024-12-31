@@ -33,7 +33,6 @@ private Pane main;
 private Pane header;
 
 private static HomeStudentController instance;
-public static StudentSocket theSocket = null;
 private static String avatarPath = UserHandler.getDetailUser().getProfileImgLocation();
 
 
@@ -67,7 +66,7 @@ private void handleJoinButtonClick() {
     System.out.println("Mã đã nhập: " + code);
     try {
         Authentication.setCode(code);
-        JavaFxApplication.changeScene("/views/JoinExam.fxml");
+        JavaFxApplication.changeScene("/views/JoinExam.fxml", "JoinExam");
     } catch (IOException e) {
         e.printStackTrace();
     }

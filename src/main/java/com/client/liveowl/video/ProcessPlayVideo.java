@@ -7,11 +7,10 @@ import java.net.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import static com.client.liveowl.AppConfig.*;
 
 public class ProcessPlayVideo {
-    public static int maxDatagramPacketLength = 1500;
-    public static int serverPort = 9512;
-    public static String serverHostName = "localhost";
+    private static int serverPort;
     public static int port = 5215;
     public Map<String, byte[]> imageBuffer = new HashMap<>();
     public ConcurrentLinkedQueue<Image> packetBuffer = new ConcurrentLinkedQueue<>();
@@ -26,7 +25,7 @@ public class ProcessPlayVideo {
     }
     public ProcessPlayVideo() {
         try {
-            serverPort = 9512;
+            serverPort = VIDEO_SERVER_PORT;
             socket = new DatagramSocket(port);
             setLivestream(true);
         } catch (SocketException e) {
@@ -39,14 +38,14 @@ public class ProcessPlayVideo {
         System.out.println("Gửi thành công chuỗi connect đến server!");
         //UdpHandler.sendMsg(socketSend, "teacher", InetAddress.getByName(serverHostName), serverPort);
         System.out.println("Gửi role teacher!");
-        UdpHandler.sendMsg(socket, connect, InetAddress.getByName(serverHostName), serverPort);
+        UdpHandler.sendMsg(socket, connect, InetAddress.getByName(SERVER_HOST_NAME), serverPort);
         System.out.println("Gửi mã " + code + " cuộc thi thành công!");
         serverPort += UdpHandler.receivePort(socket);
         System.out.println("Port mới là :" + serverPort);
         System.out.println("Chờ mọi người tham gia!");
         try {
         while (isLivestream()) {
-            byte[] message = new byte[maxDatagramPacketLength];
+            byte[] message = new byte[MAX_DATAGRAM_PACKET_LENGTH];
             try {
                 UdpHandler.receiveBytesArr(socket, message);
             } catch (SocketTimeoutException e) {
@@ -69,7 +68,7 @@ public class ProcessPlayVideo {
                 int packetId = (message[1] & 0xff);
                 int sequenceNumber = (message[2] & 0xff);
                 boolean isLastPacket = ((message[3] & 0xff) == 1);
-                int destinationIndex = (sequenceNumber - 1) * (maxDatagramPacketLength - 4);
+                int destinationIndex = (sequenceNumber - 1) * (MAX_DATAGRAM_PACKET_LENGTH - 4);
                 String Key = packetId + ":" + clientId;
                 //System.out.println(sequenceNumber +", " + packetId + ":" + clientId + ", " + destinationIndex);
                 if (imageBuffer.containsKey(Key)) {
@@ -78,10 +77,10 @@ public class ProcessPlayVideo {
                     //TeacherSocket.numberBuffer.put(Key, TeacherSocket.numberBuffer.get(Key) - 1) ;
                     int lengthOfImage = imageBytes.length;
                     if (destinationIndex >= 0 && destinationIndex < lengthOfImage) {
-                        if (destinationIndex + maxDatagramPacketLength - 4 < lengthOfImage) {
-                            System.arraycopy(message, 4, imageBytes, destinationIndex, maxDatagramPacketLength - 4);
+                        if (destinationIndex + MAX_DATAGRAM_PACKET_LENGTH - 4 < lengthOfImage) {
+                            System.arraycopy(message, 4, imageBytes, destinationIndex, MAX_DATAGRAM_PACKET_LENGTH - 4);
                         } else {
-                            System.arraycopy(message, 4, imageBytes, destinationIndex, lengthOfImage % (maxDatagramPacketLength - 4));
+                            System.arraycopy(message, 4, imageBytes, destinationIndex, lengthOfImage % (MAX_DATAGRAM_PACKET_LENGTH - 4));
                         }
                     } else {
                         System.out.println("Chỉ số đích không hợp lệ: " + destinationIndex + ", lengthOFImage" + lengthOfImage);

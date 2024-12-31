@@ -149,7 +149,7 @@ public class ProfileController
             JavaFxApplication.stage.getScene().setRoot(root);
         }
         else
-            JavaFxApplication.changeScene("/views/HomeTeacher.fxml");
+            JavaFxApplication.changeScene("/views/HomeTeacher.fxml", "Home");
     }
 
     private void updateInfo()
@@ -165,7 +165,7 @@ public class ProfileController
             genderBol = false;
         else
             return;
-        UserHandler.sendÌnor(name, email, dateOfBirth, genderBol);
+        UserHandler.sendInfor(name, email, dateOfBirth, genderBol);
     }
     private void editName()
     {
