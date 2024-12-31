@@ -29,10 +29,10 @@ public Authentication() {
 public static String getBaseUri(){
     return BASE_URI;
 }
-public boolean isAuthenticated() {
+public  boolean isAuthenticated() {
     return isAuthenticated;
 }
-private void setAuthenticated(boolean authenticated) {
+public static void setAuthenticated(boolean authenticated) {
     isAuthenticated = authenticated;
 }
 public static String getCode() {
@@ -71,16 +71,8 @@ public static boolean login(String email, String password) throws Exception {
         return false;
     }
 }
-//    ObjectMapper objectMapper = new ObjectMapper();
-//try {
-//        UserData userData = objectMapper.readValue(jsonResponse.getJSONObject("data").toString(), UserData.class);
-//        // Sử dụng userData ở đây
-//        System.out.println("User ID: " + userData.getUserId());
-//    } catch (JsonProcessingException e) {
-//        // Xử lý lỗi
-//        e.printStackTrace();
-//    }
-public boolean logout() {
+
+public  boolean logout() {
     if (!this.isAuthenticated) {
         return false;
     }

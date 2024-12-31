@@ -105,6 +105,8 @@ import com.client.liveowl.model.User;
 import com.client.liveowl.util.Authentication;
 import com.client.liveowl.util.ExamHandler;
 import com.client.liveowl.util.UserHandler;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
@@ -116,16 +118,20 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
+import javafx.util.Duration;
 import org.springframework.stereotype.Component;
 
 import javax.naming.AuthenticationException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Locale;
 
 
 public class HomeController
@@ -150,6 +156,8 @@ public class HomeController
     private AnchorPane phaiPN;
     @FXML
     private VBox listContest;
+    @FXML
+    private Label lblDateAndTime;
 
     private static HomeController instance;
     private static String avatarPath = UserHandler.getDetailUser().getProfileImgLocation();
@@ -157,6 +165,7 @@ public class HomeController
     @FXML
     public void initialize()
     {
+        startClock();
         try {
             instance = this;
             setAvatarImage(avatarPath, avt, 80.0, 80.0);
@@ -274,7 +283,10 @@ public class HomeController
     @FXML
     private void clickLogoutButton() throws IOException
     {
-        JavaFxApplication.changeScene("/views/Home.fxml");
+        Authentication authentication = new Authentication();
+        if(authentication.logout()){
+            JavaFxApplication.changeScene("/views/Login.fxml");
+        }
     }
 
     public void loadContent(String url) throws IOException
@@ -284,7 +296,19 @@ public class HomeController
         contentContainer.getChildren().add(content);
     }
 
-    public ImageView getAvt() {
+    public ImageView getAvt()
+    {
         return avt;
+    }
+
+    public void startClock() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("h:mm a | EEEE, MMM d", Locale.ENGLISH);
+
+        Timeline clock = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
+            LocalDateTime now = LocalDateTime.now();
+            lblDateAndTime.setText(now.format(formatter));
+        }));
+        clock.setCycleCount(Timeline.INDEFINITE);
+        clock.play();
     }
 }

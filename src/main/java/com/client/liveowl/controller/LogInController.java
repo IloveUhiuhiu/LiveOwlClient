@@ -43,7 +43,7 @@ public class LogInController {
             try {
                 boolean result = loginTask.get();
                 if (result) {
-                    wrongLogIn.setText("Đăng nhập thành công!");
+                    Authentication.setAuthenticated(true);
                     if (Authentication.getRole() == 1) {
                         JavaFxApplication.changeScene("/views/Home.fxml");
                     } else {

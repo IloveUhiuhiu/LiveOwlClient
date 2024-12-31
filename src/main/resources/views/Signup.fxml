@@ -67,7 +67,7 @@
                     <font>
                         <Font size="10.0" />
                     </font></CheckBox>
-                <Button fx:id="btnSignup" layoutX="205.0" layoutY="418.0" mnemonicParsing="false" onAction="#userSignUp" prefHeight="31.0" prefWidth="78.0" style="-fx-background-color: #53095b;" text="SIGN UP" textFill="#c6d44a">
+                <Button fx:id="btnSignup" defaultButton="true" layoutX="205.0" layoutY="418.0" mnemonicParsing="false" onAction="#userSignUp" prefHeight="31.0" prefWidth="78.0" style="-fx-background-color: #53095b;" text="SIGN UP" textFill="#c6d44a">
                     <font>
                         <Font name="System Bold" size="12.0" />
                     </font>
@@ -76,7 +76,7 @@
                 <Label layoutX="40.0" layoutY="84.0" prefHeight="18.0" prefWidth="60.0" text="Email" />
                 <TextField fx:id="email" layoutX="42.0" layoutY="102.0" prefHeight="26.0" prefWidth="201.0" promptText="email" />
                 <Label layoutX="44.0" layoutY="251.0" prefHeight="18.0" prefWidth="112.0" text="Xác nhận mật khẩu" />
-                <Label fx:id="wrongSignup" layoutX="129.0" layoutY="331.0" prefHeight="18.0" prefWidth="254.0" textFill="#fa0808" wrapText="true">
+                <Label fx:id="wrongSignup" layoutX="43.0" layoutY="331.0" prefHeight="18.0" prefWidth="254.0" textFill="#fa0808" wrapText="true">
                     <font>
                         <Font name="System Italic" size="12.0" />
                     </font>

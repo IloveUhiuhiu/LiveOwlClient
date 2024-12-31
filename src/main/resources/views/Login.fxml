@@ -61,7 +61,7 @@
             <Label layoutX="41.0" layoutY="207.0" prefHeight="18.0" prefWidth="78.0" text="Mật khẩu" />
             <PasswordField fx:id="password" layoutX="41.0" layoutY="225.0" prefHeight="26.0" prefWidth="201.0" promptText="123qwe!@#" />
             <CheckBox fx:id="checkbox" layoutX="41.0" layoutY="307.0" mnemonicParsing="false" prefHeight="18.0" prefWidth="134.0" text="Lưu tài khoản" />
-            <Button fx:id="btnLogin" layoutX="164.0" layoutY="303.0" mnemonicParsing="false" onAction="#userLogIn" prefHeight="26.0" prefWidth="78.0" style="-fx-background-color: #53095b;" text="LOG IN" textFill="#c6d44a">
+            <Button fx:id="btnLogin" layoutX="164.0" layoutY="303.0" mnemonicParsing="false" onAction="#userLogIn" prefHeight="26.0" prefWidth="78.0" style="-fx-background-color: #53095b;" text="LOG IN" textFill="#c6d44a" defaultButton="true">
                <font>
                   <Font name="System Bold" size="12.0" />
                </font>
