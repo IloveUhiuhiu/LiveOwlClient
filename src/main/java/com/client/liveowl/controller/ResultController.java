@@ -1,14 +1,9 @@
 package com.client.liveowl.controller;
 
-import com.client.liveowl.JavaFxApplication;
-import com.client.liveowl.KeyLogger.GetFile;
 import com.client.liveowl.model.Exam;
-import com.client.liveowl.util.Authentication;
 import com.client.liveowl.util.ExamHandler;
-import com.client.liveowl.util.UserHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -18,10 +13,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ResultController {
@@ -73,9 +66,9 @@ public Pane createPane(Exam exam) {
         resultButton.setFont(Font.font("System Bold", 12));
         resultButton.setOnAction(event -> {
             try {
-                ListStudentsController.examId = exam.getExamId();
-                ListStudentsController.code = exam.getCodeOfExam();
-                loadContent("/views/ListStudents.fxml");
+                ListStudentController.examId = exam.getExamId();
+                ListStudentController.code = exam.getCodeOfExam();
+                loadContent("/views/ListStudent.fxml");
                 addBackButton(contentContainer,5,5);
             } catch (IOException e) {
                 throw new RuntimeException(e);

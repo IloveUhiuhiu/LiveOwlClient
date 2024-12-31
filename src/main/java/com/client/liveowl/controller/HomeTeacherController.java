@@ -105,7 +105,6 @@ import com.client.liveowl.model.User;
 import com.client.liveowl.util.Authentication;
 import com.client.liveowl.util.ExamHandler;
 import com.client.liveowl.util.UserHandler;
-import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -118,7 +117,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
-import javafx.util.Duration;
 import org.springframework.stereotype.Component;
 
 import javax.naming.AuthenticationException;
@@ -126,15 +124,12 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
-import java.util.Locale;
+import javafx.animation.KeyFrame;
+import javafx.util.Duration;
 
-
-public class HomeController
+public class HomeTeacherController
 {
     @FXML
     private Button homeButton;
@@ -159,7 +154,7 @@ public class HomeController
     @FXML
     private Label lblDateAndTime;
 
-    private static HomeController instance;
+    private static HomeTeacherController instance;
     private static String avatarPath = UserHandler.getDetailUser().getProfileImgLocation();
 
     @FXML
@@ -227,7 +222,7 @@ public class HomeController
     }
 
 
-    public static HomeController getInstance()
+    public static HomeTeacherController getInstance()
     {
         return instance;
     }
@@ -253,13 +248,13 @@ public class HomeController
     @FXML
     private void clickHomeButton() throws IOException
     {
-        JavaFxApplication.changeScene("/views/Home.fxml");
+        JavaFxApplication.changeScene("/views/HomeTeacher.fxml");
     }
 
     @FXML
     private void clickContestButton() throws IOException
     {
-        loadContent("/views/Contest.fxml");
+        loadContent("/views/Exam.fxml");
     }
 
     @FXML
@@ -277,7 +272,7 @@ public class HomeController
     @FXML
     private void clickMessageButton() throws IOException
     {
-        JavaFxApplication.changeScene("/views/Home.fxml");
+        JavaFxApplication.changeScene("/views/HomeTeacher.fxml");
     }
 
     @FXML
@@ -287,6 +282,7 @@ public class HomeController
         if(authentication.logout()){
             JavaFxApplication.changeScene("/views/Login.fxml");
         }
+
     }
 
     public void loadContent(String url) throws IOException

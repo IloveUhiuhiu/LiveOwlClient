@@ -1,7 +1,6 @@
 package com.client.liveowl.controller;
 
 import com.client.liveowl.JavaFxApplication;
-import com.client.liveowl.model.User;
 import com.client.liveowl.socket.StudentSocket;
 import com.client.liveowl.util.AlertDialog;
 import com.client.liveowl.util.Authentication;
@@ -9,8 +8,6 @@ import com.client.liveowl.util.ExamHandler;
 import com.client.liveowl.util.UserHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
@@ -18,14 +15,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 
 
 import java.io.IOException;
 
-public class StudentController extends HomeController{
+public class HomeStudentController extends HomeTeacherController {
 @FXML
 private TextField codeTextField;
 @FXML
@@ -37,7 +32,7 @@ private Pane main;
 @FXML
 private Pane header;
 
-private static StudentController instance;
+private static HomeStudentController instance;
 public static StudentSocket theSocket = null;
 private static String avatarPath = UserHandler.getDetailUser().getProfileImgLocation();
 
@@ -98,7 +93,7 @@ private void avtClick() throws Exception {
         e.printStackTrace();
     }
 }
-public static StudentController getInstance()
+public static HomeStudentController getInstance()
 {
     return instance;
 }

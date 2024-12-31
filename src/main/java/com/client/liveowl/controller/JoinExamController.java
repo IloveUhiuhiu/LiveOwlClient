@@ -57,7 +57,7 @@ public void initialize() throws IOException {
                         latch.await();
                         Platform.runLater(() -> {
                             try {
-                                JavaFxApplication.changeScene("/views/Student.fxml");
+                                JavaFxApplication.changeScene("/views/HomeStudent.fxml");
                                 System.out.println("Livestream đã kết thúc. Tiến hành các thao tác tiếp theo!");
                             } catch (Exception ex) {
                                 ex.printStackTrace();
@@ -92,7 +92,7 @@ public void initialize() throws IOException {
                         }
                     }
                     try {
-                        JavaFxApplication.changeScene("/views/Student.fxml");
+                        JavaFxApplication.changeScene("/views/HomeStudent.fxml");
                     } catch (IOException ex) {
                         System.out.println("Lỗi khi chang Scene " + ex.getMessage());
                     }

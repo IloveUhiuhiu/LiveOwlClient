@@ -45,9 +45,9 @@ public class LogInController {
                 if (result) {
                     Authentication.setAuthenticated(true);
                     if (Authentication.getRole() == 1) {
-                        JavaFxApplication.changeScene("/views/Home.fxml");
+                        JavaFxApplication.changeScene("/views/HomeTeacher.fxml");
                     } else {
-                        JavaFxApplication.changeScene("/views/Student.fxml");
+                        JavaFxApplication.changeScene("/views/HomeStudent.fxml");
                     }
 
                 } else {

@@ -1,24 +1,16 @@
 package com.client.liveowl;
 
 
-import com.client.liveowl.controller.LiveController;
-import com.client.liveowl.controller.StudentController;
-import com.client.liveowl.util.AlertDialog;
 import com.client.liveowl.util.Authentication;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import org.opencv.core.Core;
 
 import java.io.IOException;
-import java.util.function.Consumer;
 
 public class JavaFxApplication extends Application {
 
@@ -72,7 +64,7 @@ public class JavaFxApplication extends Application {
     public static void changeScene(String fxml) throws IOException {
         String title = fxml.substring(fxml.lastIndexOf("/") + 1, fxml.lastIndexOf(".fxml"));
         Parent pane = FXMLLoader.load(JavaFxApplication.class.getResource(fxml));
-        stage.setTitle(title);
+        //stage.setTitle(title);
         stage.setScene(new Scene(pane)); // Tạo một scene mới
         stage.show();
     }

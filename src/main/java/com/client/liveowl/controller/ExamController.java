@@ -2,9 +2,7 @@ package com.client.liveowl.controller;
 
 import com.client.liveowl.JavaFxApplication;
 import com.client.liveowl.model.Exam;
-import com.client.liveowl.request.ExamRequest;
 import com.client.liveowl.util.AlertDialog;
-import com.client.liveowl.util.Authentication;
 import com.client.liveowl.util.ExamHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -22,7 +20,7 @@ import javafx.scene.text.Font;
 import java.io.IOException;
 import java.util.List;
 
-public class ContestController {
+public class ExamController {
     @FXML
     private Pane contentContainer;
     @FXML

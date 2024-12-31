@@ -6,34 +6,19 @@ import com.client.liveowl.util.UserHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.springframework.http.HttpStatus;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 
 public class ProfileController
@@ -133,12 +118,12 @@ public class ProfileController
                     UserHandler.sendImage(profile);
                     if(UserHandler.getDetailUser().getRole().equals("1"))
                     {
-                        HomeController homeController = HomeController.getInstance();
+                        HomeTeacherController homeController = HomeTeacherController.getInstance();
                         homeController.setAvatarImage(profile, homeController.getAvt(), 80.0, 80.0);
                     }
                     else
                     {
-                        StudentController studentController = StudentController.getInstance();
+                        HomeStudentController studentController = HomeStudentController.getInstance();
                         studentController.setAvatarImage(profile, studentController.getAvt(), 80.0, 80.0);
                     }
 
@@ -156,15 +141,15 @@ public class ProfileController
     private void goBack() throws IOException {
         if(UserHandler.getDetailUser().getRole().equals("2"))
         {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Student.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/HomeStudent.fxml"));
             Parent root = loader.load();
-            StudentController studentController = loader.getController();
+            HomeStudentController studentController = loader.getController();
             studentController.setAvatarImage(UserHandler.getDetailUser().getProfileImgLocation(),
                     studentController.getAvt(), 70.0, 70.0);
             JavaFxApplication.stage.getScene().setRoot(root);
         }
         else
-            JavaFxApplication.changeScene("/views/Home.fxml");
+            JavaFxApplication.changeScene("/views/HomeTeacher.fxml");
     }
 
     private void updateInfo()

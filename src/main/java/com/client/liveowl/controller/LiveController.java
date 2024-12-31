@@ -181,7 +181,7 @@ public class LiveController {
                     if (animationTimer != null) {
                         animationTimer.stop();
                     }
-                    JavaFxApplication.changeScene("/views/Home.fxml");
+                    JavaFxApplication.changeScene("/views/HomeTeacher.fxml");
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
