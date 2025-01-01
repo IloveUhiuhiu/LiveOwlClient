@@ -8,7 +8,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
-
 import static com.client.liveowl.AppConfig.BASE_URI;
 
 
