@@ -178,7 +178,7 @@ public class HomeTeacherController
     }
 
     @FXML
-    private void clickLogoutButton() throws IOException
+    public void clickLogoutButton() throws IOException
     {
         Authentication authentication = new Authentication();
         if(authentication.logout()){
@@ -199,12 +199,14 @@ public class HomeTeacherController
 
     public void startClock() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("h:mm a | EEE, MMM d", Locale.ENGLISH);
-
+        LocalDateTime now = LocalDateTime.now();
+        lblDateAndTime.setText(now.format(formatter));
         Timeline clock = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
-            LocalDateTime now = LocalDateTime.now();
-            lblDateAndTime.setText(now.format(formatter));
+            LocalDateTime currentTime = LocalDateTime.now();
+            lblDateAndTime.setText(currentTime.format(formatter));
         }));
         clock.setCycleCount(Timeline.INDEFINITE);
         clock.play();
     }
+
 }
