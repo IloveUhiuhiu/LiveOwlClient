@@ -17,9 +17,9 @@ public class JavaFxApplication extends Application {
     public static Stage stage;
     public static Authentication authentication;
 
-//    static {
-//        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-//    }
+    static {
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+    }
 
     @Override
     public void start(Stage primaryStage) throws Exception{
