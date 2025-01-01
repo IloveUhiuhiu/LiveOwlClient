@@ -6,20 +6,20 @@ import com.client.liveowl.util.UserHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Base64;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.util.Duration;
+
 
 public class ProfileController
 {
@@ -32,10 +32,6 @@ public class ProfileController
     private TextField txtName;
     @FXML
     private TextField txtEmail;
-    @FXML
-    private TextField txtNgaySinh;
-    @FXML
-    private TextField txtGioiTinh;
     @FXML
     private ImageView avt;
     @FXML
@@ -54,6 +50,10 @@ public class ProfileController
     private DatePicker dateofbirth;
     @FXML
     private ChoiceBox Sex;
+    @FXML
+    private Label lblSuccess;
+    @FXML
+    private Label lblFail;
     @FXML
     public void initialize()
     {
@@ -165,7 +165,18 @@ public class ProfileController
             genderBol = false;
         else
             return;
-        UserHandler.sendInfor(name, email, dateOfBirth, genderBol);
+       if( UserHandler.sendInfor(name, email, dateOfBirth, genderBol))
+       {
+           lblSuccess.setText("Cập nhật thành công");
+           lblSuccess.setVisible(true);
+           showAndHideLabel(lblSuccess);
+       }
+       else
+       {
+           lblFail.setText("Cập nhật thất bại");
+           lblFail.setVisible(true);
+           showAndHideLabel(lblFail);
+       }
     }
     private void editName()
     {
@@ -186,5 +197,13 @@ public class ProfileController
     {
         dateofbirth.setDisable(false);
         dateofbirth.requestFocus();
+    }
+    private void showAndHideLabel(Label label)
+    {
+        Timeline timeline = new Timeline(
+                new KeyFrame(javafx.util.Duration.seconds(1.5), event -> label.setVisible(false))
+        );
+        timeline.setCycleCount(1); // Chạy 1 lần
+        timeline.play();
     }
 }

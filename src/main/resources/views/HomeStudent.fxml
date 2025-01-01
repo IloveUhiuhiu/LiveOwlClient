@@ -34,7 +34,7 @@
                         <Insets top="10.0" />
                      </padding>
                   </Label>
-                  <Label layoutX="665.0" layoutY="21.0" prefHeight="40.0" prefWidth="134.0" text="1:00 PM | Sun, Jun 6" textFill="WHITE">
+                  <Label fx:id="lblDateAndTime" layoutX="601.0" layoutY="21.0" prefHeight="40.0" prefWidth="198.0" textFill="WHITE">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>

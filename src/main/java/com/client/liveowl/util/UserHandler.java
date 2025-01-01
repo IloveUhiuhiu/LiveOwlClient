@@ -182,7 +182,7 @@ public class UserHandler {
         }
     }
 
-    public static void sendInfor(String name, String email, LocalDate dateofbirth, Boolean gender) {
+    public static boolean sendInfor(String name, String email, LocalDate dateofbirth, Boolean gender) {
         String url = BASE_URI + "/users/updateinfo";
         CloseableHttpClient httpClient = HttpClients.createDefault();
         HttpPost post = new HttpPost(url);
@@ -204,20 +204,25 @@ public class UserHandler {
                     String responseString = EntityUtils.toString(responseEntity);
                     if (statusCode == HttpStatus.OK.value()) {
                         System.out.println("Thay đổi thành công.");
+                        return true;
                     } else {
                         System.out.println("Lỗi: " + statusCode + " - " + response.getStatusLine().getReasonPhrase());
                         System.out.println("Chi tiết: " + responseString);
+                        return false;
                     }
                 } else {
                     System.out.println("Phản hồi từ server rỗng.");
+                    return false;
                 }
             }
         } catch (JSONException e) {
             System.out.println("Lỗi khi tạo JSON: " + e.getMessage());
             e.printStackTrace();
+            return false;
         } catch (IOException e) {
             System.out.println("Lỗi khi gửi yêu cầu HTTP: " + e.getMessage());
             e.printStackTrace();
+            return false;
         }
     }
     public static User getInforUserById(String userId) {

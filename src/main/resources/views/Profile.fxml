@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="661.0" style="-fx-background-color: CCD1E7; -fx-background-radius: 20px;" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.client.liveowl.controller.ProfileController">
+<Pane fx:id="lblThongBao" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="661.0" style="-fx-background-color: CCD1E7; -fx-background-radius: 20px;" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.client.liveowl.controller.ProfileController">
    <children>
       <Button fx:id="btnThayDoi" layoutX="260.0" layoutY="154.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="45.0" style="-fx-background-radius: 10px; -fx-background-color: #853E93;" styleClass="btnprofile" stylesheets="@css/style.css" text="Edit" textFill="#fffcfc">
          <font>
@@ -128,5 +128,15 @@
             <Image url="@../images/writing.png" />
          </image>
       </ImageView>
+      <Label fx:id="lblSuccess" layoutX="245.0" layoutY="440.0" prefHeight="30.0" prefWidth="157.0" textAlignment="CENTER" textFill="#0aa433">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblFail" layoutX="245.0" layoutY="440.0" prefHeight="30.0" prefWidth="157.0" textAlignment="CENTER" textFill="#0aa433">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
    </children>
 </Pane>

@@ -38,6 +38,7 @@ private static String avatarPath = UserHandler.getDetailUser().getProfileImgLoca
 
 @FXML
 public void initialize() {
+    startClock();
     instance = this;
     avatarPath = UserHandler.getDetailUser().getProfileImgLocation();
     setAvatarImage(avatarPath, avt, 70.0, 70.0);

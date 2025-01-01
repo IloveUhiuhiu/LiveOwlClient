@@ -94,6 +94,7 @@ public class LiveController {
             public void handle(long now) {
                 if (!TeacherSocket.isRunning()) return;
                 System.out.println("Cập nhật ảnh");
+                System.out.println(teacherSocket.queueImage.size());
                 processImageUpdates();
                 if (!queueExit.isEmpty()) {
                     String clientIdExit = queueExit.poll();

@@ -8,7 +8,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
-
 import static com.client.liveowl.AppConfig.BASE_URI;
 
 
@@ -25,7 +24,7 @@ public Authentication() {
 public boolean isAuthenticated() {
     return isAuthenticated;
 }
-private void setAuthenticated(boolean authenticated) {
+public static void setAuthenticated(boolean authenticated) {
     isAuthenticated = authenticated;
 }
 public static String getCode() {
@@ -64,15 +63,6 @@ public static boolean login(String email, String password) throws Exception {
         return false;
     }
 }
-//    ObjectMapper objectMapper = new ObjectMapper();
-//try {
-//        UserData userData = objectMapper.readValue(jsonResponse.getJSONObject("data").toString(), UserData.class);
-//        // Sử dụng userData ở đây
-//        System.out.println("User ID: " + userData.getUserId());
-//    } catch (JsonProcessingException e) {
-//        // Xử lý lỗi
-//        e.printStackTrace();
-//    }
 public boolean logout() {
     if (!this.isAuthenticated) {
         return false;
