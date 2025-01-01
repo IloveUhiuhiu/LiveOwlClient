@@ -10,7 +10,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import static com.client.liveowl.AppConfig.*;
 
 public class ProcessPlayVideo {
-    private static int serverPort;
+    public static int serverPort;
+    public static int serverPortPause;
     public static int port = 5215;
     public Map<String, byte[]> imageBuffer = new HashMap<>();
     public ConcurrentLinkedQueue<Image> packetBuffer = new ConcurrentLinkedQueue<>();
@@ -26,6 +27,7 @@ public class ProcessPlayVideo {
     public ProcessPlayVideo() {
         try {
             serverPort = VIDEO_SERVER_PORT;
+            serverPortPause = VIDEO_SERVER_PORT;
             socket = new DatagramSocket(port);
             setLivestream(true);
         } catch (SocketException e) {
@@ -40,11 +42,13 @@ public class ProcessPlayVideo {
         System.out.println("Gửi role teacher!");
         UdpHandler.sendMsg(socket, connect, InetAddress.getByName(SERVER_HOST_NAME), serverPort);
         System.out.println("Gửi mã " + code + " cuộc thi thành công!");
-        serverPort += UdpHandler.receivePort(socket);
+        int number = UdpHandler.receivePort(socket);;
+        serverPort += number;
+        serverPortPause -= number;
         System.out.println("Port mới là :" + serverPort);
         System.out.println("Chờ mọi người tham gia!");
         try {
-        while (isLivestream()) {
+            while (isLivestream()) {
             byte[] message = new byte[MAX_DATAGRAM_PACKET_LENGTH];
             try {
                 UdpHandler.receiveBytesArr(socket, message);
@@ -108,29 +112,33 @@ public class ProcessPlayVideo {
                     try {
                         Thread.sleep(2000);
                         setLivestream(false);
-                        System.out.println("issLive = false");
+                        System.out.println("isLive = " + isLivestream());
+                        cleanResource();
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
-
                 });
                 thread.start();
 
             } else {
 
             }
+            System.out.println("Con while");
         }
-        System.out.println("keets truc");
+
         } catch(Exception e) {
             System.err.println(e.getMessage());
         } finally {
-            System.out.println("Đang đóng socket");
-            if (socket != null) socket.close();
-            imageBuffer.clear();
-            System.out.println("Đóng socket thành công");
+            cleanResource();
         }
 
     }
-
+    public void cleanResource() {
+        setLivestream(false);
+        imageBuffer.clear();
+        packetBuffer.clear();
+        if (socket != null) socket.close();
+        System.out.println("Dong socket");
+    }
 }
 

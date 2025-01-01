@@ -3,17 +3,19 @@ package com.client.liveowl.controller;
 import com.client.liveowl.keylogger.ProcessGetFile;
 import com.client.liveowl.model.ResultDTO;
 import com.client.liveowl.model.ResultItem;
+import com.client.liveowl.socket.StudentSocket;
+import com.client.liveowl.socket.TeacherSocket;
+import com.client.liveowl.util.AlertDialog;
+import com.client.liveowl.util.Authentication;
 import com.client.liveowl.util.ResultHandler;
+import com.client.liveowl.video.ProcessPlayVideo;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -188,9 +190,27 @@ public class ListStudentController {
         Stage videoStage = new Stage();
         videoStage.setTitle("Video Player");
         videoStage.setScene(scene);
-        videoStage.show();
         VideoPlayerController controller = loader.getController();
-        controller.initialize(code,clientId);
+        ProcessPlayVideo watchedVideo = new ProcessPlayVideo();
+        videoStage.setOnCloseRequest(event -> {
+            event.consume();
+            AlertDialog alertDialog = new AlertDialog("Xác nhận thoát " ,null,"Bạn có chắc chắn muốn thoát không?", Alert.AlertType.CONFIRMATION);
+            Alert alert = alertDialog.getConfirmationDialog();
+            alert.showAndWait().ifPresent(response -> {
+                if (response == ButtonType.OK) {
+                    controller.sendNotificationToServer("exit");
+                    watchedVideo.cleanResource();
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    videoStage.close();
+                }
+            });
+        });
+        videoStage.show();
+        controller.initialize(code,clientId,watchedVideo);
         System.out.println("Success");
     }
 

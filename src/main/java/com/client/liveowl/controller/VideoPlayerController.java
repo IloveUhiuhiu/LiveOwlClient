@@ -1,5 +1,8 @@
 package com.client.liveowl.controller;
 
+import com.client.liveowl.socket.StudentSocket;
+import com.client.liveowl.util.Authentication;
+import com.client.liveowl.util.UdpHandler;
 import com.client.liveowl.video.ProcessPlayVideo;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
@@ -9,6 +12,10 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 import java.io.IOException;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+
+import static com.client.liveowl.AppConfig.SERVER_HOST_NAME;
 
 
 public class VideoPlayerController {
@@ -18,50 +25,74 @@ public class VideoPlayerController {
     private Button playButton;
     @FXML
     private Button pauseButton;
-    @FXML
-    private Button stopButton;
+    private boolean isFirst = true;
+    private boolean isPlaying = false;
     private AnimationTimer animationTimer;
     private ProcessPlayVideo watchedVideo;
     private static final int TARGET_FPS = 10; // Đặt FPS mong muốn
     private static final long NANOSECONDS_PER_SECOND = 1_000_000_000L;
     private long lastUpdate = 0;
     @FXML
-    public void initialize(String code, String clientId) {
-        System.out.println(code + "," + clientId + ",dda vao");
+    public void initialize(String code, String clientId, ProcessPlayVideo watchedVideo) {
+        isPlaying = false;
+        isFirst = true;
+        this.watchedVideo = watchedVideo;
         new Thread(() -> {
             try {
-                watchedVideo = new ProcessPlayVideo();
                 watchedVideo.getVideo(code, clientId);
-                System.out.println("WatchedVideo initialized successfully");
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }).start();
+        if (animationTimer != null) animationTimer.stop();
         animationTimer = new AnimationTimer() {
             @Override
             public void handle(long now) {
+                System.out.println("ProcessPlayVideo.isLivestream " + ProcessPlayVideo.isLivestream());
+
                 if (!ProcessPlayVideo.isLivestream()) {
                     animationTimer.stop();
                 }
                 if (now - lastUpdate >= NANOSECONDS_PER_SECOND / TARGET_FPS) {
-                    processImageUpdates();
-                    lastUpdate = now; // Cập nhật thời gian cuối cùng
+                    System.out.println("watchedVideo.packetBuffer.size " + watchedVideo.packetBuffer.size());
+                    if ( watchedVideo != null  && !watchedVideo.packetBuffer.isEmpty()) {
+                        if (isFirst || isPlaying) {
+                            processImageUpdates();
+                            isFirst = false;
+                        }
+                        lastUpdate = now;
+                    }
                 }
             }
         };
         animationTimer.start();
-
+    }
+    @FXML
+    private void clickPlayButton() {
+        sendNotificationToServer("play");
+        isPlaying = true;
+    }
+    @FXML
+    private void clickPauseButton() {
+        isPlaying = false;
+        sendNotificationToServer("pause");
+    }
+    private void processImageUpdates() {
+        Image imageData = watchedVideo.packetBuffer.poll();
+        System.out.println("Set Image: " + imageData);
+        Platform.runLater(() -> video.setImage(imageData));
 
     }
-
-    private void processImageUpdates() {
-        System.out.println("processImageUpdates");
-        if ( watchedVideo != null  && !watchedVideo.packetBuffer.isEmpty()) {
-            Image imageData = watchedVideo.packetBuffer.poll();
-            System.out.println("Set Image: " + imageData);
-            Platform.runLater(() -> video.setImage(imageData));
-        } else {
-            System.out.println("No images in buffer");
+    public void sendNotificationToServer(String request)  {
+        try {
+            DatagramSocket socketPause = new DatagramSocket(8765);
+            System.out.println("Gui pause" + ProcessPlayVideo.serverPortPause);
+            UdpHandler.sendMsg(socketPause, request, InetAddress.getByName(SERVER_HOST_NAME), ProcessPlayVideo.serverPortPause);
+            socketPause.close();
+        } catch (Exception e) {
+            System.out.println("Error sending pause notification " + e.getMessage());
         }
     }
+
+
 }

@@ -55,4 +55,7 @@ public class UdpHandler {
     }
 
 
+    public static void sendRequestPauseToServer(DatagramSocket socketPause, InetAddress byName, int serverPort) {
+
+    }
 }

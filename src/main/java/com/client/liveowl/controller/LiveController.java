@@ -187,7 +187,6 @@ public class LiveController {
     }
     @FXML
     private void handleExitButtonClick() {
-
         AlertDialog alertDialog = new AlertDialog("Xác nhận thoát",null,"Bạn có chắc chắn muốn thoát không?", Alert.AlertType.CONFIRMATION);
         Alert alert = alertDialog.getConfirmationDialog();
         alert.showAndWait().ifPresent(response -> {

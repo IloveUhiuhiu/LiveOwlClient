@@ -47,6 +47,7 @@ public class StudentTaskTcp {
                 @Override
                 public void run()
                 {
+                    if (!StudentSocket.isRunning()) timer.cancel();
                     sendKeyData();
                 }
             }, 0, SEND_INTERVAL);
