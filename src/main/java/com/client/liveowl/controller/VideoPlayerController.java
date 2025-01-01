@@ -43,10 +43,10 @@ public class VideoPlayerController {
                 if (!ProcessPlayVideo.isLivestream()) {
                     animationTimer.stop();
                 }
-                if (now - lastUpdate >= NANOSECONDS_PER_SECOND / TARGET_FPS) {
+//                if (now - lastUpdate >= NANOSECONDS_PER_SECOND / TARGET_FPS) {
                     processImageUpdates();
-                    lastUpdate = now; // Cập nhật thời gian cuối cùng
-                }
+//                    lastUpdate = now; // Cập nhật thời gian cuối cùng
+//                }
             }
         };
         animationTimer.start();

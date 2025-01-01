@@ -98,6 +98,8 @@ public class ProcessPlayVideo {
                             System.out.println("Ảnh null");
                         }
                         imageBuffer.remove(Key);
+                        System.out.println(imageBuffer.size());
+                        System.out.println(packetBuffer.size());
                     }
 
                 } else {

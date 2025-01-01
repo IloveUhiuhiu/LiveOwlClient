@@ -48,7 +48,9 @@ public class ProcessGetFile {
             buttonPanel.setLayout(new FlowLayout());
 
             JButton startButton = new JButton("Bắt đầu");
+            startButton.setBackground(Color.decode("#FFB6AF"));
             JButton endButton = new JButton("Kết thúc");
+            endButton.setBackground(Color.decode("#FAE0C7"));
 
             buttonPanel.add(startButton);
             buttonPanel.add(endButton);

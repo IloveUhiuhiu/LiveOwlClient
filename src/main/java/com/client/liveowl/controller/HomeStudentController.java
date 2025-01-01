@@ -31,6 +31,8 @@ private ImageView avt;
 private Pane main;
 @FXML
 private Pane header;
+@FXML
+private Pane pnLogout;
 
 private static HomeStudentController instance;
 private static String avatarPath = UserHandler.getDetailUser().getProfileImgLocation();
@@ -49,6 +51,13 @@ public void initialize() {
         try {
             avtClick();
         } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    });
+    pnLogout.setOnMouseClicked(event -> {
+        try {
+            clickLogoutButton();
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     });
@@ -93,6 +102,7 @@ private void avtClick() throws Exception {
         e.printStackTrace();
     }
 }
+
 public static HomeStudentController getInstance()
 {
     return instance;
