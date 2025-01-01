@@ -43,7 +43,7 @@ private VideoCapture camera = null;
 
 @FXML
 public void initialize() throws IOException {
-
+    addHover(buttonCancel); addHover(buttonRequest);
     buttonRequest.setOnAction(e -> {
         image.setImage(null);
         StudentSocket studentSocket = new StudentSocket();
@@ -152,5 +152,17 @@ public void initialize() throws IOException {
         UdpHandler.sendRequestExitToTeacher(socketExit, Authentication.getUserId(), InetAddress.getByName(SERVER_HOST_NAME),StudentSocket.newServerPort);
         if (camera != null) camera.release();
         socketExit.close();
+    }
+    private void addHover(Button button) {
+        button.setOnMouseEntered(e -> {
+            button.setScaleX(1.05);
+            button.setScaleY(1.05);
+            button.setCursor(javafx.scene.Cursor.HAND);
+        });
+
+        button.setOnMouseExited(e -> {
+            button.setScaleX(1);
+            button.setScaleY(1);
+        });
     }
 }

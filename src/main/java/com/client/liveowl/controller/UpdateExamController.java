@@ -2,11 +2,10 @@ package com.client.liveowl.controller;
 
 import com.client.liveowl.request.ExamRequest;
 import com.client.liveowl.util.ExamHandler;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -15,6 +14,10 @@ import java.time.LocalTime;
 public class UpdateExamController {
     public static ExamRequest examRequest = new ExamRequest();
     public static String updateId;
+    @FXML
+    private Label lblSuccess;
+    @FXML
+    private Label lblFailed;
     @FXML
     private TextField nameOfExam;
     @FXML
@@ -46,18 +49,42 @@ public class UpdateExamController {
         date.setValue(examRequest.getStartTimeOfExam().toLocalDate());
         hour.setValue(examRequest.getStartTimeOfExam().getHour());
         minutes.setValue(examRequest.getStartTimeOfExam().getMinute());
-
+        addHover(addExam);
         addExam.setOnAction(e -> {
             LocalDate selectedDate = date.getValue();
             Integer selectedHour = hour.getValue();
             Integer selectedMinute = minutes.getValue();
             LocalTime time = LocalTime.of(selectedHour, selectedMinute);
             LocalDateTime startTimeOfExam = LocalDateTime.of(selectedDate, time);
-            ExamHandler.updateExam(new ExamRequest(nameOfExam.getText(),subjectOfExam.getText(),startTimeOfExam,Integer.parseInt(durationOfExam.getText())),updateId);
+            if (ExamHandler.updateExam(new ExamRequest(nameOfExam.getText(),subjectOfExam.getText(),startTimeOfExam,Integer.parseInt(durationOfExam.getText())),updateId)) {
+                lblSuccess.setText("Cập nhật thành công");
+                showAndHideLabel(lblSuccess);
+            } else {
+                lblFailed.setText("Cập nhật thất bại");
+                showAndHideLabel(lblFailed);
+            }
         });
 
+    }
+    private void showAndHideLabel(Label label)
+    {
+        Timeline timeline = new Timeline(
+                new KeyFrame(javafx.util.Duration.seconds(1.5), event -> label.setVisible(false))
+        );
+        timeline.setCycleCount(1);
+        timeline.play();
+    }
+    private void addHover(Button button) {
+        button.setOnMouseEntered(e -> {
+            button.setScaleX(1.05);
+            button.setScaleY(1.05);
+            button.setCursor(javafx.scene.Cursor.HAND);
+        });
 
-
+        button.setOnMouseExited(e -> {
+            button.setScaleX(1);
+            button.setScaleY(1);
+        });
     }
 
 }

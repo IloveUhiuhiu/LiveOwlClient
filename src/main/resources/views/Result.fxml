@@ -166,7 +166,7 @@
       <!--            <Image url="@../images/icons8-add-48.png" />-->
       <!--         </image>-->
       <!--      </ImageView>-->
-      <Button fx:id="prevButton" layoutX="228.0" layoutY="457.0" mnemonicParsing="false" onAction="#onPrevPage" style="-fx-background-radius: 15px;" text="Trang trước" />
-      <Button fx:id="nextButton" layoutX="361.0" layoutY="457.0" mnemonicParsing="false" onAction="#onNextPage" prefHeight="25.0" prefWidth="78.0" style="-fx-background-radius: 15px;" text="Trang sau" />
+      <Button fx:id="prevButton" layoutX="228.0" layoutY="457.0" mnemonicParsing="false" onAction="#onPrevPage" style="-fx-background-radius: 15px; -fx-background-color: #006400;" text="Trang trước" textFill="WHITE" />
+      <Button fx:id="nextButton" layoutX="361.0" layoutY="457.0" mnemonicParsing="false" onAction="#onNextPage" prefHeight="25.0" prefWidth="78.0" style="-fx-background-radius: 15px; -fx-background-color: #006400;" text="Trang sau" textFill="WHITE" />
    </children>
 </Pane>

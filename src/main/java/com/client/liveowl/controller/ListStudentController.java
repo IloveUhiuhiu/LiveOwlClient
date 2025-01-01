@@ -52,6 +52,7 @@ public class ListStudentController {
                 return new TableCell<ResultItem, String>() {
                     private final Button button = new Button("Chi Tiết");
                     {
+                        addHover(button);
                         button.setStyle("-fx-font-weight: bold;-fx-background-color: #001C44; -fx-background-radius: 8px; -fx-border-radius: 8px;");
                         button.setTextFill(Color.WHITE);
                         button.setFont(Font.font("System Bold", 12.0));
@@ -78,6 +79,7 @@ public class ListStudentController {
                 return new TableCell<ResultItem, String>() {
                     private final Button button = new Button("Video");
                     {
+                        addHover(button);
                         button.setStyle("-fx-font-weight: bold;-fx-background-color: #0C5776; -fx-background-radius: 8px; -fx-border-radius: 8px;");
                         button.setTextFill(Color.WHITE);
                         button.setFont(Font.font("System Bold", 12.0));
@@ -115,6 +117,7 @@ public class ListStudentController {
                 return new TableCell<ResultItem, String>() {
                     private final Button button = new Button("Bàn Phím");
                     {
+                        addHover(button);
                         button.setStyle("-fx-font-weight: bold;-fx-background-color: #2D99AE; -fx-background-radius: 8px; -fx-border-radius: 8px;");
                         button.setTextFill(Color.WHITE);
                         button.setFont(Font.font("System Bold", 12.0));
@@ -190,5 +193,6 @@ public class ListStudentController {
         controller.initialize(code,clientId);
         System.out.println("Success");
     }
+
 
 }

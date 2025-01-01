@@ -165,13 +165,6 @@ public class ExamHandler {
                 System.out.println("Status Code: " + statusCode);
 
                 if (statusCode == HttpStatus.OK.value()) {
-//                    HttpEntity responseEntity = response.getEntity();
-//                    String responseString = EntityUtils.toString(responseEntity);
-//
-//                    // Chuyển đổi từ JSON sang đối tượng Exam
-//                    JSONObject jsonResponse = new JSONObject(responseString);
-//                    JSONObject dataObject = jsonResponse.getJSONObject("data");
-//                    return new ObjectMapper().readValue(dataObject.toString(), Exam.class);
                     return true;
                 } else {
                     System.err.println("Failed to fetch exam: " + statusCode);

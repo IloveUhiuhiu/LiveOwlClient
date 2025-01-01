@@ -4,6 +4,8 @@ import com.client.liveowl.JavaFxApplication;
 import com.client.liveowl.model.Exam;
 import com.client.liveowl.util.AlertDialog;
 import com.client.liveowl.util.ExamHandler;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -30,6 +32,10 @@ public class ExamController {
     private final int itemsPerPage = 2;
     @FXML
     private Button prevButton;
+    @FXML
+    private Label lblSuccess;
+    @FXML
+    private Label lblFailed;
 
     @FXML
     private Button nextButton;
@@ -40,6 +46,7 @@ public class ExamController {
     private List<Exam> exams;
     @FXML
     public void initialize() {
+        addHover(prevButton);addHover(nextButton);
         reloadContent();
     }
     public void reloadContent() {
@@ -54,10 +61,8 @@ public class ExamController {
         contentList.getChildren().clear();
         int cnt = 0;
         for (Exam exam : examsTmp) {
-
             Pane examPane = createExamPane(exam,++cnt);
             contentList.getChildren().add(examPane);
-
         }
         addAddButton(contentContainer);
     }
@@ -214,12 +219,18 @@ public class ExamController {
             Alert alert =  alertDialog.getConfirmationDialog();
             alert.showAndWait().ifPresent(response -> {
                 if (response == ButtonType.OK) {
-                    ExamHandler.deleteExam(exam.getExamId());
+
+                    if (ExamHandler.deleteExam(exam.getExamId())) {
+                        lblSuccess.setText("Xóa thành công");
+                        showAndHideLabel(lblSuccess);
+                    } else {
+                        lblFailed.setText("Xóa lỗi");
+                        showAndHideLabel(lblFailed);
+                    }
                     goBack();
                 }
             });
         });
-
         // Nút "Màn hình giám sát"
         Button monitorButton = new Button("Màn hình giám sát");
         monitorButton.setLayoutY(10.0);
@@ -285,6 +296,7 @@ public class ExamController {
     }
     private void addBackButton(Pane content,int x,int y) {
         Button backButton = new Button("Quay Lại");
+        addHover(backButton);
         backButton.setLayoutX(x);
         backButton.setLayoutY(y);
         backButton.setPrefHeight(30.0);
@@ -350,6 +362,14 @@ public class ExamController {
             button.setScaleX(1);
             button.setScaleY(1);
         });
+    }
+    private void showAndHideLabel(Label label)
+    {
+        Timeline timeline = new Timeline(
+                new KeyFrame(javafx.util.Duration.seconds(1.5), event -> label.setVisible(false))
+        );
+        timeline.setCycleCount(1);
+        timeline.play();
     }
 
 

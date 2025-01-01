@@ -110,7 +110,7 @@
                               </Pane>
                               <Label fx:id="lblDateAndTime" layoutX="374.0" layoutY="26.0" prefHeight="38.0" prefWidth="186.0" textFill="#fff9f9">
                                  <font>
-                                    <Font size="15.0" />
+                                    <Font name="System Bold" size="15.0" />
                                  </font>
                               </Label>
                               <ImageView fx:id="avt" fitHeight="80.0" fitWidth="80.0" layoutX="572.0" layoutY="7.0" pickOnBounds="true" preserveRatio="true" style="-fx-background-radius: 90px;" />
