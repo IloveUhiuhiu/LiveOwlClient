@@ -41,6 +41,7 @@ private int currentPage = 0;
 private final int itemsPerPage = 5;
 private List<Exam> exams;
 public void initialize() {
+    addHover(prevButton);addHover(nextButton);
     reLoadContent();
 }
 private void reLoadContent() {
