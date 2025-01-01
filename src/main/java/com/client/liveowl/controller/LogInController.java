@@ -45,9 +45,9 @@ public class LogInController {
                 if (result) {
                     Authentication.setAuthenticated(true);
                     if (Authentication.getRole() == 1) {
-                        JavaFxApplication.changeScene("/views/HomeTeacher.fxml");
+                        JavaFxApplication.changeScene("/views/HomeTeacher.fxml", "Home");
                     } else {
-                        JavaFxApplication.changeScene("/views/HomeStudent.fxml");
+                        JavaFxApplication.changeScene("/views/HomeStudent.fxml", "Home");
                     }
 
                 } else {
@@ -68,7 +68,7 @@ public class LogInController {
 
     @FXML
     public void LoginToSignup() throws IOException {
-        JavaFxApplication.changeScene("/views/Signup.fxml");
+        JavaFxApplication.changeScene("/views/Signup.fxml", "Signup");
     }
 
 }

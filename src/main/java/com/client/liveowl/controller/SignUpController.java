@@ -345,7 +345,7 @@ private void sendSignupRequest(String email, String password, String fullname, L
         try (CloseableHttpResponse response = httpClient.execute(post)) {
             int statusCode = response.getStatusLine().getStatusCode();
             if (statusCode == HttpStatus.OK.value()) {
-                JavaFxApplication.changeScene("/views/Login.fxml");
+                JavaFxApplication.changeScene("/views/Login.fxml", "Login");
             } else {
                 wrongEM.setText("Email đã tồn tại");
             }
@@ -358,6 +358,6 @@ private void sendSignupRequest(String email, String password, String fullname, L
 
 @FXML
 public void SignupToLogin() throws IOException {
-    JavaFxApplication.changeScene("/views/Login.fxml");
+    JavaFxApplication.changeScene("/views/Login.fxml", "Login");
 }
 }

@@ -1,7 +1,11 @@
 package com.client.liveowl.util;
+import com.client.liveowl.model.Exam;
 import com.client.liveowl.model.User;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -10,24 +14,17 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import static com.client.liveowl.AppConfig.BASE_URI;
 
 @Service
 public class UserHandler {
-   // private static final String BASE_URI = "http://localhost:9090";
-   // private static final String BASE_URI = "http://10.10.26.160:9090";
-    private static final String BASE_URI = Authentication.getBaseUri();
+
 
     public static String getUserId() {
         String url = BASE_URI + "/users/detail";
@@ -185,7 +182,7 @@ public class UserHandler {
         }
     }
 
-    public static void sendÌnor(String name, String email, LocalDate dateofbirth, Boolean gender) {
+    public static boolean sendInfor(String name, String email, LocalDate dateofbirth, Boolean gender) {
         String url = BASE_URI + "/users/updateinfo";
         CloseableHttpClient httpClient = HttpClients.createDefault();
         HttpPost post = new HttpPost(url);
@@ -207,23 +204,65 @@ public class UserHandler {
                     String responseString = EntityUtils.toString(responseEntity);
                     if (statusCode == HttpStatus.OK.value()) {
                         System.out.println("Thay đổi thành công.");
+                        return true;
                     } else {
                         System.out.println("Lỗi: " + statusCode + " - " + response.getStatusLine().getReasonPhrase());
                         System.out.println("Chi tiết: " + responseString);
+                        return false;
                     }
                 } else {
                     System.out.println("Phản hồi từ server rỗng.");
+                    return false;
                 }
             }
         } catch (JSONException e) {
             System.out.println("Lỗi khi tạo JSON: " + e.getMessage());
             e.printStackTrace();
+            return false;
         } catch (IOException e) {
             System.out.println("Lỗi khi gửi yêu cầu HTTP: " + e.getMessage());
             e.printStackTrace();
+            return false;
         }
     }
+    public static User getInforUserById(String userId) {
+        String url = BASE_URI + "/users/getuserbyid/" + userId;
+        System.out.println("Token: " + Authentication.getToken());
+        System.out.println("Request URL: " + url);
 
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpGet get = new HttpGet(url);
+            get.setHeader("Authorization", "Bearer " + Authentication.getToken());
+
+            try (CloseableHttpResponse response = httpClient.execute(get)) {
+                int statusCode = response.getStatusLine().getStatusCode();
+                System.out.println("Status Code: " + statusCode);
+
+                if (statusCode == HttpStatus.OK.value()) {
+                    HttpEntity responseEntity = response.getEntity();
+                    String responseString = EntityUtils.toString(responseEntity);
+
+                    JSONObject jsonResponse = new JSONObject(responseString);
+                    JSONObject dataObject = jsonResponse.getJSONObject("data");
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    objectMapper.registerModule(new JavaTimeModule());
+                    return objectMapper.readValue(dataObject.toString(), User.class);
+                } else {
+                    System.err.println("Failed to fetch user: " + statusCode);
+                    return null;
+                }
+            } catch (IOException e) {
+                System.err.println("I/O error: " + e.getMessage());
+                return null;
+            } catch (JSONException e) {
+                System.err.println("JSON error: " + e.getMessage());
+                throw new RuntimeException(e);
+            }
+        } catch (IOException e) {
+            System.err.println("Error creating HTTP client: " + e.getMessage());
+            return null;
+        }
+    }
 
 //    public  static  void main(String[] args) {
 ////        List<String> allid = getAllAccountID();

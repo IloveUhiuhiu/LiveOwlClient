@@ -26,14 +26,10 @@ public class JavaFxApplication extends Application {
         stage = primaryStage;
         stage.setResizable(false);
         Parent root = FXMLLoader.load(getClass().getResource("/views/Login.fxml"));
-        //Parent root = FXMLLoader.load(getClass().getResource("/views/JoinExam.fxml"));
         stage.setTitle("Login");
         Image iconImage = new Image(getClass().getResourceAsStream("/images/logo.png"));
-
-
         stage.getIcons().add(iconImage);
         Scene scene = new Scene(root,600,400);
-        scene.getStylesheets().add(getClass().getResource("/views/css/style.css").toExternalForm());
         stage.setScene(scene);
 //        stage.setOnCloseRequest(event -> {
 //            event.consume();
@@ -61,23 +57,12 @@ public class JavaFxApplication extends Application {
         stage.show();
     }
 
-    public static void changeScene(String fxml) throws IOException {
-        String title = fxml.substring(fxml.lastIndexOf("/") + 1, fxml.lastIndexOf(".fxml"));
+    public static void changeScene(String fxml, String title) throws IOException {
         Parent pane = FXMLLoader.load(JavaFxApplication.class.getResource(fxml));
-        //stage.setTitle(title);
+        stage.setTitle(title);
         stage.setScene(new Scene(pane)); // Tạo một scene mới
         stage.show();
     }
-
-//    public static void changeScene(String fxmlPath, Consumer<Object> initController) throws IOException {
-//        FXMLLoader loader = new FXMLLoader(JavaFxApplication.class.getResource(fxmlPath));
-//        Parent root = loader.load();
-//        if (initController != null) {
-//            initController.accept(loader.getController());
-//        }
-//        stage.setScene(new Scene(root));
-//    }
-
 
     public static void setMaximized() {
         stage.setMaximized(true);
@@ -85,8 +70,6 @@ public class JavaFxApplication extends Application {
     public static void setResizable(boolean resizable) {
         stage.setResizable(resizable);
     }
-
-
     public static void main(String[] args) {
         Application.launch(args);
     }

@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
-import static com.client.liveowl.AppConfig.serverHostName;
+import static com.client.liveowl.AppConfig.SERVER_HOST_NAME;
 import static com.client.liveowl.socket.StudentSocket.latch;
 
 
@@ -57,7 +57,7 @@ public void initialize() throws IOException {
                         latch.await();
                         Platform.runLater(() -> {
                             try {
-                                JavaFxApplication.changeScene("/views/HomeStudent.fxml");
+                                JavaFxApplication.changeScene("/views/HomeStudent.fxml","Home");
                                 System.out.println("Livestream đã kết thúc. Tiến hành các thao tác tiếp theo!");
                             } catch (Exception ex) {
                                 ex.printStackTrace();
@@ -83,16 +83,16 @@ public void initialize() throws IOException {
 
             alert.showAndWait().ifPresent(response -> {
                 if (response == ButtonType.OK) {
-                    if (StudentSocket.isLive()) {
+                    if (StudentSocket.isRunning()) {
                         try {
-                            StudentSocket.setLive(false);
+                            StudentSocket.setRunning(false);
                             sendExitNotificationToTeacher();
                         } catch (Exception ex) {
                             System.out.println("Lỗi khi gui exit " + ex.getMessage());
                         }
                     }
                     try {
-                        JavaFxApplication.changeScene("/views/HomeStudent.fxml");
+                        JavaFxApplication.changeScene("/views/HomeStudent.fxml", "Home");
                     } catch (IOException ex) {
                         System.out.println("Lỗi khi chang Scene " + ex.getMessage());
                     }
@@ -149,7 +149,7 @@ public void initialize() throws IOException {
     public void sendExitNotificationToTeacher() throws Exception {
         System.out.println("Send exit for teacher");
         DatagramSocket socketExit = new DatagramSocket(8765);
-        UdpHandler.sendRequestExitToTeacher(socketExit, Authentication.getUserId(), InetAddress.getByName(serverHostName),StudentSocket.newServerPort);
+        UdpHandler.sendRequestExitToTeacher(socketExit, Authentication.getUserId(), InetAddress.getByName(SERVER_HOST_NAME),StudentSocket.newServerPort);
         if (camera != null) camera.release();
         socketExit.close();
     }

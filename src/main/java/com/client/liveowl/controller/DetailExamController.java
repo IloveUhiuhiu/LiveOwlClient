@@ -1,14 +1,8 @@
 package com.client.liveowl.controller;
 
 import com.client.liveowl.model.Exam;
-import com.client.liveowl.request.ExamRequest;
-import com.client.liveowl.util.ExamHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 public class DetailExamController {
     public static Exam examRequest = new Exam();

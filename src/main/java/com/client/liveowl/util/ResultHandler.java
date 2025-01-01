@@ -1,9 +1,6 @@
 package com.client.liveowl.util;
-
-import com.client.liveowl.model.Exam;
 import com.client.liveowl.model.Result;
 import com.client.liveowl.model.ResultDTO;
-import com.client.liveowl.model.ResultItem;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -24,8 +21,9 @@ import org.springframework.http.HttpStatus;
 import java.io.IOException;
 import java.util.List;
 
+import static com.client.liveowl.AppConfig.BASE_URI;
+
 public class ResultHandler {
-    private static final String BASE_URI = Authentication.getBaseUri();
 
     public static void addresult(Result result)
     {
