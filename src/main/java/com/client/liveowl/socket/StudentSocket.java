@@ -20,8 +20,6 @@ import java.util.logging.Logger;
 public class StudentSocket{
 
     public static Random rand = new Random();
-    private static final StringBuilder keyLogBuffer = new StringBuilder();
-    //public static ConcurrentLinkedQueue<Image> cache = new ConcurrentLinkedQueue<>();
     public static final VideoCapture camera = null;
     private static DatagramSocket socketSend;
     private static DatagramSocket socketReceive;
@@ -30,10 +28,12 @@ public class StudentSocket{
     private int clientPortReceive;
     private int clientPortSend;
     public static int newServerPort;
+    public static int newServerPortLogger;
     public StudentSocket() {
         try {
             latch = new CountDownLatch(1);
             newServerPort = SERVER_PORT;
+            newServerPortLogger = SERVER_PORT_LOGGER;
             isRunning = true;
             clientPortSend = rand.nextInt(999)+ STUDENT_PORT;
             clientPortReceive = clientPortSend - 1000;
@@ -54,66 +54,24 @@ public class StudentSocket{
         if (message.equals("fail")) {
             return false;
         }
-        newServerPort += UdpHandler.receivePort(socketSend);
+        int number = UdpHandler.receivePort(socketSend);
+        newServerPort += number;
+        newServerPortLogger += number;
+        System.out.println("Port logger new la: " + newServerPortLogger);
         return true;
     }
-    private static void sendKeyData() {
-        String dataToSend;
-        synchronized (keyLogBuffer) {
-            if (keyLogBuffer.length() == 0) {
-                return;
-            }
-            dataToSend = keyLogBuffer.toString();
-            keyLogBuffer.setLength(0);
-        }
-        try (Socket socket = new Socket(SERVER_HOST_NAME, SERVER_PORT_LOGGER);
-             PrintWriter writer = new PrintWriter(socket.getOutputStream(), true)) {
-            System.out.println(Authentication.getUserId());
-            writer.println(Authentication.getUserId());
-            writer.println(dataToSend);
-            System.out.println("Dữ liệu đã được gửi: " + dataToSend);
-        } catch (IOException e) {
-            System.out.println("Lỗi kết nối. Dữ liệu sẽ được gửi lại lần sau.");
-            synchronized (keyLogBuffer) {
-                keyLogBuffer.insert(0, dataToSend); // Thêm lại dữ liệu vào bộ đệm nếu gửi thất bại
-            }
-        }
-    }
+
     public void LiveStream() throws IOException {
-        Thread taskThread = new Thread(new StudentTaskUdp(socketSend, socketReceive));
+        Thread taskUdpThread = new Thread(new StudentTaskUdp(socketSend, socketReceive));
+
         try {
-            taskThread.start();
-            Timer timer = new Timer();
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    if (!StudentSocket.isRunning()) {
-                        timer.cancel();
-                        return;
-                    }
-                    sendKeyData();
-                }
-            }, 0, SEND_INTERVAL);
+            taskUdpThread.start();
+            StudentTaskTcp.start();
+        } catch (Exception e) {
 
-            Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
-            logger.setLevel(Level.OFF);
-            logger.setUseParentHandlers(false);
-
-            GlobalScreen.registerNativeHook();
-            GlobalScreen.addNativeKeyListener(new NativeKeyListener() {
-                private boolean isShift = false;
-
-                @Override
-                public void nativeKeyPressed(NativeKeyEvent e) {
-                    String ketText = NativeKeyEvent.getKeyText(e.getKeyCode());
-                    keyLogBuffer.append(ketText + " ");
-                }
-            });
-        } catch (NativeHookException e) {
-            throw new RuntimeException(e);
         } finally {
             try {
-                taskThread.join(); // Chỉ gọi join() ở đây nếu cần phải đợi kết thúc
+                taskUdpThread.join(); // Chỉ gọi join() ở đây nếu cần phải đợi kết thúc
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             } finally {

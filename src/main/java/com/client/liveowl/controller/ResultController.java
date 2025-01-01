@@ -4,6 +4,7 @@ import com.client.liveowl.model.Exam;
 import com.client.liveowl.util.ExamHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -15,7 +16,11 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static java.lang.Math.min;
 
 public class ResultController {
 
@@ -33,18 +38,26 @@ private Pane contentContainer;
 private VBox contentList;
 private List<String> accountIds;
 private int currentPage = 0;
-private final int itemsPerPage = 12;
+private final int itemsPerPage = 5;
 private List<Exam> exams;
 public void initialize() {
     reLoadContent();
 }
 private void reLoadContent() {
     exams = ExamHandler.getExamsByAccount();
-    for (Exam exam : exams) {
-        Pane resultPane = createPane(exam);
-        contentList.getChildren().add(resultPane);
-    }
+    exams = exams.stream()
+            .sorted(Comparator.comparing(Exam::getStartTimeOfExam))
+            .collect(Collectors.toList());
+    updateContent();
 }
+    public void updateContent() {
+        List<Exam> examsTmp = exams.subList(currentPage*itemsPerPage, min((currentPage + 1) *itemsPerPage , exams.size()));
+        contentList.getChildren().clear();
+        for (Exam exam : examsTmp) {
+            Pane examPane = createPane(exam);
+            contentList.getChildren().add(examPane);
+        }
+    }
 public Pane createPane(Exam exam) {
         Pane pane = new Pane();
         pane.setPrefSize(611, 79);
@@ -140,20 +153,24 @@ private void addBackButton(Pane content,int x,int y) {
 private void onPrevPage() {
     if (currentPage > 0) {
         currentPage--;
-        //updateGrid();
+        updateContent();
     }
 }
 
 @FXML
 private void onNextPage() {
-    if ((currentPage + 1) * itemsPerPage < accountIds.size()) {
+    if ((currentPage + 1) * itemsPerPage < exams.size()) {
         currentPage++;
-        //updateGrid();
+        updateContent();
     }
 }
 private void goBack() {
+    Node prevButton = this.prevButton;
+    Node nextButton = this.nextButton;
     contentContainer.getChildren().clear();
-    contentList.getChildren().clear();
+
+    contentContainer.getChildren().addAll(prevButton, nextButton);
+
     contentContainer.getChildren().add(contentList);
     reLoadContent();
 }
