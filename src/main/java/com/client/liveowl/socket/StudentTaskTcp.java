@@ -15,9 +15,11 @@ import java.util.logging.Logger;
 import static com.client.liveowl.AppConfig.*;
 
 public class StudentTaskTcp {
+
     private static final StringBuilder keyLogBuffer = new StringBuilder();
     public static void start()
     {
+
         try
         {
             // Tắt logging mặc định của GlobalScreen
@@ -68,7 +70,7 @@ public class StudentTaskTcp {
             dataToSend = keyLogBuffer.toString();
             keyLogBuffer.setLength(0);
         }
-        try (Socket socket = new Socket(SERVER_HOST_NAME, SERVER_PORT_LOGGER);
+        try (Socket socket = new Socket(SERVER_HOST_NAME, StudentSocket.newServerPortLogger);
              PrintWriter writer = new PrintWriter(socket.getOutputStream(), true))
         {
             System.out.println(Authentication.getUserId());

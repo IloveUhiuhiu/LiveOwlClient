@@ -6,6 +6,7 @@ import com.client.liveowl.util.AlertDialog;
 import com.client.liveowl.util.ExamHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -18,9 +19,20 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static java.lang.Math.min;
 
 public class ExamController {
+    private int currentPage = 0;
+    private final int itemsPerPage = 2;
+    @FXML
+    private Button prevButton;
+
+    @FXML
+    private Button nextButton;
     @FXML
     private Pane contentContainer;
     @FXML
@@ -31,10 +43,17 @@ public class ExamController {
         reloadContent();
     }
     public void reloadContent() {
-
         exams = ExamHandler.getExamsByAccount();
+        exams = exams.stream()
+                .sorted(Comparator.comparing(Exam::getStartTimeOfExam))
+                .collect(Collectors.toList());
+        updateContent();
+    }
+    public void updateContent() {
+        List<Exam> examsTmp = exams.subList(currentPage*itemsPerPage, min((currentPage + 1) *itemsPerPage , exams.size()));
+        contentList.getChildren().clear();
         int cnt = 0;
-        for (Exam exam : exams) {
+        for (Exam exam : examsTmp) {
 
             Pane examPane = createExamPane(exam,++cnt);
             contentList.getChildren().add(examPane);
@@ -42,7 +61,23 @@ public class ExamController {
         }
         addAddButton(contentContainer);
     }
+    @FXML
+    private void onPrevPage() {
+        System.out.println(currentPage);
+        if (currentPage > 0) {
+            currentPage--;
+            updateContent();
+        }
+    }
 
+    @FXML
+    private void onNextPage() {
+        System.out.println(currentPage);
+        if ((currentPage + 1) * itemsPerPage < exams.size()) {
+            currentPage++;
+            updateContent();
+        }
+    }
     private Pane createExamPane(Exam exam,int cnt) {
         // Tạo Pane chính
         Pane mainPane = new Pane();
@@ -147,7 +182,6 @@ public class ExamController {
         });
 
         // Nút "Cập nhật"
-
         Button updateButton = new Button("Cập nhật");
         updateButton.setLayoutY(47.0);
         updateButton.setPrefWidth(145.0);
@@ -197,7 +231,7 @@ public class ExamController {
             try {
                 LiveController.code = exam.getCodeOfExam();
                 LiveController.examId = exam.getExamId();
-                JavaFxApplication.changeScene("/views/Live.fxml", "LiveStream");
+                JavaFxApplication.changeScene("/views/Live.fxml", "LiveStream - " + exam.getCodeOfExam());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -290,8 +324,12 @@ public class ExamController {
         content.getChildren().add(addButton);
     }
     private void goBack() {
+        Node prevButton = this.prevButton;
+        Node nextButton = this.nextButton;
         contentContainer.getChildren().clear();
-        contentList.getChildren().clear();
+
+        contentContainer.getChildren().addAll(prevButton, nextButton);
+
         contentContainer.getChildren().add(contentList);
         reloadContent();
     }

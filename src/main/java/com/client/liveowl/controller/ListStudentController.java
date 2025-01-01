@@ -148,7 +148,7 @@ public class ListStudentController {
                     rs.getStudentId(),
                     rs.getName()
             ));
-            cnt ++;
+            cnt++;
         }
         tableContent.setItems(data);
     }

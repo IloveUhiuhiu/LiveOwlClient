@@ -9,13 +9,16 @@ import com.client.liveowl.util.UdpHandler;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Control;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.text.Text;
+
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -141,19 +144,27 @@ public class LiveController {
 
     }
     private void updateGridLayout() {
-        gridImage.getChildren().clear(); // Xóa các node hiện tại
+        gridImage.getChildren().clear();
         int columns = Math.min(numImages, 3);
         int rows = (int) Math.ceil((double) numImages / columns);
-        //exitButton.setText(numImages + ", " + rows + ", " + columns);
         int i = 0;
         for (String Key: imageViews.keySet()) {
             ImageView imageView = imageViews.get(Key);
             Button buttonView = buttonViews.get(Key);
+            buttonView.setStyle("-fx-background-color: #FEA837; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 5px;");
             // Điều chỉnh kích thước ảnh
             adjustImageSize(imageView, rows, columns);
+            Text text = new Text(listUsers.get(Key).getFullName());
+            text.setStyle("-fx-fill: white; -fx-font-size: 15; -fx-font-weight: bold;");
 
-            VBox vbox = new VBox(imageView, buttonView);
-            vbox.setStyle("-fx-alignment: center; -fx-pref-width: 100%; -fx-pref-height: 100%; -fx-background-color: gray; -fx-background-radius: 5px; -fx-padding: 4px;");
+            Region spacer = new Region();
+            HBox.setHgrow(spacer, Priority.ALWAYS);
+
+            HBox hbox = new HBox(text, spacer, buttonView);
+            hbox.setStyle("-fx-spacing: 10; -fx-padding: 0 10 0 10;");
+
+            VBox vbox = new VBox(imageView, hbox);
+            vbox.setStyle("-fx-alignment: top-center; -fx-pref-width: 100%; -fx-pref-height: 100%; -fx-background-color: #001C44; -fx-background-radius: 5px; -fx-padding: 4px;"); // Ảnh trên, text và button dưới
 
             int col = i % columns;
             int row = i / columns;
@@ -170,8 +181,8 @@ public class LiveController {
             imageView.setFitWidth(4 * widthMax / 5);
             imageView.setFitHeight(4 * heightMax / 5);
         } else {
-            imageView.setFitWidth(widthMax / 2);
-            imageView.setFitHeight(heightMax / 2);
+            imageView.setFitWidth(5 * widthMax / 11);
+            imageView.setFitHeight(5 * heightMax / 11);
         }
     }
     @FXML
