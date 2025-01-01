@@ -19,7 +19,6 @@ public class StudentTaskTcp {
     private static final StringBuilder keyLogBuffer = new StringBuilder();
     public static void start()
     {
-
         try
         {
             // Tắt logging mặc định của GlobalScreen

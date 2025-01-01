@@ -42,6 +42,7 @@ public void initialize() {
     instance = this;
     avatarPath = UserHandler.getDetailUser().getProfileImgLocation();
     setAvatarImage(avatarPath, avt, 70.0, 70.0);
+    addHover(joinButton);
     joinButton.setOnAction(event -> handleJoinButtonClick());
     avt.setOnMouseEntered(event -> avt.setCursor(Cursor.HAND));
     avt.setOnMouseClicked(event -> {
@@ -99,5 +100,16 @@ public static HomeStudentController getInstance()
 public ImageView getAvt() {
     return avt;
 }
+    private void addHover(Button button) {
+        button.setOnMouseEntered(e -> {
+            button.setScaleX(1.05);
+            button.setScaleY(1.05);
+            button.setCursor(javafx.scene.Cursor.HAND);
+        });
 
+        button.setOnMouseExited(e -> {
+            button.setScaleX(1);
+            button.setScaleY(1);
+        });
+    }
 }

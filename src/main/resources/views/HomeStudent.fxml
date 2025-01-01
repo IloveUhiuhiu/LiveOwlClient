@@ -71,7 +71,7 @@
                   </ImageView>
                   <Pane layoutX="29.0" layoutY="375.0" opacity="0.61" prefHeight="125.0" prefWidth="453.0" style="-fx-background-color: white; -fx-background-radius: 10px;">
                      <children>
-                        <Button fx:id="joinButton" layoutX="307.0" layoutY="63.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="124.0" style="-fx-background-color: #192841;" text="Tham gia" textFill="WHITE">
+                        <Button fx:id="joinButton" layoutX="307.0" layoutY="63.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="124.0" style="-fx-background-color: #192841;" text="Tham gia" textFill="WHITE" defaultButton="true">
                            <font>
                               <Font name="System Bold" size="14.0" />
                            </font>

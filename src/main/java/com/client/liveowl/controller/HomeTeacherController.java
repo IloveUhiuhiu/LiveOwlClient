@@ -198,7 +198,7 @@ public class HomeTeacherController
     }
 
     public void startClock() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("h:mm a | EEEE, MMM d", Locale.ENGLISH);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("h:mm a | EEE, MMM d", Locale.ENGLISH);
 
         Timeline clock = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
             LocalDateTime now = LocalDateTime.now();
