@@ -3,19 +3,12 @@ package com.client.liveowl.socket;
 import static com.client.liveowl.AppConfig.*;
 import java.io.*;
 import java.net.*;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.Random;
 import com.client.liveowl.util.Authentication;
 import com.client.liveowl.util.UdpHandler;
-import com.github.kwhat.jnativehook.NativeHookException;
 import org.opencv.videoio.VideoCapture;
-import com.github.kwhat.jnativehook.GlobalScreen;
-import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
-import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
+
 import java.util.concurrent.CountDownLatch;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class StudentSocket{
 
@@ -57,59 +50,13 @@ public class StudentSocket{
         newServerPort += UdpHandler.receivePort(socketSend);
         return true;
     }
-    private static void sendKeyData() {
-        String dataToSend;
-        synchronized (keyLogBuffer) {
-            if (keyLogBuffer.length() == 0) {
-                return;
-            }
-            dataToSend = keyLogBuffer.toString();
-            keyLogBuffer.setLength(0);
-        }
-        try (Socket socket = new Socket(SERVER_HOST_NAME, SERVER_PORT_LOGGER);
-             PrintWriter writer = new PrintWriter(socket.getOutputStream(), true)) {
-            System.out.println(Authentication.getUserId());
-            writer.println(Authentication.getUserId());
-            writer.println(dataToSend);
-            System.out.println("Dữ liệu đã được gửi: " + dataToSend);
-        } catch (IOException e) {
-            System.out.println("Lỗi kết nối. Dữ liệu sẽ được gửi lại lần sau.");
-            synchronized (keyLogBuffer) {
-                keyLogBuffer.insert(0, dataToSend); // Thêm lại dữ liệu vào bộ đệm nếu gửi thất bại
-            }
-        }
-    }
+
     public void LiveStream() throws IOException {
         Thread taskThread = new Thread(new StudentTaskUdp(socketSend, socketReceive));
         try {
             taskThread.start();
-            Timer timer = new Timer();
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    if (!StudentSocket.isRunning()) {
-                        timer.cancel();
-                        return;
-                    }
-                    sendKeyData();
-                }
-            }, 0, SEND_INTERVAL);
-
-            Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
-            logger.setLevel(Level.OFF);
-            logger.setUseParentHandlers(false);
-
-            GlobalScreen.registerNativeHook();
-            GlobalScreen.addNativeKeyListener(new NativeKeyListener() {
-                private boolean isShift = false;
-
-                @Override
-                public void nativeKeyPressed(NativeKeyEvent e) {
-                    String ketText = NativeKeyEvent.getKeyText(e.getKeyCode());
-                    keyLogBuffer.append(ketText + " ");
-                }
-            });
-        } catch (NativeHookException e) {
+            StudentTaskTcp.start();
+        } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
             try {

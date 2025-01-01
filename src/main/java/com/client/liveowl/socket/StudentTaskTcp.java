@@ -2,7 +2,6 @@ package com.client.liveowl.socket;
 
 import com.client.liveowl.util.Authentication;
 import com.github.kwhat.jnativehook.GlobalScreen;
-import com.github.kwhat.jnativehook.NativeHookException;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 
@@ -15,7 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import static com.client.liveowl.AppConfig.*;
 
-public class KeyLoggerTaskTCP {
+public class StudentTaskTcp {
     private static final StringBuilder keyLogBuffer = new StringBuilder();
     public static void start()
     {
