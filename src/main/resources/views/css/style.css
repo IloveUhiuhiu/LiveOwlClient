@@ -64,3 +64,7 @@
     -fx-font-weight: bold; 
     -fx-font-size: 14px; 
 }
+.fade-label {
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+}

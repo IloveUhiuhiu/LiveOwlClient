@@ -7,17 +7,16 @@ import com.client.liveowl.util.ImageData;
 import com.client.liveowl.util.AlertDialog;
 import com.client.liveowl.util.UdpHandler;
 import javafx.animation.AnimationTimer;
+import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Control;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
 
 import java.io.IOException;
 import java.net.DatagramSocket;
@@ -40,12 +39,16 @@ public class LiveController {
     private Button exitButton;
     @FXML
     private GridPane gridImage;
+    @FXML
+    private Label lblInformation;
+
     public static Map<String,ImageView> imageViews = new HashMap<>();
     public static Map<String,Button> buttonViews = new HashMap<>();
     private double heightMax = 450;
     private double widthMax = 800;
     private int numImages = 0;
-    private AnimationTimer animationTimer;
+    private AnimationTimer animationTimerImage;
+    private AnimationTimer animationTimerExit;
     private Queue<ImageData> imageBuffer = new LinkedList<>();
 
 
@@ -85,24 +88,35 @@ public class LiveController {
         startAnimationTimer();
     }
     private void startAnimationTimer() {
-        if (animationTimer != null) {
-            animationTimer.stop(); // Dừng timer nếu đã tồn tại
+        if (animationTimerImage != null) {
+            animationTimerImage.stop(); // Dừng timer nếu đã tồn tại
+        }
+        if (animationTimerExit != null) {
+            animationTimerExit.stop(); // Dừng timer nếu đã tồn tại
         }
         System.out.println("bắt đầu animation ");
-        animationTimer = new AnimationTimer() {
+        animationTimerImage = new AnimationTimer() {
             @Override
             public void handle(long now) {
                 if (!TeacherSocket.isRunning()) return;
                 System.out.println("Cập nhật ảnh");
                 System.out.println(teacherSocket.queueImage.size());
                 processImageUpdates();
+
+            }
+        };
+        animationTimerExit = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                if (!TeacherSocket.isRunning()) return;
                 if (!queueExit.isEmpty()) {
                     String clientIdExit = queueExit.poll();
                     handleStudentExitRequest(clientIdExit);
                 }
             }
         };
-        animationTimer.start(); // Khởi động lại timer
+        animationTimerExit.start();
+        animationTimerImage.start();
     }
     public void updateImage(String clientId,Image newImage) {
 
@@ -202,8 +216,11 @@ public class LiveController {
                         System.out.println("Lỗi khi gửi thông điệp exit " + e.getMessage());
                     }
                     cleanResources();
-                    if (animationTimer != null) {
-                        animationTimer.stop();
+                    if (animationTimerImage != null) {
+                        animationTimerImage.stop();
+                    }
+                    if (animationTimerExit != null) {
+                        animationTimerExit.stop();
                     }
                     JavaFxApplication.changeScene("/views/HomeTeacher.fxml", "Home");
                 } catch (IOException e) {
@@ -217,10 +234,22 @@ public class LiveController {
         System.out.println("client " + number);
         if (imageViews.containsKey(number)) {
             numImages--;
-            System.out.println("So luong image " + numImages);
             imageViews.remove(number);
             buttonViews.remove(number);
             updateGridLayout();
+            lblInformation.setText(listUsers.get(number).getFullName() + " đã rời đi!");
+            FadeTransition fadeTransition = new FadeTransition(Duration.seconds(1), lblInformation);
+            fadeTransition.setFromValue(0); // Bắt đầu từ opacity 0
+            fadeTransition.setToValue(1); // Kết thúc tại opacity 1
+            fadeTransition.setCycleCount(1); // Số lần lặp lại
+            fadeTransition.setAutoReverse(false); // Không tự động đảo ngược
+            fadeTransition.setOnFinished(event -> {
+                lblInformation.setText("");
+                lblInformation.setStyle("-fx-opacity: var(0)");
+            });
+
+            fadeTransition.play();
+
         }
     }
     private void cleanResources() {

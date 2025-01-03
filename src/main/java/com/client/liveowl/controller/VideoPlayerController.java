@@ -29,7 +29,7 @@ public class VideoPlayerController {
     private boolean isPlaying = false;
     private AnimationTimer animationTimer;
     private ProcessPlayVideo watchedVideo;
-    private static final int TARGET_FPS = 10; // Đặt FPS mong muốn
+    private static final int TARGET_FPS = 30; // Đặt FPS mong muốn
     private static final long NANOSECONDS_PER_SECOND = 1_000_000_000L;
     private long lastUpdate = 0;
     @FXML
