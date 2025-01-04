@@ -17,9 +17,11 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.regex.Pattern;
 
+import static com.client.liveowl.AppConfig.BASE_URI;
+
 public class SignUpController {
 
-private static final String SIGNUP_URL = "http://localhost:9090/users/signup";
+private static final String SIGNUP_URL = BASE_URI + "/users/signup";
 private static final String EMAIL_REGEX = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,}$";
 private static final String PASSWORD_REGEX = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$";
 

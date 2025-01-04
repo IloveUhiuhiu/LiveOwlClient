@@ -4,7 +4,7 @@ public class AppConfig {
     public static int MAX_DATAGRAM_PACKET_LENGTH = 1500;
     public static int SERVER_PORT = 9000;
     public static int VIDEO_SERVER_PORT = 1604;
-    public static String SERVER_HOST_NAME = "localhost";
+    public static String SERVER_HOST_NAME = "192.168.1.16";
     public static int STUDENT_PORT = 8000;
     public static int TEACHER_PORT = 6000;
     public static final int SEND_INTERVAL = 7000;

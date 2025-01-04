@@ -195,6 +195,7 @@ public void xuly(String input) throws AWTException {
                         robot.keyRelease(KeyEvent.VK_SHIFT);
                         i++;
                         continue;
+
                     case "Semicolon":
                         robot.keyPress(KeyEvent.VK_SHIFT);
                         robot.keyPress(KeyEvent.VK_SEMICOLON);
@@ -244,6 +245,7 @@ public void xuly(String input) throws AWTException {
                         robot.keyRelease(KeyEvent.VK_SHIFT);
                         i += 2;
                         continue;
+
                     default:
                         robot.keyPress(KeyEvent.VK_SHIFT);
                         robot.keyPress(nextElement.toUpperCase().charAt(0));
@@ -276,6 +278,10 @@ public void xuly(String input) throws AWTException {
             case "Comma":
                 robot.keyPress(KeyEvent.VK_COMMA);
                 robot.keyRelease(KeyEvent.VK_COMMA);
+                break;
+            case "Tab":
+                robot.keyPress(KeyEvent.VK_TAB);
+                robot.keyRelease(KeyEvent.VK_TAB);
                 break;
             case "Period":
                 robot.keyPress(KeyEvent.VK_PERIOD);

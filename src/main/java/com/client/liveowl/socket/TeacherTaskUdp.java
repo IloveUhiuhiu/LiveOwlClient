@@ -5,9 +5,7 @@ import com.client.liveowl.util.ImageData;
 import com.client.liveowl.util.UdpHandler;
 import com.client.liveowl.util.UserHandler;
 import javafx.scene.image.Image;
-import java.io.ByteArrayInputStream;
 import java.net.DatagramSocket;
-import java.net.SocketException;
 import static com.client.liveowl.AppConfig.MAX_DATAGRAM_PACKET_LENGTH;
 
 class TeacherTaskUdp extends Thread {
@@ -61,7 +59,7 @@ class TeacherTaskUdp extends Thread {
         byte[] imageBytes = new byte[lengthOfImage];
         String key = imageId + ":" + clientId;
         TeacherSocket.imageBuffer.put(key, imageBytes);
-        System.out.println("Nhận độ dài: " + lengthOfImage);
+        //System.out.println("Nhận độ dài: " + lengthOfImage);
     }
 
     private void handleImageDataPacket(byte[] message) {
@@ -75,30 +73,50 @@ class TeacherTaskUdp extends Thread {
         if (TeacherSocket.imageBuffer.containsKey(key)) {
             byte[] imageBytes = TeacherSocket.imageBuffer.get(key);
             int lengthOfImage = imageBytes.length;
-
             if (destinationIndex >= 0 && destinationIndex < lengthOfImage) {
                 int bytesToCopy = Math.min(MAX_DATAGRAM_PACKET_LENGTH - 12, lengthOfImage - destinationIndex);
-                System.arraycopy(message, 12, imageBytes, destinationIndex, bytesToCopy);
-                if (isLastPacket) {
-                    handleCompleteImage(key, clientId, imageBytes);
+                if (bytesToCopy > 0) {
+                    System.arraycopy(message, 12, imageBytes, destinationIndex, bytesToCopy);
+                    if (isLastPacket) {
+                        handleCompleteImage(key, clientId, imageBytes);
+                    }
+                } else {
+                    System.out.println("Error: bytesToCopy invalid (" + bytesToCopy + ")");
                 }
             } else {
-                System.out.println("Error destinationIndex: " + destinationIndex + ", lengthOfImage: " + lengthOfImage);
+                System.out.println("Error destinationIndex (" + destinationIndex + ") is out of bounds. Image length: " + lengthOfImage);
             }
         } else {
-            System.out.println("Error " + key + " is not in buffer!");
+            System.out.println("Error: key " + key + " is not found in the buffer!");
         }
+
     }
 
     private void handleCompleteImage(String key, String clientId, byte[] imageBytes) {
-        ++TeacherSocket.imageAtual;
-        System.out.println("Số ảnh nhận thực sự: " + TeacherSocket.imageAtual);
+        //++TeacherSocket.imageAtual;
+        //System.out.println("Số ảnh nhận thực sự: " + TeacherSocket.imageAtual);
         if (imageBytes != null && imageBytes.length > 0) {
             TeacherSocket.imageCount++;
             System.out.println("Hiển thị ảnh thứ " + TeacherSocket.imageCount + ", " + imageBytes.length + ", " + TeacherSocket.queueImage.size());
             try {
-                Image newImage = new Image(new ByteArrayInputStream(imageBytes));
-                TeacherSocket.queueImage.add(new ImageData(clientId, newImage));
+                try {
+                    Image newImage = ImageData.canConvertToImage(imageBytes);
+                    if (newImage != null) {
+                        TeacherSocket.lastImage.put(clientId, newImage);
+                    } else {
+                        System.out.println("ẹc");
+                        Image lastImage = TeacherSocket.lastImage.get(clientId);
+                        if (lastImage != null) {
+                            newImage = lastImage;
+                        } else {
+                            return;
+                        }
+                    }
+                    TeacherSocket.queueImage.add(new ImageData(clientId, newImage));
+                } catch (Exception e) {
+                    System.out.println("Lỗi khi tạo Image: " + e.getMessage());
+                }
+
             } catch (Exception e) {
                 System.err.println("Lỗi khi tạo hình ảnh: " + e.getMessage());
             }
@@ -125,15 +143,15 @@ class TeacherTaskUdp extends Thread {
         try {
             System.out.println("Đang đóng socket");
             TeacherSocket.setRunning(false);
+            if (TeacherSocket.imageBuffer != null) TeacherSocket.imageBuffer.clear();
+            if (TeacherSocket.queueExit != null) TeacherSocket.queueExit.clear();
+            if (TeacherSocket.queueImage != null) TeacherSocket.queueImage.clear();
             if (socketSend != null) {
                 socketSend.close();
             }
             if (socketRecieve != null) {
                 socketRecieve.close();
             }
-            if (TeacherSocket.imageBuffer != null) TeacherSocket.imageBuffer.clear();
-            if (TeacherSocket.queueExit != null) TeacherSocket.queueExit.clear();
-            if (TeacherSocket.queueImage != null) TeacherSocket.queueImage.clear();
             System.out.println("Đóng TeacherTaskUdp thành công");
         } catch (Exception e) {
             System.err.println("Lỗi khi đóng socket: " + e.getMessage());

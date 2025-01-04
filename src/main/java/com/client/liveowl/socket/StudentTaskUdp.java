@@ -27,25 +27,26 @@ class StudentTaskUdp extends Thread {
     @Override
     public void run() {
         try {
-            Thread thread = new Thread(() -> {
+            Thread listenerThread = new Thread(() -> {
                 try {
                     while (StudentSocket.isRunning()) {
                         String request = UdpHandler.receiveMsg(socketRecieve);
                         System.out.println("msg: " + request);
-                        if (request.equals("camera")) {
-                            if (isCamera == 1) isCamera = 0;
-                            else isCamera = 1;
-                        }
-                        else if (request.equals("exit")) {
-                            System.out.println("Đã exit");
-                            cleanupResources();
+                        switch (request) {
+                            case "camera":
+                                isCamera = (isCamera == 1) ? 0 : 1;
+                                break;
+                            case "exit":
+                                System.out.println("Đã exit");
+                                cleanupResources();
+                                break;
                         }
                     }
                 } catch (Exception e) {
                     System.out.println("Error in camera or exit: " + e.getMessage());
                 }
             });
-            thread.start();
+            listenerThread.start();
             robot = new Robot();
             captureImages(socketSend, camera);
         } catch (Exception e) {
@@ -146,9 +147,9 @@ class StudentTaskUdp extends Thread {
     private void cleanupResources() {
         try {
             StudentSocket.setRunning(false);
+            if (camera != null) camera.release();
             if (socketSend != null) socketSend.close();
             if (socketRecieve != null) socketRecieve.close();
-            if (camera != null) camera.release();
 
         } catch (Exception e) {
             System.err.println("Error closing resources: " + e.getMessage());

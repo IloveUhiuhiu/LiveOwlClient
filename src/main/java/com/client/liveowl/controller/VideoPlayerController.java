@@ -48,13 +48,13 @@ public class VideoPlayerController {
         animationTimer = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                System.out.println("ProcessPlayVideo.isLivestream " + ProcessPlayVideo.isLivestream());
+                //System.out.println("ProcessPlayVideo.isLivestream " + ProcessPlayVideo.isLivestream());
 
                 if (!ProcessPlayVideo.isLivestream()) {
                     animationTimer.stop();
                 }
                 if (now - lastUpdate >= NANOSECONDS_PER_SECOND / TARGET_FPS) {
-                    System.out.println("watchedVideo.packetBuffer.size " + watchedVideo.packetBuffer.size());
+                    //System.out.println("watchedVideo.packetBuffer.size " + watchedVideo.packetBuffer.size());
                     if ( watchedVideo != null  && !watchedVideo.packetBuffer.isEmpty()) {
                         if (isFirst || isPlaying) {
                             processImageUpdates();
@@ -79,14 +79,14 @@ public class VideoPlayerController {
     }
     private void processImageUpdates() {
         Image imageData = watchedVideo.packetBuffer.poll();
-        System.out.println("Set Image: " + imageData);
+        //System.out.println("Set Image: " + imageData);
         Platform.runLater(() -> video.setImage(imageData));
 
     }
     public void sendNotificationToServer(String request)  {
         try {
             DatagramSocket socketPause = new DatagramSocket(8765);
-            System.out.println("Gui pause" + ProcessPlayVideo.serverPortPause);
+            //System.out.println("Gui pause" + ProcessPlayVideo.serverPortPause);
             UdpHandler.sendMsg(socketPause, request, InetAddress.getByName(SERVER_HOST_NAME), ProcessPlayVideo.serverPortPause);
             socketPause.close();
         } catch (Exception e) {

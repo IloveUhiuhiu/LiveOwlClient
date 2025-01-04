@@ -1,6 +1,8 @@
 package com.client.liveowl.util;
 import javafx.scene.image.Image;
-import org.opencv.core.Mat;
+import org.opencv.core.*;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
@@ -8,7 +10,11 @@ import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class ImageData {
 
@@ -45,8 +51,8 @@ public static BufferedImage resizeImage(BufferedImage originalImage, int newWidt
     g.dispose();
     return resizedImage;
 }
+
 public static byte[] handleImage(BufferedImage originalImage) {
-    //System.out.println(originalImage.getWidth() + ", " + originalImage.getHeight() + ", " + originalImage.getWidth()/ originalImage.getHeight());
     BufferedImage image = ImageData.resizeImage(originalImage, 768, 432);
     try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
         float quality = 0.8f;
@@ -62,4 +68,18 @@ public static byte[] handleImage(BufferedImage originalImage) {
         throw new RuntimeException("Lỗi xử lý ảnh: " + e.getMessage());
     }
 }
+public static Image canConvertToImage(byte[] imageBytes) {
+    try {
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(imageBytes);
+        Image image = new Image(byteArrayInputStream);
+        if (image.getWidth() > 0 && image.getHeight() > 0) {
+            return image;
+        }
+    } catch (Exception e) {
+
+    }
+    return null;
+}
+
+
 }

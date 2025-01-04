@@ -2,6 +2,8 @@ package com.client.liveowl.socket;
 import com.client.liveowl.model.User;
 import com.client.liveowl.util.ImageData;
 import com.client.liveowl.util.UdpHandler;
+import javafx.scene.image.Image;
+
 import java.io.IOException;
 import java.net.*;
 import java.util.*;
@@ -14,6 +16,7 @@ import static com.client.liveowl.AppConfig.*;
 public class TeacherSocket{
     public static Random rand = new Random();
     public static Map<String, byte[]> imageBuffer = new HashMap<>();
+    public static Map<String, Image> lastImage = new HashMap<>();
     public static int imageCount = 0;
     public static int imageAtual = 0;
     public static int newserverPort;
@@ -21,6 +24,7 @@ public class TeacherSocket{
     public DatagramSocket socketRecieve;
     public static ConcurrentLinkedQueue<ImageData> queueImage = new ConcurrentLinkedQueue<>();
     public static ConcurrentLinkedQueue<String> queueExit = new ConcurrentLinkedQueue<>();
+
 
     public static Map<String, User> listUsers = new ConcurrentHashMap<>();
     public static volatile boolean isRunning = true;
